@@ -29,7 +29,7 @@ const RepositoryStatus: React.FC<RepositoryStatusProps> = ({
         className="text-sm flex items-center gap-2"
       >
         <Cog className="h-4 w-4" />
-        Configure FlyFrog
+        Configure
       </Button>
     );
   }
@@ -52,15 +52,27 @@ const RepositoryStatus: React.FC<RepositoryStatusProps> = ({
                 <Progress value={coveragePercentage} className="h-1.5" />
               </div>
             )}
-            <Button
-              variant={isFullyConfigured ? "outline" : "default"}
-              size="sm"
-              onClick={onConfigure}
-              className="ml-2"
-            >
-              <Cog className="h-4 w-4 mr-2" />
-              {isFullyConfigured ? "Manage" : "Configure"}
-            </Button>
+            {isFullyConfigured ? (
+              <Button
+                variant="outline"
+                size="icon"
+                onClick={onConfigure}
+                className="h-8 w-8"
+                title="Manage Configuration"
+              >
+                <Cog className="h-4 w-4" />
+              </Button>
+            ) : (
+              <Button
+                variant="default"
+                size="sm"
+                onClick={onConfigure}
+                className="ml-2"
+              >
+                <Cog className="h-4 w-4 mr-2" />
+                Configure
+              </Button>
+            )}
           </div>
         </TooltipTrigger>
         <TooltipContent>

@@ -21,23 +21,24 @@ const RepositoryItem: React.FC<RepositoryItemProps> = ({
   onConfigureClick
 }) => {
   const [isOpen, setIsOpen] = useState(false);
-  const hasWorkflows = repository.workflows && repository.workflows.length > 0;
+  const [repoState, setRepoState] = useState(repository);
+  const hasWorkflows = repoState.workflows && repoState.workflows.length > 0;
   const navigate = useNavigate();
   
   // Calculate package type coverage
   const calculatePackageTypeCoverage = () => {
-    if (!repository.packageTypeStatus) return 0;
+    if (!repoState.packageTypeStatus) return 0;
     
-    const total = Object.keys(repository.packageTypeStatus).length;
+    const total = Object.keys(repoState.packageTypeStatus).length;
     if (total === 0) return 0;
     
-    const connected = Object.values(repository.packageTypeStatus).filter(Boolean).length;
+    const connected = Object.values(repoState.packageTypeStatus).filter(Boolean).length;
     return Math.round((connected / total) * 100);
   };
 
   const coveragePercentage = calculatePackageTypeCoverage();
-  const missingPackageTypes = repository.packageTypeStatus 
-    ? Object.entries(repository.packageTypeStatus)
+  const missingPackageTypes = repoState.packageTypeStatus 
+    ? Object.entries(repoState.packageTypeStatus)
         .filter(([_, isConnected]) => !isConnected)
         .map(([type]) => type)
     : [];
@@ -46,7 +47,26 @@ const RepositoryItem: React.FC<RepositoryItemProps> = ({
 
   const handleConfigure = (e: React.MouseEvent) => {
     e.stopPropagation();
-    navigate('/ci-configuration', { state: { repository } });
+    navigate('/ci-configuration', { state: { repository: repoState } });
+  };
+
+  const handleRemoveMissingPackage = (type: string) => {
+    if (!repoState.packageTypeStatus) return;
+    
+    const updatedPackageTypeStatus = { ...repoState.packageTypeStatus };
+    delete updatedPackageTypeStatus[type];
+    
+    const updatedRepo = {
+      ...repoState,
+      packageTypeStatus: updatedPackageTypeStatus
+    };
+    
+    // Re-calculate if this change makes the repo fully configured
+    const newTotal = Object.keys(updatedPackageTypeStatus).length;
+    const newConnected = Object.values(updatedPackageTypeStatus).filter(Boolean).length;
+    const newCoverage = newTotal > 0 ? Math.round((newConnected / newTotal) * 100) : 100;
+    
+    setRepoState(updatedRepo);
   };
 
   return (
@@ -57,10 +77,10 @@ const RepositoryItem: React.FC<RepositoryItemProps> = ({
     >
       <div 
         className="grid grid-cols-12 gap-2 px-6 py-4 hover:bg-muted/30 transition-colors cursor-pointer"
-        onClick={() => onClick(repository)}
+        onClick={() => onClick(repoState)}
       >
         <div className="col-span-6 flex items-center gap-2">
-          {hasWorkflows && repository.isConfigured && (
+          {hasWorkflows && repoState.isConfigured && (
             <CollapsibleTrigger 
               onClick={(e) => e.stopPropagation()}
               className="p-1 hover:bg-secondary rounded-sm mr-1"
@@ -73,30 +93,31 @@ const RepositoryItem: React.FC<RepositoryItemProps> = ({
             </CollapsibleTrigger>
           )}
           
-          {(!hasWorkflows || !repository.isConfigured) && <div className="w-6" />}
+          {(!hasWorkflows || !repoState.isConfigured) && <div className="w-6" />}
           
           <div className="flex flex-col">
-            <span className="font-medium truncate">{repository.name}</span>
-            <span className="text-xs text-muted-foreground truncate">{repository.orgName}</span>
+            <span className="font-medium truncate">{repoState.name}</span>
+            <span className="text-xs text-muted-foreground truncate">{repoState.orgName}</span>
           </div>
         </div>
         
         <div className="col-span-2 hidden md:flex justify-center items-center">
-          {repository.isConfigured && repository.packageTypes && repository.packageTypes.length > 0 ? (
+          {repoState.isConfigured && repoState.packageTypes && repoState.packageTypes.length > 0 ? (
             <PackageTypeBadges 
-              packageTypes={repository.packageTypes}
+              packageTypes={repoState.packageTypes}
               missingPackageTypes={missingPackageTypes}
+              onRemoveMissingPackage={handleRemoveMissingPackage}
             />
           ) : (
-            repository.isConfigured ? 
+            repoState.isConfigured ? 
             <span className="text-xs text-muted-foreground">-</span> :
             <span className="text-xs text-muted-foreground">Not configured yet</span>
           )}
         </div>
         
         <div className="col-span-2 hidden md:flex justify-center items-center">
-          {repository.isConfigured ? (
-            <span className="text-sm text-muted-foreground">{repository.lastUpdated}</span>
+          {repoState.isConfigured ? (
+            <span className="text-sm text-muted-foreground">{repoState.lastUpdated}</span>
           ) : (
             <span className="text-xs text-muted-foreground">-</span>
           )}
@@ -104,7 +125,7 @@ const RepositoryItem: React.FC<RepositoryItemProps> = ({
         
         <div className="col-span-2 md:col-span-2 flex justify-end items-center">
           <RepositoryStatus
-            isConfigured={repository.isConfigured}
+            isConfigured={repoState.isConfigured}
             isFullyConfigured={isFullyConfigured}
             coveragePercentage={coveragePercentage}
             missingPackageTypes={missingPackageTypes}
@@ -113,9 +134,9 @@ const RepositoryItem: React.FC<RepositoryItemProps> = ({
         </div>
       </div>
       
-      {hasWorkflows && repository.isConfigured && (
+      {hasWorkflows && repoState.isConfigured && (
         <CollapsibleContent className="bg-muted/30">
-          {repository.workflows?.map((workflow) => (
+          {repoState.workflows?.map((workflow) => (
             <WorkflowItem key={workflow.id} workflow={workflow} />
           ))}
         </CollapsibleContent>
