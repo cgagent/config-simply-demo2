@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Repository } from '@/types/repository';
 import { ChevronDown, ChevronRight, Cog } from 'lucide-react';
@@ -25,7 +24,6 @@ const RepositoryItem: React.FC<RepositoryItemProps> = ({
   const hasWorkflows = repoState.workflows && repoState.workflows.length > 0;
   const navigate = useNavigate();
   
-  // Calculate package type coverage
   const calculatePackageTypeCoverage = () => {
     if (!repoState.packageTypeStatus) return 0;
     
@@ -61,7 +59,6 @@ const RepositoryItem: React.FC<RepositoryItemProps> = ({
       packageTypeStatus: updatedPackageTypeStatus
     };
     
-    // Re-calculate if this change makes the repo fully configured
     const newTotal = Object.keys(updatedPackageTypeStatus).length;
     const newConnected = Object.values(updatedPackageTypeStatus).filter(Boolean).length;
     const newCoverage = newTotal > 0 ? Math.round((newConnected / newTotal) * 100) : 100;
@@ -109,9 +106,7 @@ const RepositoryItem: React.FC<RepositoryItemProps> = ({
               onRemoveMissingPackage={handleRemoveMissingPackage}
             />
           ) : (
-            repoState.isConfigured ? 
-            <span className="text-xs text-muted-foreground">-</span> :
-            <span className="text-xs text-muted-foreground">Not configured yet</span>
+            <span className="text-xs text-muted-foreground">-</span>
           )}
         </div>
         
