@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Repository } from '@/types/repository';
 import { ChevronDown, ChevronRight, Cog } from 'lucide-react';
@@ -128,26 +129,14 @@ const RepositoryItem: React.FC<RepositoryItemProps> = ({
         </div>
 
         <div className="col-span-1 md:flex justify-center items-center hidden">
-          {isFullyConfigured ? (
-            <Button
-              variant="outline"
-              size="icon"
-              onClick={handleConfigure}
-              className="h-8 w-8"
-              title="Manage Configuration"
-            >
-              <Cog className="h-4 w-4" />
-            </Button>
-          ) : (
-            <Button
-              variant="default"
-              size="sm"
-              onClick={handleConfigure}
-            >
-              <Cog className="h-4 w-4 mr-2" />
-              Set
-            </Button>
-          )}
+          <Button
+            variant="default"
+            size="sm"
+            onClick={handleConfigure}
+          >
+            <Cog className="h-4 w-4 mr-2" />
+            Set
+          </Button>
         </div>
       </div>
       
