@@ -3,12 +3,7 @@ import React from 'react';
 import { cn } from '@/lib/utils';
 import { Bot, User } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
-
-export interface Message {
-  id: string;
-  role: 'user' | 'bot';
-  content: string;
-}
+import { Message } from './constants';
 
 interface ChatMessageProps {
   message: Message;
