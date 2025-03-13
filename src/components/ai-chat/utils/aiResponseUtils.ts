@@ -78,7 +78,7 @@ Severity: High
 
    • [Homepage](https://request.js.org/)`;
   }
-  else if (lowerQuery.includes('blocked') || (lowerQuery.includes('block') && lowerQuery.includes('package'))) {
+  else if (lowerQuery.includes('blocked') || lowerQuery.includes('block package') || lowerQuery.includes('packages were blocked') || lowerQuery.includes('which packages were blocked')) {
     return `In the past 2 weeks, we blocked the following malicious npm packages:
 
 evil-package-101: Attempted to steal user credentials.
