@@ -8,12 +8,9 @@ const Home: React.FC = () => {
     <div className="min-h-screen flex flex-col bg-background">
       <NavBar />
       
-      <main className="flex-1 w-full mx-auto py-8 flex flex-col items-center justify-center">
-        <div className="max-w-3xl w-full mx-auto px-4 sm:px-6 flex flex-col">
-          <h1 className="text-3xl font-bold text-center mb-8">What do you want to know?</h1>
-          
-          {/* AI Chat container */}
-          <div className="flex-1 flex flex-col border rounded-xl overflow-hidden shadow-sm bg-background">
+      <main className="flex-1 w-full mx-auto flex flex-col">
+        <div className="max-w-3xl w-full mx-auto px-4 sm:px-6 flex flex-col h-[calc(100vh-64px)]">
+          <div className="flex-1 flex flex-col border-0 overflow-hidden bg-background">
             <div className="flex-1 flex flex-col p-6 overflow-hidden">
               <AIChat />
             </div>
