@@ -1,8 +1,9 @@
+
 import React, { useState } from 'react';
-import NavBar from '@/components/NavBar';
 import RepositoryHeader from '@/components/RepositoryHeader';
 import RepositoryList from '@/components/RepositoryList';
-import { Repository, commonPackageTypes } from '@/types/repository';
+import StatusSummary from '@/components/StatusSummary';
+import { Repository } from '@/types/repository';
 
 interface Organization {
   id: string;
@@ -97,29 +98,34 @@ const RepositoriesPage: React.FC = () => {
     setSelectedRepo(repo);
   };
 
+  // Calculate summary statistics
+  const totalRepos = repositories.length;
+  const configuredRepos = repositories.filter(repo => repo.isConfigured).length;
+
   return (
-    <div className="min-h-screen flex flex-col bg-background">
-      <NavBar />
-      
-      <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 py-8">
-        <div className="animate-fadeIn">
-          <RepositoryHeader 
+    <div className="p-6">
+      <div className="animate-fadeIn">
+        <RepositoryHeader 
+          organizations={organizations}
+          selectedOrg={selectedOrg}
+          setSelectedOrg={setSelectedOrg}
+        />
+        
+        <div className="flex flex-col gap-4 mt-4">
+          <StatusSummary 
+            totalRepos={totalRepos}
+            configuredRepos={configuredRepos}
+          />
+          
+          <RepositoryList 
+            repositories={repositories}
+            onConfigureRepository={handleConfigureRepository}
             organizations={organizations}
             selectedOrg={selectedOrg}
             setSelectedOrg={setSelectedOrg}
           />
-          
-          <div className="mt-6">
-            <RepositoryList 
-              repositories={repositories}
-              onConfigureRepository={handleConfigureRepository}
-              organizations={organizations}
-              selectedOrg={selectedOrg}
-              setSelectedOrg={setSelectedOrg}
-            />
-          </div>
         </div>
-      </main>
+      </div>
     </div>
   );
 };
