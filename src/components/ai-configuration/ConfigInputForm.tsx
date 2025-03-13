@@ -31,7 +31,7 @@ export const ConfigInputForm: React.FC<ConfigInputFormProps> = ({
           value={input}
           onChange={(e) => setInput(e.target.value)}
           onKeyDown={handleKeyDown}
-          placeholder="Ask about CI configuration..."
+          placeholder=""
           disabled={isProcessing}
           className="flex-1"
         />
