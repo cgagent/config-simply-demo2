@@ -22,7 +22,7 @@ export const SUGGESTED_QUERIES = [
   },
   {
     label: "abc",
-    query: "Which packages were blocked in the last 2 weeks?"
+    query: "abc"
   }
 ];
 
@@ -33,3 +33,4 @@ export interface Message {
   role: 'user' | 'bot';
   content: string;
 }
+

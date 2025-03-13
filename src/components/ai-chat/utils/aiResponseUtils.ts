@@ -80,7 +80,6 @@ Severity: High
   }
   else if (lowerQuery.includes('blocked') || 
            lowerQuery.includes('which packages were blocked') ||
-           (lowerQuery.includes('packages') && lowerQuery.includes('blocked') && lowerQuery.includes('weeks')) ||
            lowerQuery === 'abc') {
     return `In the past 2 weeks, we blocked the following malicious npm packages:
 
