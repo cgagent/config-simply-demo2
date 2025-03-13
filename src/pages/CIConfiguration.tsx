@@ -122,7 +122,7 @@ ${selectedPackageTypes.includes('docker') ?
               <ChevronLeft className="h-4 w-4 mr-1" />
               Back to repositories
             </Button>
-            <h1 className="text-2xl font-bold">
+            <h1 className="text-2xl font-bold text-foreground">
               Configure CI for {repository?.name || 'Repository'}
             </h1>
           </div>
@@ -140,41 +140,41 @@ ${selectedPackageTypes.includes('docker') ?
             </TabsList>
             
             <TabsContent value="manual" className="space-y-8">
-              <div className="bg-white p-6 rounded-lg border border-border shadow-sm">
-                <h2 className="text-xl font-semibold mb-2">Step 1: Select CI Server</h2>
+              <div className="bg-card rounded-lg border border-border shadow-sm p-6 text-card-foreground">
+                <h2 className="text-xl font-semibold mb-2 text-foreground">Step 1: Select CI Server</h2>
                 <p className="text-muted-foreground mb-4">
                   Choose the continuous integration server where your workflows run
                 </p>
                 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
                   <div 
-                    className={`flex flex-col items-center border rounded-lg p-6 cursor-pointer hover:bg-muted transition-colors ${ciServer === 'github' ? 'border-primary ring-2 ring-primary/20' : 'border-border'}`}
+                    className={`flex flex-col items-center border rounded-lg p-6 cursor-pointer hover:bg-accent transition-colors ${ciServer === 'github' ? 'border-primary ring-2 ring-primary/20' : 'border-border'}`}
                     onClick={() => handleCIServerSelect('github')}
                   >
-                    <Github className="h-12 w-12 mb-4" />
-                    <h3 className="font-medium">GitHub Actions</h3>
+                    <Github className="h-12 w-12 mb-4 text-foreground" />
+                    <h3 className="font-medium text-foreground">GitHub Actions</h3>
                     <p className="text-sm text-muted-foreground text-center mt-2">
                       Configure FlyFrog with GitHub Actions workflows
                     </p>
                   </div>
                   
                   <div 
-                    className={`flex flex-col items-center border rounded-lg p-6 cursor-pointer hover:bg-muted transition-colors ${ciServer === 'circle' ? 'border-primary ring-2 ring-primary/20' : 'border-border'}`}
+                    className={`flex flex-col items-center border rounded-lg p-6 cursor-pointer hover:bg-accent transition-colors ${ciServer === 'circle' ? 'border-primary ring-2 ring-primary/20' : 'border-border'}`}
                     onClick={() => handleCIServerSelect('circle')}
                   >
-                    <CircleIcon className="h-12 w-12 mb-4" />
-                    <h3 className="font-medium">Circle CI</h3>
+                    <CircleIcon className="h-12 w-12 mb-4 text-foreground" />
+                    <h3 className="font-medium text-foreground">Circle CI</h3>
                     <p className="text-sm text-muted-foreground text-center mt-2">
                       Configure FlyFrog with Circle CI pipelines
                     </p>
                   </div>
                   
                   <div 
-                    className={`flex flex-col items-center border rounded-lg p-6 cursor-pointer hover:bg-muted transition-colors ${ciServer === 'generic' ? 'border-primary ring-2 ring-primary/20' : 'border-border'}`}
+                    className={`flex flex-col items-center border rounded-lg p-6 cursor-pointer hover:bg-accent transition-colors ${ciServer === 'generic' ? 'border-primary ring-2 ring-primary/20' : 'border-border'}`}
                     onClick={() => handleCIServerSelect('generic')}
                   >
-                    <Code className="h-12 w-12 mb-4" />
-                    <h3 className="font-medium">Generic CI</h3>
+                    <Code className="h-12 w-12 mb-4 text-foreground" />
+                    <h3 className="font-medium text-foreground">Generic CI</h3>
                     <p className="text-sm text-muted-foreground text-center mt-2">
                       Configure FlyFrog with any other CI system
                     </p>
@@ -189,7 +189,7 @@ ${selectedPackageTypes.includes('docker') ?
                 >
                   <CollapsibleContent className="space-y-8">
                     <div>
-                      <h2 className="text-xl font-semibold mb-2">Step 2: Select Package Managers</h2>
+                      <h2 className="text-xl font-semibold mb-2 text-foreground">Step 2: Select Package Managers</h2>
                       <p className="text-muted-foreground mb-4">
                         Choose the package managers that your project uses
                       </p>
@@ -198,7 +198,7 @@ ${selectedPackageTypes.includes('docker') ?
                         {commonPackageTypes.map((type) => (
                           <div 
                             key={type}
-                            className={`border rounded-lg p-4 cursor-pointer hover:bg-muted transition-colors ${
+                            className={`border rounded-lg p-4 cursor-pointer hover:bg-accent transition-colors ${
                               selectedPackageTypes.includes(type) 
                                 ? 'border-primary ring-2 ring-primary/20 bg-primary/5' 
                                 : 'border-border'
@@ -206,8 +206,8 @@ ${selectedPackageTypes.includes('docker') ?
                             onClick={() => togglePackageType(type)}
                           >
                             <div className="flex items-center">
-                              <Package className="h-5 w-5 mr-2" />
-                              <span className="font-medium capitalize">{type}</span>
+                              <Package className="h-5 w-5 mr-2 text-foreground" />
+                              <span className="font-medium capitalize text-foreground">{type}</span>
                               {selectedPackageTypes.includes(type) && (
                                 <Check className="h-4 w-4 ml-auto text-primary" />
                               )}
@@ -218,7 +218,7 @@ ${selectedPackageTypes.includes('docker') ?
                       
                       {selectedPackageTypes.length > 0 && (
                         <div className="mb-6">
-                          <h3 className="text-sm font-medium mb-2">Selected Package Managers:</h3>
+                          <h3 className="text-sm font-medium mb-2 text-foreground">Selected Package Managers:</h3>
                           <div className="flex flex-wrap gap-2">
                             {selectedPackageTypes.map((type) => (
                               <Badge key={type} variant="secondary" className="flex items-center gap-1">
@@ -245,7 +245,7 @@ ${selectedPackageTypes.includes('docker') ?
                     >
                       <CollapsibleContent className="space-y-8">
                         <div>
-                          <h2 className="text-xl font-semibold mb-2">Step 3: Add FlyFrog to your CI workflow</h2>
+                          <h2 className="text-xl font-semibold mb-2 text-foreground">Step 3: Add FlyFrog to your CI workflow</h2>
                           
                           <Tabs defaultValue="setup" className="mt-6">
                             <TabsList className="mb-4">
@@ -256,7 +256,7 @@ ${selectedPackageTypes.includes('docker') ?
                             <TabsContent value="setup" className="space-y-4">
                               <div className="bg-muted rounded-md p-4">
                                 <div className="flex justify-between items-center mb-2">
-                                  <Label className="text-sm font-medium">Add this snippet to your workflow file:</Label>
+                                  <Label className="text-sm font-medium text-foreground">Add this snippet to your workflow file:</Label>
                                   <Button 
                                     variant="outline" 
                                     size="sm" 
@@ -276,7 +276,7 @@ ${selectedPackageTypes.includes('docker') ?
                             <TabsContent value="full" className="space-y-4">
                               <div className="bg-muted rounded-md p-4">
                                 <div className="flex justify-between items-center mb-2">
-                                  <Label className="text-sm font-medium">Complete workflow example for {repository?.name || 'your repository'}:</Label>
+                                  <Label className="text-sm font-medium text-foreground">Complete workflow example for {repository?.name || 'your repository'}:</Label>
                                   <Button 
                                     variant="outline" 
                                     size="sm" 
@@ -298,9 +298,9 @@ ${selectedPackageTypes.includes('docker') ?
                         <Separator className="my-8" />
                         
                         <div>
-                          <h2 className="text-xl font-semibold mb-2">Step 4: Merge to your default branch</h2>
+                          <h2 className="text-xl font-semibold mb-2 text-foreground">Step 4: Merge to your default branch</h2>
                           <div className="bg-muted rounded-lg p-6 mb-6">
-                            <h3 className="text-lg font-medium mb-2 flex items-center">
+                            <h3 className="text-lg font-medium mb-2 flex items-center text-foreground">
                               <GitBranch className="h-5 w-5 mr-2" />
                               Final Step
                             </h3>
@@ -327,8 +327,8 @@ ${selectedPackageTypes.includes('docker') ?
             </TabsContent>
             
             <TabsContent value="ai" className="space-y-4">
-              <div className="bg-white p-6 rounded-lg border border-border shadow-sm">
-                <h2 className="text-xl font-semibold mb-4">AI-Powered Configuration</h2>
+              <div className="bg-card p-6 rounded-lg border border-border shadow-sm text-card-foreground">
+                <h2 className="text-xl font-semibold mb-4 text-foreground">AI-Powered Configuration</h2>
                 <p className="text-muted-foreground mb-6">
                   Chat with our AI assistant to automatically configure FlyFrog for your repository
                 </p>
@@ -344,3 +344,4 @@ ${selectedPackageTypes.includes('docker') ?
 };
 
 export default CIConfigurationPage;
+
