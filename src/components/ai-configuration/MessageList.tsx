@@ -1,7 +1,7 @@
 
 import React, { useRef, useEffect } from 'react';
-import { ChatMessage } from './ChatMessage';
-import { Message } from './constants';
+import { Message } from './types';
+import { MessageItem } from './MessageItem';
 
 interface MessageListProps {
   messages: Message[];
@@ -19,16 +19,9 @@ export const MessageList: React.FC<MessageListProps> = ({ messages }) => {
   };
 
   return (
-    <div className="flex-1 overflow-y-auto py-4 space-y-4">
-      {messages.length === 0 && (
-        <div className="h-full flex items-center justify-center">
-          <p className="text-muted-foreground text-center text-sm">
-            Ask anything to get started
-          </p>
-        </div>
-      )}
+    <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-muted/30">
       {messages.map((message) => (
-        <ChatMessage key={message.id} message={message} />
+        <MessageItem key={message.id} message={message} />
       ))}
       <div ref={messagesEndRef} />
     </div>
