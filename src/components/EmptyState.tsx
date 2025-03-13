@@ -18,9 +18,9 @@ const EmptyState: React.FC<EmptyStateProps> = ({ className, onConnect }) => {
       <div className="w-20 h-20 rounded-full bg-accent flex items-center justify-center mb-6">
         <Github className="h-10 w-10 text-primary" />
       </div>
-      <h2 className="text-2xl font-bold mb-3">Welcome to Repository Integration</h2>
+      <h2 className="text-2xl font-bold mb-3">Connect Your GitHub Repositories</h2>
       <p className="text-muted-foreground mb-3 max-w-md">
-        Connect your GitHub organization to start configuring repositories with our product.
+        Connect your GitHub organization to start configuring repositories with our CI/CD pipeline.
       </p>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 my-8 w-full max-w-2xl">
         <div className="flex flex-col items-center p-4 rounded-lg bg-background border border-border">
@@ -42,13 +42,10 @@ const EmptyState: React.FC<EmptyStateProps> = ({ className, onConnect }) => {
             <span className="font-semibold">3</span>
           </div>
           <h3 className="font-medium mb-1">Configure</h3>
-          <p className="text-xs text-muted-foreground">Set up repository integration</p>
+          <p className="text-xs text-muted-foreground">Set up CI/CD workflows</p>
         </div>
       </div>
       <div className="flex flex-col items-center">
-        <div className="text-sm text-muted-foreground mb-6">
-          <span className="font-medium">0 repositories</span> connected out of <span className="font-medium">0 total</span>
-        </div>
         <Button 
           onClick={onConnect}
           icon={<PlusCircle className="h-4 w-4" />}

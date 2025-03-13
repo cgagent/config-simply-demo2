@@ -14,12 +14,14 @@ interface RepositoryHeaderProps {
   organizations: Organization[];
   selectedOrg: Organization;
   setSelectedOrg: (org: Organization) => void;
+  onGitHubConnected?: () => void;
 }
 
 const RepositoryHeader: React.FC<RepositoryHeaderProps> = ({
   organizations,
   selectedOrg,
-  setSelectedOrg
+  setSelectedOrg,
+  onGitHubConnected
 }) => {
   const [showAuthDialog, setShowAuthDialog] = useState(false);
   
@@ -29,6 +31,14 @@ const RepositoryHeader: React.FC<RepositoryHeaderProps> = ({
   
   const handleCloseAuthDialog = () => {
     setShowAuthDialog(false);
+  };
+
+  const handleAuthComplete = () => {
+    setShowAuthDialog(false);
+    // Notify parent component that GitHub is connected
+    if (onGitHubConnected) {
+      onGitHubConnected();
+    }
   };
   
   return (
@@ -49,7 +59,8 @@ const RepositoryHeader: React.FC<RepositoryHeaderProps> = ({
       {/* GitHub Authentication Flow Dialog */}
       <GitHubAuthFlow 
         showDialog={showAuthDialog} 
-        onClose={handleCloseAuthDialog} 
+        onClose={handleCloseAuthDialog}
+        onComplete={handleAuthComplete}
       />
     </div>
   );

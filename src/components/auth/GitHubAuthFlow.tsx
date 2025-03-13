@@ -12,12 +12,13 @@ import { githubOrgs, githubRepos } from './githubData';
 type GitHubAuthFlowProps = {
   onClose: () => void;
   showDialog: boolean;
+  onComplete?: () => void;
 };
 
 // Auth flow stages that match the GitHub OAuth flow more closely
 type AuthStage = 'initial' | 'organization' | 'repositories' | 'confirmation';
 
-const GitHubAuthFlow: React.FC<GitHubAuthFlowProps> = ({ onClose, showDialog }) => {
+const GitHubAuthFlow: React.FC<GitHubAuthFlowProps> = ({ onClose, showDialog, onComplete }) => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const [stage, setStage] = useState<AuthStage>('initial');
@@ -83,8 +84,13 @@ const GitHubAuthFlow: React.FC<GitHubAuthFlowProps> = ({ onClose, showDialog }) 
       description: `Connected to ${selectedOrg?.name} with ${Object.values(selectedRepos).filter(Boolean).length} repositories`,
     });
     
-    onClose();
-    navigate('/repositories');
+    // Call the onComplete callback if provided
+    if (onComplete) {
+      onComplete();
+    } else {
+      onClose();
+      navigate('/repositories');
+    }
   };
   
   const handleBack = () => {

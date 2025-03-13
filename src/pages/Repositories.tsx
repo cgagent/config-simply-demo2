@@ -3,7 +3,9 @@ import React, { useState } from 'react';
 import RepositoryHeader from '@/components/RepositoryHeader';
 import RepositoryList from '@/components/RepositoryList';
 import StatusSummary from '@/components/StatusSummary';
+import EmptyState from '@/components/EmptyState';
 import { Repository } from '@/types/repository';
+import { useToast } from '@/hooks/use-toast';
 
 interface Organization {
   id: string;
@@ -11,6 +13,9 @@ interface Organization {
 }
 
 const RepositoriesPage: React.FC = () => {
+  const { toast } = useToast();
+  // Flag to check if GitHub is connected
+  const [isGitHubConnected, setIsGitHubConnected] = useState<boolean>(false);
   // Reduced git repositories to just 3 with different configuration statuses
   const [repositories, setRepositories] = useState<Repository[]>([
     {
@@ -98,6 +103,26 @@ const RepositoriesPage: React.FC = () => {
     setSelectedRepo(repo);
   };
 
+  // Handler for connecting GitHub
+  const handleConnectGitHub = () => {
+    // Open GitHub auth flow dialog
+    // In a real implementation, this would be triggered through RepositoryHeader
+    toast({
+      title: "Starting GitHub Connection",
+      description: "Redirecting to GitHub authorization page...",
+    });
+    
+    // For demo purposes, we'll just set this to true after a short delay
+    // In a real app, this would be set after successful OAuth flow completion
+    setTimeout(() => {
+      setIsGitHubConnected(true);
+      toast({
+        title: "GitHub Connected",
+        description: "Successfully connected to GitHub.",
+      });
+    }, 1000);
+  };
+
   // Calculate summary statistics
   const totalRepos = repositories.length;
   const configuredRepos = repositories.filter(repo => repo.isConfigured).length;
@@ -111,20 +136,24 @@ const RepositoriesPage: React.FC = () => {
           setSelectedOrg={setSelectedOrg}
         />
         
-        <div className="flex flex-col gap-4 mt-4">
-          <StatusSummary 
-            totalRepos={totalRepos}
-            configuredRepos={configuredRepos}
-          />
-          
-          <RepositoryList 
-            repositories={repositories}
-            onConfigureRepository={handleConfigureRepository}
-            organizations={organizations}
-            selectedOrg={selectedOrg}
-            setSelectedOrg={setSelectedOrg}
-          />
-        </div>
+        {isGitHubConnected ? (
+          <div className="flex flex-col gap-4 mt-4">
+            <StatusSummary 
+              totalRepos={totalRepos}
+              configuredRepos={configuredRepos}
+            />
+            
+            <RepositoryList 
+              repositories={repositories}
+              onConfigureRepository={handleConfigureRepository}
+              organizations={organizations}
+              selectedOrg={selectedOrg}
+              setSelectedOrg={setSelectedOrg}
+            />
+          </div>
+        ) : (
+          <EmptyState onConnect={handleConnectGitHub} className="mt-8" />
+        )}
       </div>
     </div>
   );
