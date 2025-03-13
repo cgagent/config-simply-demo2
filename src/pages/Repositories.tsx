@@ -10,10 +10,21 @@ interface Organization {
 }
 
 const RepositoriesPage: React.FC = () => {
-  // Mock git repositories data with workflows as children
+  // Reduced git repositories to just 3 with different configuration statuses
   const [repositories, setRepositories] = useState<Repository[]>([
     {
       id: '1',
+      name: 'infrastructure',
+      owner: 'dev-team',
+      orgName: 'Development Team',
+      language: 'YAML',
+      lastUpdated: '12 days ago',
+      packageTypes: [],
+      isConfigured: false,
+      workflows: []
+    },
+    {
+      id: '2',
       name: 'frontend-app',
       owner: 'acme-org',
       orgName: 'ACME Organization',
@@ -46,7 +57,7 @@ const RepositoriesPage: React.FC = () => {
       ]
     },
     {
-      id: '2',
+      id: '3',
       name: 'backend-api',
       owner: 'acme-org',
       orgName: 'ACME Organization',
@@ -67,67 +78,6 @@ const RepositoriesPage: React.FC = () => {
           buildNumber: 76,
           lastRun: '5 days ago',
           packageTypes: ['npm', 'python', 'docker']
-        }
-      ]
-    },
-    {
-      id: '3',
-      name: 'documentation',
-      owner: 'dev-team',
-      orgName: 'Development Team',
-      language: 'Markdown',
-      lastUpdated: '10 days ago',
-      packageTypes: ['maven', 'rpm'],
-      isConfigured: true,
-      packageTypeStatus: {
-        'maven': true,
-        'rpm': true,
-        'debian': false
-      },
-      workflows: [
-        { 
-          id: 'w4', 
-          name: 'Documentation Build', 
-          status: 'active',
-          buildNumber: 35,
-          lastRun: '10 days ago',
-          packageTypes: ['maven', 'rpm']
-        }
-      ]
-    },
-    {
-      id: '4',
-      name: 'infrastructure',
-      owner: 'dev-team',
-      orgName: 'Development Team',
-      language: 'YAML',
-      lastUpdated: '12 days ago',
-      packageTypes: [],
-      isConfigured: false,
-      workflows: []
-    },
-    {
-      id: '5',
-      name: 'fully-configured-repo',
-      owner: 'acme-org',
-      orgName: 'ACME Organization',
-      language: 'Python',
-      lastUpdated: '1 day ago',
-      packageTypes: ['npm', 'docker', 'python'],
-      isConfigured: true,
-      packageTypeStatus: {
-        'npm': true,
-        'docker': true,
-        'python': true
-      },
-      workflows: [
-        { 
-          id: 'w5', 
-          name: 'Full Pipeline', 
-          status: 'active', 
-          buildNumber: 127,
-          lastRun: '1 day ago',
-          packageTypes: ['npm', 'docker', 'python']
         }
       ]
     }
