@@ -1,10 +1,9 @@
+
 import React, { useState } from 'react';
 import RepositoryHeader from '@/components/RepositoryHeader';
 import RepositoryList from '@/components/RepositoryList';
 import StatusSummary from '@/components/StatusSummary';
 import { Repository } from '@/types/repository';
-import { useToast } from '@/hooks/use-toast';
-import GitHubAuthFlow from '@/components/auth/GitHubAuthFlow';
 
 interface Organization {
   id: string;
@@ -12,14 +11,6 @@ interface Organization {
 }
 
 const RepositoriesPage: React.FC = () => {
-  const { toast } = useToast();
-  // Flag to check if GitHub is connected
-  const [isGitHubConnected, setIsGitHubConnected] = useState<boolean>(false);
-  // Flag to check if organization permissions were granted
-  const [hasOrgPermissions, setHasOrgPermissions] = useState<boolean>(false);
-  // State to control the GitHub auth dialog
-  const [showAuthDialog, setShowAuthDialog] = useState<boolean>(!isGitHubConnected || !hasOrgPermissions);
-  
   // Reduced git repositories to just 3 with different configuration statuses
   const [repositories, setRepositories] = useState<Repository[]>([
     {
@@ -107,29 +98,6 @@ const RepositoriesPage: React.FC = () => {
     setSelectedRepo(repo);
   };
 
-  // Handler for connecting GitHub
-  const handleConnectGitHub = () => {
-    setShowAuthDialog(true);
-  };
-
-  // Handler for GitHub connection with org permissions info
-  const handleGitHubConnected = (orgPermissionsGranted: boolean) => {
-    setIsGitHubConnected(true);
-    setHasOrgPermissions(orgPermissionsGranted);
-    setShowAuthDialog(false);
-    
-    toast({
-      title: "GitHub Connected",
-      description: orgPermissionsGranted 
-        ? "Successfully connected to GitHub with organization access." 
-        : "Connected to GitHub without organization access.",
-    });
-  };
-
-  const handleCloseAuthDialog = () => {
-    setShowAuthDialog(false);
-  };
-
   // Calculate summary statistics
   const totalRepos = repositories.length;
   const configuredRepos = repositories.filter(repo => repo.isConfigured).length;
@@ -141,39 +109,23 @@ const RepositoriesPage: React.FC = () => {
           organizations={organizations}
           selectedOrg={selectedOrg}
           setSelectedOrg={setSelectedOrg}
-          onGitHubConnected={handleGitHubConnected}
-          onConnectGitHub={handleConnectGitHub}
         />
         
-        {isGitHubConnected && hasOrgPermissions ? (
-          <div className="flex flex-col gap-4 mt-4">
-            <StatusSummary 
-              totalRepos={totalRepos}
-              configuredRepos={configuredRepos}
-            />
-            
-            <RepositoryList 
-              repositories={repositories}
-              onConfigureRepository={handleConfigureRepository}
-              organizations={organizations}
-              selectedOrg={selectedOrg}
-              setSelectedOrg={setSelectedOrg}
-            />
-          </div>
-        ) : (
-          <div className="flex justify-center items-center min-h-[500px]">
-            <p className="text-muted-foreground">Please connect to GitHub to view your repositories.</p>
-          </div>
-        )}
+        <div className="flex flex-col gap-4 mt-4">
+          <StatusSummary 
+            totalRepos={totalRepos}
+            configuredRepos={configuredRepos}
+          />
+          
+          <RepositoryList 
+            repositories={repositories}
+            onConfigureRepository={handleConfigureRepository}
+            organizations={organizations}
+            selectedOrg={selectedOrg}
+            setSelectedOrg={setSelectedOrg}
+          />
+        </div>
       </div>
-      
-      {/* GitHub Authentication Flow Dialog */}
-      <GitHubAuthFlow 
-        showDialog={showAuthDialog} 
-        onClose={handleCloseAuthDialog}
-        onComplete={handleGitHubConnected}
-        skipInitialAuth={isGitHubConnected}
-      />
     </div>
   );
 };
