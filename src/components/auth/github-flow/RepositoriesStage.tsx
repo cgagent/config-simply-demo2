@@ -32,18 +32,12 @@ const RepositoriesStage: React.FC = () => {
   };
   
   const handleRepoSelect = (repoId: string, checked: boolean) => {
-    setSelectedRepos(prev => ({
-      ...prev,
-      [repoId]: checked
-    }));
+    // Fixed the type error by creating a new object instead of using function
+    const updatedRepos = { ...selectedRepos, [repoId]: checked };
+    setSelectedRepos(updatedRepos);
     
     // Check if all repositories are selected to update selectAll status
-    const updatedSelection = {
-      ...selectedRepos,
-      [repoId]: checked
-    };
-    
-    const allSelected = orgRepos.every(repo => updatedSelection[repo.id]);
+    const allSelected = orgRepos.every(repo => updatedRepos[repo.id]);
     setSelectAll(allSelected);
   };
   

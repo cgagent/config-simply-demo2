@@ -174,6 +174,7 @@ const RepositoriesPage: React.FC = () => {
         showDialog={showAuthDialog} 
         onClose={handleCloseAuthDialog}
         onComplete={handleGitHubConnected}
+        skipInitialAuth={isGitHubConnected}
       />
     </div>
   );
