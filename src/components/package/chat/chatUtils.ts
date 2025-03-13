@@ -1,10 +1,9 @@
-
 import { Package } from '@/types/package';
-import { formatNumber, formatBytes } from '@/lib/formatters';
-import { Message } from './ChatMessage';
+import { format } from 'date-fns';
 
+// Process the user query and return a response based on the query type
 export const processUserQuery = (
-  query: string, 
+  query: string,
   packages: Package[]
 ): string => {
   const lowerQuery = query.toLowerCase();
@@ -26,26 +25,27 @@ Severity: High`;
   } 
   else if (lowerQuery.includes('vulnerabilit')) {
     return getVulnerablePackages(packages);
-  }
-  else if (lowerQuery.includes('blocked')) {
-    return getBlockedPackages(packages);
-  }
-  else if (lowerQuery.includes('size') || lowerQuery.includes('storage')) {
+  } 
+  else if (lowerQuery.includes('block')) {
+    return getBlockedPackages();
+  } 
+  else if (lowerQuery.includes('size') || lowerQuery.includes('largest')) {
     return getLargestPackages(packages);
-  }
-  else if (lowerQuery.includes('summary') || lowerQuery.includes('overview')) {
-    return getPackageSummary(packages);
+  } 
+  else if (lowerQuery.includes('sbom') || lowerQuery.includes('report')) {
+    return generateSbomReport(packages);
   }
   else {
     return getGenericResponse(query);
   }
 };
 
-export const getInitialMessage = (): Message => {
+// Get initial welcome message
+export const getInitialMessage = () => {
   return {
-    id: '1',
+    id: 'welcome',
     role: 'bot',
-    content: 'Hi! I\'m your package management assistant. You can search for packages in your organization or public packages, and get information about updated versions, vulnerabilities, licenses, and more. How can I help you today?'
+    content: 'Hi there! I\'m your package assistant. I can help you analyze your packages, detect vulnerabilities, and provide recommendations. What would you like to know?'
   };
 };
 
@@ -54,78 +54,71 @@ export const DEFAULT_SUGGESTED_QUERIES = [
   "Show me existing packages with vulnerabilities",
   "Show me the packages that are blocked",
   "Show me the largest packages by size",
-  "Give me a summary of my packages"
+  "Please create an Sbom report"
 ];
 
+// Helper function to get the top 5 most downloaded packages
 function getTopDownloadedPackages(packages: Package[]): string {
-  const sortedPackages = [...packages]
-    .sort((a, b) => b.downloads - a.downloads)
-    .slice(0, 10);
-  
-  let response = `Here are the 10 most downloaded packages:\n\n`;
+  const sortedPackages = [...packages].sort((a, b) => b.downloads - a.downloads).slice(0, 5);
+  if (sortedPackages.length === 0) {
+    return "No packages found.";
+  }
+  let response = "Here are the top 5 most downloaded packages:\n\n";
   sortedPackages.forEach((pkg, index) => {
-    response += `${index + 1}. **${pkg.name}** (${pkg.type}) - ${formatNumber(pkg.downloads)} downloads\n`;
+    response += `${index + 1}. ${pkg.name} (Downloads: ${pkg.downloads})\n`;
   });
-  
   return response;
 }
 
+// Helper function to get packages with vulnerabilities
 function getVulnerablePackages(packages: Package[]): string {
-  const vulnerablePackages = packages.filter(pkg => pkg.vulnerabilities > 0)
-    .sort((a, b) => b.vulnerabilities - a.vulnerabilities);
-  
+  const vulnerablePackages = packages.filter(pkg => pkg.vulnerabilities > 0);
   if (vulnerablePackages.length === 0) {
-    return 'Great news! I couldn\'t find any packages with vulnerabilities.';
-  } else {
-    let response = `I found ${vulnerablePackages.length} packages with vulnerabilities:\n\n`;
-    vulnerablePackages.forEach((pkg, index) => {
-      const severity = pkg.vulnerabilities > 2 ? 'High' : 'Low';
-      response += `${index + 1}. **${pkg.name}** (${pkg.type}) - ${pkg.vulnerabilities} vulnerabilities (${severity} severity)\n`;
-    });
-    return response;
+    return "No packages with vulnerabilities found.";
   }
-}
-
-function getBlockedPackages(packages: Package[]): string {
-  const blockedPackages = packages.filter(pkg => pkg.vulnerabilities > 2);
-  
-  if (blockedPackages.length === 0) {
-    return 'There are currently no blocked packages.';
-  } else {
-    let response = `I found ${blockedPackages.length} blocked packages due to high security risks:\n\n`;
-    blockedPackages.forEach((pkg, index) => {
-      response += `${index + 1}. **${pkg.name}** (${pkg.type}) - Blocked due to ${pkg.vulnerabilities} critical vulnerabilities\n`;
-    });
-    return response;
-  }
-}
-
-function getLargestPackages(packages: Package[]): string {
-  const sortedBySize = [...packages]
-    .sort((a, b) => b.size - a.size)
-    .slice(0, 5);
-  
-  let response = `Here are the 5 largest packages by size:\n\n`;
-  sortedBySize.forEach((pkg, index) => {
-    response += `${index + 1}. **${pkg.name}** (${pkg.type}) - ${formatBytes(pkg.size)}\n`;
+  let response = "Here are the packages with vulnerabilities:\n\n";
+  vulnerablePackages.forEach((pkg, index) => {
+    response += `${index + 1}. ${pkg.name} (Vulnerabilities: ${pkg.vulnerabilities})\n`;
   });
-  
   return response;
 }
 
-function getPackageSummary(packages: Package[]): string {
-  const totalPackages = packages.length;
-  const totalConsumption = packages.reduce((acc, pkg) => acc + pkg.downloads, 0);
-  const totalStorage = packages.reduce((acc, pkg) => acc + pkg.size, 0);
-  const maliciousPackages = packages.filter(pkg => pkg.vulnerabilities > 2).length;
-  
-  let response = `Here's a summary of your package statistics:\n\n`;
-  response += `• Total Packages: ${totalPackages}\n`;
-  response += `• Total Downloads: ${formatNumber(totalConsumption)}\n`;
-  response += `• Total Storage: ${formatBytes(totalStorage)}\n`;
-  response += `• Malicious Packages: ${maliciousPackages}\n`;
-  
+// Helper function to get blocked packages (currently returns a mock response)
+function getBlockedPackages(): string {
+  return "Blocked packages information is not available in this demo.";
+}
+
+// Helper function to get the 5 largest packages by size
+function getLargestPackages(packages: Package[]): string {
+  const sortedPackages = [...packages].sort((a, b) => b.size - a.size).slice(0, 5);
+  if (sortedPackages.length === 0) {
+    return "No packages found.";
+  }
+  let response = "Here are the 5 largest packages by size:\n\n";
+  sortedPackages.forEach((pkg, index) => {
+    const sizeInMB = (pkg.size / (1024 * 1024)).toFixed(2);
+    response += `${index + 1}. ${pkg.name} (${sizeInMB} MB)\n`;
+  });
   return response;
+}
+
+// Helper function to generate a mock SBOM report
+function generateSbomReport(packages: Package[]): string {
+  if (packages.length === 0) {
+    return "No packages found to generate an SBOM report.";
+  }
+  let report = "SBOM Report:\n\n";
+  packages.forEach(pkg => {
+    const createdAtFormatted = format(new Date(pkg.createdAt), 'MMMM dd, yyyy');
+    report += `Package: ${pkg.name}\n`;
+    report += `Type: ${pkg.type}\n`;
+    report += `Created At: ${createdAtFormatted}\n`;
+    report += `Vulnerabilities: ${pkg.vulnerabilities}\n`;
+    report += `Downloads: ${pkg.downloads}\n`;
+    const sizeInMB = (pkg.size / (1024 * 1024)).toFixed(2);
+    report += `Size: ${sizeInMB} MB\n\n`;
+  });
+  return report;
 }
 
 function getGenericResponse(input: string): string {
@@ -134,5 +127,5 @@ function getGenericResponse(input: string): string {
     `• Show me existing packages with vulnerabilities\n` +
     `• Show me the packages that are blocked\n` +
     `• Show me the largest packages by size\n` +
-    `• Give me a summary of my packages\n`;
+    `• Please create an Sbom report\n`;
 }
