@@ -1,17 +1,10 @@
-
 import React, { useState } from 'react';
 import { Message } from './ChatMessage';
 import { MessageList } from './MessageList';
 import { ChatInput } from './ChatInput';
 import { useToast } from '@/hooks/use-toast';
 
-const INITIAL_MESSAGES: Message[] = [
-  {
-    id: '1',
-    role: 'bot',
-    content: 'Hi there! I\'m your AI assistant. Ask me anything about repositories, CI/CD, coding, or any other tech questions you might have!'
-  }
-];
+const INITIAL_MESSAGES: Message[] = [];
 
 export const AIChat: React.FC = () => {
   const [messages, setMessages] = useState<Message[]>(INITIAL_MESSAGES);

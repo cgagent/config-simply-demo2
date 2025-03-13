@@ -43,7 +43,7 @@ export const ChatInput: React.FC<ChatInputProps> = ({
         value={input}
         onChange={(e) => setInput(e.target.value)}
         onKeyDown={handleKeyDown}
-        placeholder="Ask anything..."
+        placeholder="Ask anything about repositories, CI/CD, or coding..."
         disabled={isProcessing}
         className="pr-12 resize-none overflow-hidden min-h-[56px]"
         rows={1}
