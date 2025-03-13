@@ -7,21 +7,47 @@ import { Send } from 'lucide-react';
 interface ChatInputProps {
   onSendMessage: (message: string) => void;
   isProcessing: boolean;
+  isInitialState?: boolean;
 }
 
 export const ChatInput: React.FC<ChatInputProps> = ({
   onSendMessage,
-  isProcessing
+  isProcessing,
+  isInitialState = false
 }) => {
   const [input, setInput] = useState('');
   const textareaRef = useRef<HTMLTextAreaElement>(null);
-
+  const [placeholderIndex, setPlaceholderIndex] = useState(0);
+  
+  const staticPlaceholder = "Ask anything about repositories, CI/CD, or coding...";
+  
+  const rotatingPlaceholders = [
+    "Set up your CI with FlyFrog",
+    "Show you what packages are being used in your organization",
+    "Find a public package",
+    "See the malicious packages that blocked by FlyFrog",
+    "Check your data consumption or storage in the last month",
+    "Create an Sbom report for you"
+  ];
+  
+  // Effect for textarea auto-resize
   useEffect(() => {
     if (textareaRef.current) {
       textareaRef.current.style.height = 'auto';
       textareaRef.current.style.height = `${textareaRef.current.scrollHeight}px`;
     }
   }, [input]);
+  
+  // Effect for rotating placeholders
+  useEffect(() => {
+    if (!isInitialState) return;
+    
+    const interval = setInterval(() => {
+      setPlaceholderIndex((prev) => (prev + 1) % rotatingPlaceholders.length);
+    }, 3000);
+    
+    return () => clearInterval(interval);
+  }, [isInitialState]);
 
   const handleSendMessage = () => {
     if (!input.trim()) return;
@@ -36,6 +62,10 @@ export const ChatInput: React.FC<ChatInputProps> = ({
     }
   };
 
+  const currentPlaceholder = isInitialState 
+    ? `Ask FlyFrog to ${rotatingPlaceholders[placeholderIndex]}`
+    : staticPlaceholder;
+
   return (
     <div className="relative">
       <Textarea
@@ -43,9 +73,9 @@ export const ChatInput: React.FC<ChatInputProps> = ({
         value={input}
         onChange={(e) => setInput(e.target.value)}
         onKeyDown={handleKeyDown}
-        placeholder="Ask anything about repositories, CI/CD, or coding..."
+        placeholder={currentPlaceholder}
         disabled={isProcessing}
-        className="pr-12 resize-none overflow-hidden min-h-[56px]"
+        className={`pr-12 resize-none overflow-hidden min-h-[56px] ${isInitialState ? 'text-lg' : ''}`}
         rows={1}
       />
       <Button

@@ -77,7 +77,8 @@ export const AIChat: React.FC = () => {
         <div className="w-full max-w-xl">
           <ChatInput 
             isProcessing={isProcessing} 
-            onSendMessage={handleSendMessage} 
+            onSendMessage={handleSendMessage}
+            isInitialState={true}
           />
         </div>
       </div>
@@ -91,7 +92,11 @@ export const AIChat: React.FC = () => {
         <MessageList messages={messages} />
       </div>
       <div className="pt-4 border-t">
-        <ChatInput isProcessing={isProcessing} onSendMessage={handleSendMessage} />
+        <ChatInput 
+          isProcessing={isProcessing} 
+          onSendMessage={handleSendMessage} 
+          isInitialState={false}
+        />
       </div>
     </div>
   );
