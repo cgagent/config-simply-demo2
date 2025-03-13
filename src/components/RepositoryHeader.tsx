@@ -14,7 +14,7 @@ interface RepositoryHeaderProps {
   organizations: Organization[];
   selectedOrg: Organization;
   setSelectedOrg: (org: Organization) => void;
-  onGitHubConnected?: () => void;
+  onGitHubConnected?: (hasOrgPermissions: boolean) => void;
 }
 
 const RepositoryHeader: React.FC<RepositoryHeaderProps> = ({
@@ -33,11 +33,11 @@ const RepositoryHeader: React.FC<RepositoryHeaderProps> = ({
     setShowAuthDialog(false);
   };
 
-  const handleAuthComplete = () => {
+  const handleAuthComplete = (hasOrgPermissions: boolean = false) => {
     setShowAuthDialog(false);
-    // Notify parent component that GitHub is connected
+    // Notify parent component that GitHub is connected and whether org permissions were granted
     if (onGitHubConnected) {
-      onGitHubConnected();
+      onGitHubConnected(hasOrgPermissions);
     }
   };
   

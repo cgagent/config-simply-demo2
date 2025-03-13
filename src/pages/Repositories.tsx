@@ -16,6 +16,8 @@ const RepositoriesPage: React.FC = () => {
   const { toast } = useToast();
   // Flag to check if GitHub is connected
   const [isGitHubConnected, setIsGitHubConnected] = useState<boolean>(false);
+  // Flag to check if organization permissions were granted
+  const [hasOrgPermissions, setHasOrgPermissions] = useState<boolean>(false);
   // Reduced git repositories to just 3 with different configuration statuses
   const [repositories, setRepositories] = useState<Repository[]>([
     {
@@ -123,6 +125,19 @@ const RepositoriesPage: React.FC = () => {
     }, 1000);
   };
 
+  // Handler for GitHub connection with org permissions info
+  const handleGitHubConnected = (orgPermissionsGranted: boolean) => {
+    setIsGitHubConnected(true);
+    setHasOrgPermissions(orgPermissionsGranted);
+    
+    toast({
+      title: "GitHub Connected",
+      description: orgPermissionsGranted 
+        ? "Successfully connected to GitHub with organization access." 
+        : "Connected to GitHub without organization access.",
+    });
+  };
+
   // Calculate summary statistics
   const totalRepos = repositories.length;
   const configuredRepos = repositories.filter(repo => repo.isConfigured).length;
@@ -134,9 +149,10 @@ const RepositoriesPage: React.FC = () => {
           organizations={organizations}
           selectedOrg={selectedOrg}
           setSelectedOrg={setSelectedOrg}
+          onGitHubConnected={handleGitHubConnected}
         />
         
-        {isGitHubConnected ? (
+        {isGitHubConnected && hasOrgPermissions ? (
           <div className="flex flex-col gap-4 mt-4">
             <StatusSummary 
               totalRepos={totalRepos}
@@ -152,7 +168,11 @@ const RepositoriesPage: React.FC = () => {
             />
           </div>
         ) : (
-          <EmptyState onConnect={handleConnectGitHub} className="mt-8" />
+          <EmptyState 
+            onConnect={handleConnectGitHub} 
+            className="mt-8"
+            noOrgAccess={isGitHubConnected && !hasOrgPermissions}
+          />
         )}
       </div>
     </div>

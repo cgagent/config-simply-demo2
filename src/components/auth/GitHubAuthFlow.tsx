@@ -12,7 +12,7 @@ import { githubOrgs, githubRepos } from './githubData';
 type GitHubAuthFlowProps = {
   onClose: () => void;
   showDialog: boolean;
-  onComplete?: () => void;
+  onComplete?: (hasOrgPermissions: boolean) => void;
 };
 
 // Auth flow stages that match the GitHub OAuth flow more closely
@@ -25,6 +25,7 @@ const GitHubAuthFlow: React.FC<GitHubAuthFlowProps> = ({ onClose, showDialog, on
   const [selectedOrg, setSelectedOrg] = useState<GithubOrg | null>(null);
   const [selectedRepos, setSelectedRepos] = useState<Record<string, boolean>>({});
   const [selectAll, setSelectAll] = useState(false);
+  const [hasGrantedOrgPermissions, setHasGrantedOrgPermissions] = useState(false);
   
   // Filter repositories based on selected organization
   const orgRepos = selectedOrg 
@@ -39,6 +40,7 @@ const GitHubAuthFlow: React.FC<GitHubAuthFlowProps> = ({ onClose, showDialog, on
   const handleOrgSelect = (org: GithubOrg) => {
     setSelectedOrg(org);
     setStage('repositories');
+    setHasGrantedOrgPermissions(true);
     
     // Reset repository selection when changing organization
     setSelectedRepos({});
@@ -77,6 +79,21 @@ const GitHubAuthFlow: React.FC<GitHubAuthFlowProps> = ({ onClose, showDialog, on
     setStage('confirmation');
   };
   
+  const handleSkipOrgPermissions = () => {
+    // User chose to connect without granting organization permissions
+    toast({
+      title: "GitHub Authentication Successful",
+      description: "Connected to GitHub without organization permissions",
+    });
+    
+    if (onComplete) {
+      onComplete(false);
+    } else {
+      onClose();
+      navigate('/repositories');
+    }
+  };
+  
   const handleComplete = () => {
     // Complete the GitHub auth flow
     toast({
@@ -86,7 +103,7 @@ const GitHubAuthFlow: React.FC<GitHubAuthFlowProps> = ({ onClose, showDialog, on
     
     // Call the onComplete callback if provided
     if (onComplete) {
-      onComplete();
+      onComplete(true);
     } else {
       onClose();
       navigate('/repositories');
@@ -135,6 +152,7 @@ const GitHubAuthFlow: React.FC<GitHubAuthFlowProps> = ({ onClose, showDialog, on
           {stage === 'initial' && (
             <AuthorizationScreen 
               onAuthorize={handleStartAuth}
+              onSkipOrgPermissions={handleSkipOrgPermissions}
               onCancel={onClose}
             />
           )}

@@ -5,10 +5,15 @@ import Button from '@/components/Button';
 
 interface AuthorizationScreenProps {
   onAuthorize: () => void;
+  onSkipOrgPermissions?: () => void;
   onCancel: () => void;
 }
 
-const AuthorizationScreen: React.FC<AuthorizationScreenProps> = ({ onAuthorize, onCancel }) => {
+const AuthorizationScreen: React.FC<AuthorizationScreenProps> = ({ 
+  onAuthorize, 
+  onSkipOrgPermissions,
+  onCancel 
+}) => {
   return (
     <div className="space-y-4">
       <div className="rounded-md bg-muted p-4">
@@ -48,9 +53,19 @@ const AuthorizationScreen: React.FC<AuthorizationScreenProps> = ({ onAuthorize, 
           className="w-full justify-center"
           icon={<Github className="h-4 w-4" />}
         >
-          Authorize with GitHub
+          Authorize with Full Access
           <ExternalLink className="ml-1 h-3 w-3" />
         </Button>
+        
+        {onSkipOrgPermissions && (
+          <Button
+            onClick={onSkipOrgPermissions}
+            variant="outline"
+            className="w-full justify-center"
+          >
+            Continue without Organization Access
+          </Button>
+        )}
         
         <Button
           onClick={onCancel}
