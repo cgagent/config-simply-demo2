@@ -37,6 +37,7 @@ export const AIChat: React.FC = () => {
       inputValue={inputValue}
       setInputValue={setInputValue}
       onSendMessage={handleSendMessage}
+      onSelectQuery={handleSelectQuery}
       showCIConfig={showCIConfig}
       repository={repository}
     />

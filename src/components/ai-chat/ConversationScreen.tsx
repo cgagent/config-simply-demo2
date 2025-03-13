@@ -2,9 +2,10 @@
 import React from 'react';
 import { MessageList } from './MessageList';
 import { ChatInput } from './ChatInput';
-import { Message } from './constants';
+import { Message, SUGGESTED_QUERIES } from './constants';
 import { AIConfigurationChat } from '@/components/ai-configuration';
 import { Sheet, SheetContent } from '@/components/ui/sheet';
+import { SuggestedQueries } from './SuggestedQueries';
 
 interface ConversationScreenProps {
   messages: Message[];
@@ -12,6 +13,7 @@ interface ConversationScreenProps {
   inputValue: string;
   setInputValue: (value: string) => void;
   onSendMessage: (content: string) => void;
+  onSelectQuery: (query: string) => void;
   showCIConfig: boolean;
   repository?: any;
 }
@@ -22,6 +24,7 @@ export const ConversationScreen: React.FC<ConversationScreenProps> = ({
   inputValue,
   setInputValue,
   onSendMessage,
+  onSelectQuery,
   showCIConfig,
   repository
 }) => {
@@ -39,6 +42,16 @@ export const ConversationScreen: React.FC<ConversationScreenProps> = ({
           </div>
         </div>
       )}
+      
+      <div className="mb-4 mt-2">
+        <SuggestedQueries 
+          queries={SUGGESTED_QUERIES.map(q => q.label)} 
+          onSelectQuery={(label) => {
+            const query = SUGGESTED_QUERIES.find(q => q.label === label)?.query || '';
+            onSelectQuery(query);
+          }} 
+        />
+      </div>
       
       <div className="pt-4 border-t">
         <ChatInput 
