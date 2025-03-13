@@ -22,7 +22,7 @@ export const SUGGESTED_QUERIES = [
   },
   {
     label: "abc",
-    query: "What is abc?"
+    query: "Which packages were blocked in the last 2 weeks?"
   }
 ];
 
