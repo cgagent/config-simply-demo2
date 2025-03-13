@@ -26,13 +26,8 @@ const NavBar: React.FC<NavBarProps> = ({ className }) => {
     )}>
       <div className="max-w-7xl mx-auto">
         <div className="flex items-center justify-between h-16">
-          <div className="flex items-center gap-2">
-            <Link to="/dashboard" className="flex items-center">
-              <div className="flex items-center justify-center w-10 h-10 rounded-md bg-primary text-white font-semibold">
-                R
-              </div>
-            </Link>
-          </div>
+          {/* Left side empty now that logo is removed */}
+          <div className="flex-1"></div>
 
           <div className="flex items-center">
             <DropdownMenu>
