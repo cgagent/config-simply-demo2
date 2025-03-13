@@ -13,6 +13,10 @@ export const SUGGESTED_QUERIES = [
     query: "recommend me for 3 npm packages for making http requests."
   },
   {
+    label: "Blocked Packages",
+    query: "Which packages were blocked in the last 2 weeks?"
+  },
+  {
     label: "Sbom",
     query: "Generate an Sbom report for the last 30 days"
   }
