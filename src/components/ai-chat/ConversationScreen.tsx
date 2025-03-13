@@ -3,7 +3,7 @@ import React from 'react';
 import { MessageList } from './MessageList';
 import { ChatInput } from './ChatInput';
 import { Message } from './constants';
-import AIConfigurationChat from '@/components/AIConfigurationChat';
+import { AIConfigurationChat } from '@/components/ai-configuration';
 import { Sheet, SheetContent } from '@/components/ui/sheet';
 
 interface ConversationScreenProps {
