@@ -13,12 +13,12 @@ export const SUGGESTED_QUERIES = [
     query: "recommend me for 3 npm packages for making http requests."
   },
   {
-    label: "Sbom",
-    query: "Generate an Sbom report for the last 30 days"
+    label: "Blocked Packages",
+    query: "abc"
   },
   {
-    label: "abc",
-    query: "abc"
+    label: "Sbom",
+    query: "Generate an Sbom report for the last 30 days"
   }
 ];
 
