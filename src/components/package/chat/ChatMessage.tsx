@@ -41,17 +41,18 @@ export const ChatMessage: React.FC<ChatMessageProps> = ({ message }) => {
               
               return (
                 <div key={index} className="bg-muted/40 rounded-md p-5 border shadow-sm w-full">
-                  <div className="font-bold text-md mb-3">{packageName}</div>
-                  <div className="flex flex-col space-y-2">
-                    <div className="flex">
-                      <span className="text-muted-foreground font-medium mr-2">Version:</span>
-                      <span>{version}</span>
-                    </div>
-                    <div className="flex">
-                      <span className="text-muted-foreground font-medium mr-2">License:</span>
-                      <span>{license}</span>
-                    </div>
+                  <div className="font-bold text-md mb-4">{packageName}</div>
+                  
+                  <div className="mb-2">
+                    <div className="text-muted-foreground font-medium mb-1">Version:</div>
+                    <div>{version}</div>
                   </div>
+                  
+                  <div className="mb-2">
+                    <div className="text-muted-foreground font-medium mb-1">License:</div>
+                    <div>{license}</div>
+                  </div>
+                  
                   {lines.length > 3 && lines[3].includes('Dependencies:') && (
                     <div className="mt-4">
                       <div className="text-muted-foreground font-medium mb-2">Dependencies:</div>
