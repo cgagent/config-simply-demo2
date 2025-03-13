@@ -28,7 +28,7 @@ const EmptyState: React.FC<EmptyStateProps> = ({ className, onConnect, noOrgAcce
         <>
           <h2 className="text-2xl font-bold mb-3">Organization Access Required</h2>
           <p className="text-muted-foreground mb-6 max-w-md">
-            You've connected your GitHub account, but you need to grant access to your organizations to configure repositories.
+            You've connected your GitHub account, but you need to grant organization access to configure repositories.
           </p>
           <Button 
             onClick={onConnect}
@@ -42,17 +42,17 @@ const EmptyState: React.FC<EmptyStateProps> = ({ className, onConnect, noOrgAcce
         </>
       ) : (
         <>
-          <h2 className="text-2xl font-bold mb-3">Connect Your GitHub Repositories</h2>
+          <h2 className="text-2xl font-bold mb-3">Connect GitHub Repositories</h2>
           <p className="text-muted-foreground mb-3 max-w-md">
-            Connect your GitHub organization to start configuring repositories with our CI/CD pipeline.
+            Grant organization access to view and configure your repositories with our CI/CD pipeline.
           </p>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 my-8 w-full max-w-2xl">
             <div className="flex flex-col items-center p-4 rounded-lg bg-background border border-border">
               <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center mb-3">
                 <span className="font-semibold">1</span>
               </div>
-              <h3 className="font-medium mb-1">Connect</h3>
-              <p className="text-xs text-muted-foreground">Link your GitHub organization</p>
+              <h3 className="font-medium mb-1">Grant Access</h3>
+              <p className="text-xs text-muted-foreground">Allow access to your organizations</p>
             </div>
             <div className="flex flex-col items-center p-4 rounded-lg bg-background border border-border">
               <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center mb-3">
@@ -72,11 +72,11 @@ const EmptyState: React.FC<EmptyStateProps> = ({ className, onConnect, noOrgAcce
           <div className="flex flex-col items-center">
             <Button 
               onClick={onConnect}
-              icon={<Github className="h-4 w-4" />}
+              icon={<Building2 className="h-4 w-4" />}
               className="button-shine group transition-all duration-300"
               size="lg"
             >
-              Connect GitHub Organization
+              Grant Organization Access
               <ArrowRight className="ml-1 h-4 w-4 transition-transform group-hover:translate-x-1" />
             </Button>
           </div>
