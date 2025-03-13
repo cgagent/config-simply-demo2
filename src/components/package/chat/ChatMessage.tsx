@@ -25,6 +25,66 @@ export const ChatMessage: React.FC<ChatMessageProps> = ({ message }) => {
     });
   };
 
+  // Helper function to format package entries in SBOM reports
+  const formatPackageData = (content: string) => {
+    if (content.includes('SBOM report')) {
+      const parts = content.split(/\n\n(?=Package:)/);
+      return (
+        <>
+          <p className="mb-3">{parts[0]}</p>
+          <div className="space-y-6">
+            {parts.slice(1).map((packageData, index) => {
+              const lines = packageData.split('\n');
+              const packageName = lines[0].replace('Package: ', '');
+              const version = lines[1].replace('Version: ', '');
+              const license = lines[2].replace('License: ', '');
+              
+              return (
+                <div key={index} className="bg-muted/40 rounded-md p-3 border">
+                  <div className="font-medium text-sm mb-1">{packageName}</div>
+                  <div className="grid grid-cols-2 gap-2 text-xs">
+                    <div className="text-muted-foreground">Version:</div>
+                    <div>{version}</div>
+                    <div className="text-muted-foreground">License:</div>
+                    <div>{license}</div>
+                  </div>
+                  {lines.length > 3 && lines[3].includes('Dependencies:') && (
+                    <>
+                      <div className="text-xs text-muted-foreground mt-2">Dependencies:</div>
+                      <ul className="list-disc pl-5 text-xs mt-1">
+                        {lines.slice(4).map((dep, i) => (
+                          <li key={i}>{dep}</li>
+                        ))}
+                      </ul>
+                    </>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        </>
+      );
+    }
+    
+    return content.split('\n').map((line, i) => {
+      if (line.startsWith('• ')) {
+        return <p key={i} className="mb-1 ml-2">• {line.substring(2)}</p>;
+      } else if (line.match(/^\d+\./)) {
+        return <p key={i} className="mb-1 ml-2">{line}</p>;
+      } else if (line.includes('**')) {
+        return (
+          <p key={i} className="mb-1">
+            {line.split('**').map((segment, j) => 
+              j % 2 === 1 ? <strong key={j}>{segment}</strong> : segment
+            )}
+          </p>
+        );
+      } else {
+        return <p key={i} className="mb-1">{line}</p>;
+      }
+    });
+  };
+
   return (
     <div 
       className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}
@@ -56,23 +116,7 @@ export const ChatMessage: React.FC<ChatMessageProps> = ({ message }) => {
         </div>
         
         <div className="whitespace-pre-wrap">
-          {message.content.split('\n').map((line, i) => {
-            if (line.startsWith('• ')) {
-              return <p key={i} className="mb-1 ml-2">• {line.substring(2)}</p>;
-            } else if (line.match(/^\d+\./)) {
-              return <p key={i} className="mb-1 ml-2">{line}</p>;
-            } else if (line.includes('**')) {
-              return (
-                <p key={i} className="mb-1">
-                  {line.split('**').map((segment, j) => 
-                    j % 2 === 1 ? <strong key={j}>{segment}</strong> : segment
-                  )}
-                </p>
-              );
-            } else {
-              return <p key={i} className="mb-1">{line}</p>;
-            }
-          })}
+          {formatPackageData(message.content)}
         </div>
       </div>
     </div>
