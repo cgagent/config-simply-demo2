@@ -32,7 +32,7 @@ export const ChatMessage: React.FC<ChatMessageProps> = ({ message }) => {
       return (
         <>
           <p className="mb-6 text-sm font-medium">{parts[0]}</p>
-          <div className="space-y-8">
+          <div className="flex flex-col space-y-6">
             {parts.slice(1).map((packageData, index) => {
               const lines = packageData.split('\n');
               const packageName = lines[0].replace('Package: ', '');
@@ -40,7 +40,7 @@ export const ChatMessage: React.FC<ChatMessageProps> = ({ message }) => {
               const license = lines[2].replace('License: ', '');
               
               return (
-                <div key={index} className="bg-muted/40 rounded-md p-5 border mb-4 shadow-sm">
+                <div key={index} className="bg-muted/40 rounded-md p-5 border shadow-sm w-full">
                   <div className="font-semibold text-md mb-3">{packageName}</div>
                   <div className="grid grid-cols-2 gap-3 text-xs mb-4">
                     <div className="text-muted-foreground font-medium">Version:</div>
