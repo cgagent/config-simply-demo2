@@ -45,11 +45,8 @@ export const ConversationScreen: React.FC<ConversationScreenProps> = ({
       
       <div className="mb-4 mt-2">
         <SuggestedQueries 
-          queries={SUGGESTED_QUERIES.map(q => q.label)} 
-          onSelectQuery={(label) => {
-            const query = SUGGESTED_QUERIES.find(q => q.label === label)?.query || '';
-            onSelectQuery(query);
-          }} 
+          queries={SUGGESTED_QUERIES} 
+          onSelectQuery={onSelectQuery} 
         />
       </div>
       

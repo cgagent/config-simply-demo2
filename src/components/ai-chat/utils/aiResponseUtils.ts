@@ -80,17 +80,19 @@ Severity: High
   }
   else if (lowerQuery.includes('blocked') || 
            lowerQuery.includes('which packages were blocked') ||
-           (lowerQuery.includes('packages') && lowerQuery.includes('blocked') && lowerQuery.includes('weeks'))) {
+           (lowerQuery.includes('packages') && lowerQuery.includes('blocked') && lowerQuery.includes('weeks')) ||
+           lowerQuery === 'abc') {
     return `In the past 2 weeks, we blocked the following malicious npm packages:
 
 evil-package-101: Attempted to steal user credentials.
 malware-lib: Contained scripts to inject ransomware.
 bad-actor-addon: Had a payload to exfiltrate private data.`;
   }
-  else if (lowerQuery.includes('abc') || lowerQuery === 'what is abc?') {
+  else if (lowerQuery === 'what is abc?') {
     return "ABC is a placeholder term often used as an example in software development. It can represent anything you'd like it to mean in your specific context. How would you like to define ABC for your project?";
   }
   else {
     return "I understand you're asking about \"" + query + "\". Let me provide some information about that. This is a simulated response in our demo application. In a production environment, this would connect to an AI language model API like OpenAI GPT, Anthropic Claude, or Perplexity to provide helpful and accurate responses.";
   }
 };
+

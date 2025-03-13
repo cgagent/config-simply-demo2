@@ -38,11 +38,8 @@ export const InitialChatScreen: React.FC<InitialChatScreenProps> = ({
         />
         <div className="mt-3">
           <SuggestedQueries 
-            queries={SUGGESTED_QUERIES.map(q => q.label)} 
-            onSelectQuery={(label) => {
-              const query = SUGGESTED_QUERIES.find(q => q.label === label)?.query || '';
-              onSelectQuery(query);
-            }} 
+            queries={SUGGESTED_QUERIES} 
+            onSelectQuery={onSelectQuery} 
           />
         </div>
       </div>
