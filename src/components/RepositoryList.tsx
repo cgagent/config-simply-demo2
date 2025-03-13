@@ -4,7 +4,6 @@ import { cn } from '@/lib/utils';
 import RepositoryListHeader from './RepositoryListHeader';
 import RepositoryItem from './RepositoryItem';
 import { Repository } from '@/types/repository';
-import StatusSummary from './StatusSummary';
 import { useNavigate } from 'react-router-dom';
 
 interface RepositoryListProps {
@@ -36,17 +35,9 @@ const RepositoryList: React.FC<RepositoryListProps> = ({
     onConfigureRepository(repo);
     navigate('/ci-configuration', { state: { repository: repo } });
   };
-  
-  const configuredCount = repositories.filter(repo => repo.isConfigured).length;
 
   return (
     <div className={cn("animate-fadeIn", className)}>
-      <StatusSummary 
-        totalRepos={repositories.length} 
-        configuredRepos={configuredCount} 
-        className="mb-8"
-      />
-
       <RepositoryListHeader 
         onSearch={setSearchTerm}
         filter={filter}
