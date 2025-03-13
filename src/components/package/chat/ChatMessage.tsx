@@ -41,22 +41,26 @@ export const ChatMessage: React.FC<ChatMessageProps> = ({ message }) => {
               
               return (
                 <div key={index} className="bg-muted/40 rounded-md p-5 border shadow-sm w-full">
-                  <div className="font-semibold text-md mb-3">{packageName}</div>
-                  <div className="grid grid-cols-2 gap-3 text-xs mb-4">
-                    <div className="text-muted-foreground font-medium">Version:</div>
-                    <div>{version}</div>
-                    <div className="text-muted-foreground font-medium">License:</div>
-                    <div>{license}</div>
+                  <div className="font-bold text-md mb-3">{packageName}</div>
+                  <div className="flex flex-col space-y-2">
+                    <div className="flex">
+                      <span className="text-muted-foreground font-medium mr-2">Version:</span>
+                      <span>{version}</span>
+                    </div>
+                    <div className="flex">
+                      <span className="text-muted-foreground font-medium mr-2">License:</span>
+                      <span>{license}</span>
+                    </div>
                   </div>
                   {lines.length > 3 && lines[3].includes('Dependencies:') && (
-                    <>
-                      <div className="text-xs font-medium text-muted-foreground mt-4 mb-2">Dependencies:</div>
-                      <ul className="list-disc pl-6 text-xs space-y-2">
+                    <div className="mt-4">
+                      <div className="text-muted-foreground font-medium mb-2">Dependencies:</div>
+                      <div className="pl-2">
                         {lines.slice(4).map((dep, i) => (
-                          <li key={i} className="mb-1">{dep}</li>
+                          <div key={i} className="mb-1">{dep}</div>
                         ))}
-                      </ul>
-                    </>
+                      </div>
+                    </div>
                   )}
                 </div>
               );
