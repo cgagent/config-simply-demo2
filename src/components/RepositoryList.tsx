@@ -6,16 +6,27 @@ import RepositoryItem from './RepositoryItem';
 import { Repository } from '@/types/repository';
 import { useNavigate } from 'react-router-dom';
 
+interface Organization {
+  id: string;
+  name: string;
+}
+
 interface RepositoryListProps {
   repositories: Repository[];
   className?: string;
   onConfigureRepository: (repo: Repository) => void;
+  organizations?: Organization[];
+  selectedOrg?: Organization;
+  setSelectedOrg?: (org: Organization) => void;
 }
 
 const RepositoryList: React.FC<RepositoryListProps> = ({ 
   repositories,
   className,
-  onConfigureRepository
+  onConfigureRepository,
+  organizations,
+  selectedOrg,
+  setSelectedOrg
 }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [filter, setFilter] = useState<'all' | 'configured' | 'not-configured'>('all');
@@ -42,6 +53,9 @@ const RepositoryList: React.FC<RepositoryListProps> = ({
         onSearch={setSearchTerm}
         filter={filter}
         onFilterChange={setFilter}
+        organizations={organizations}
+        selectedOrg={selectedOrg}
+        setSelectedOrg={setSelectedOrg}
       />
       
       <div className="bg-white rounded-lg border border-border overflow-hidden shadow-sm">

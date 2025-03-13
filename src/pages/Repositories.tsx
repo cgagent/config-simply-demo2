@@ -1,10 +1,8 @@
-
 import React, { useState } from 'react';
 import NavBar from '@/components/NavBar';
 import RepositoryHeader from '@/components/RepositoryHeader';
 import RepositoryList from '@/components/RepositoryList';
 import { Repository, commonPackageTypes } from '@/types/repository';
-import OrganizationSelect from '@/components/OrganizationSelect';
 
 interface Organization {
   id: string;
@@ -162,20 +160,12 @@ const RepositoriesPage: React.FC = () => {
           />
           
           <div className="mt-6">
-            <div className="mb-4 flex items-center justify-between">
-              <div className="flex items-center">
-                <h2 className="text-xl font-semibold mr-3">GitHub Git Repositories</h2>
-                <OrganizationSelect 
-                  organizations={organizations}
-                  selectedOrg={selectedOrg}
-                  setSelectedOrg={setSelectedOrg}
-                />
-              </div>
-            </div>
-            
             <RepositoryList 
               repositories={repositories}
               onConfigureRepository={handleConfigureRepository}
+              organizations={organizations}
+              selectedOrg={selectedOrg}
+              setSelectedOrg={setSelectedOrg}
             />
           </div>
         </div>

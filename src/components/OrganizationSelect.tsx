@@ -15,19 +15,21 @@ interface OrganizationSelectProps {
   organizations: Organization[];
   selectedOrg: Organization;
   setSelectedOrg: (org: Organization) => void;
+  className?: string;
 }
 
 const OrganizationSelect: React.FC<OrganizationSelectProps> = ({
   organizations,
   selectedOrg,
-  setSelectedOrg
+  setSelectedOrg,
+  className
 }) => {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button 
           variant="outline" 
-          className="gap-2"
+          className={cn("gap-2", className)}
         >
           <Github className="h-4 w-4" />
           {selectedOrg.name}
