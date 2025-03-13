@@ -9,7 +9,7 @@ import { Package } from '@/types/package';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 const PackagesPage: React.FC = () => {
-  // Mock packages data
+  // Mock packages data with specified package types: npm, Docker, Maven, Python, Debian
   const [packages, setPackages] = useState<Package[]>([
     {
       id: '1',
@@ -73,6 +73,24 @@ const PackagesPage: React.FC = () => {
       vulnerabilities: 1,
       downloads: 5620,
       size: 1024 * 1024 * 3.6, // 3.6 MB
+    },
+    {
+      id: '8',
+      name: 'database-connector',
+      type: 'maven',
+      createdAt: '2023-09-05T16:30:00Z',
+      vulnerabilities: 2,
+      downloads: 18920,
+      size: 1024 * 1024 * 5.7, // 5.7 MB
+    },
+    {
+      id: '9',
+      name: 'logging-service',
+      type: 'debian',
+      createdAt: '2023-07-20T08:45:00Z',
+      vulnerabilities: 4,
+      downloads: 23470,
+      size: 1024 * 1024 * 1.2, // 1.2 MB
     },
   ]);
 

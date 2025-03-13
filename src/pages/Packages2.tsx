@@ -5,7 +5,7 @@ import PackageAIChat from '@/components/package/PackageAIChat';
 import { Package } from '@/types/package';
 
 const Packages2: React.FC = () => {
-  // Mock packages data
+  // Mock packages data with specified package types: npm, Docker, Maven, Python, Debian
   const [packages, setPackages] = useState<Package[]>([
     {
       id: '1',
@@ -99,12 +99,12 @@ const Packages2: React.FC = () => {
     },
     {
       id: '11',
-      name: 'web-framework',
-      type: 'npm',
+      name: 'ci-toolkit',
+      type: 'debian',
       createdAt: '2023-08-15T09:10:00Z',
       vulnerabilities: 3,
-      downloads: 89750,
-      size: 1024 * 1024 * 7.3, // 7.3 MB
+      downloads: 14750,
+      size: 1024 * 1024 * 2.3, // 2.3 MB
     },
     {
       id: '12',
