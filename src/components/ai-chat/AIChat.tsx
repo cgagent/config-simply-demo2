@@ -136,13 +136,13 @@ export const AIChat: React.FC = () => {
   // Initial state (no messages yet)
   if (messages.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center h-full pt-2">
-        <div className="flex items-center justify-center mb-2">
+      <div className="flex flex-col items-center justify-center h-full pt-0">
+        <div className="flex items-center justify-center mb-1">
           <div className="relative h-16 w-16 bg-primary/10 rounded-full flex items-center justify-center">
             <FlyFrogIcon />
           </div>
         </div>
-        <h1 className="text-2xl font-bold text-center mb-4">What do you want to know?</h1>
+        <h1 className="text-2xl font-bold text-center mb-3">What do you want to know?</h1>
         <div className="w-full max-w-xl">
           <ChatInput 
             isProcessing={isProcessing} 
@@ -151,7 +151,7 @@ export const AIChat: React.FC = () => {
             value={inputValue}
             setValue={setInputValue}
           />
-          <div className="mt-4">
+          <div className="mt-3">
             <SuggestedQueries 
               queries={SUGGESTED_QUERIES.map(q => q.label)} 
               onSelectQuery={(label) => {
@@ -183,3 +183,4 @@ export const AIChat: React.FC = () => {
     </div>
   );
 };
+

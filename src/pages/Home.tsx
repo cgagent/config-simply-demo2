@@ -9,9 +9,9 @@ const Home: React.FC = () => {
       <NavBar />
       
       <main className="flex-1 w-full mx-auto flex flex-col">
-        <div className="max-w-3xl w-full mx-auto px-4 sm:px-6 flex flex-col h-[calc(100vh-64px)]">
+        <div className="max-w-3xl w-full mx-auto px-4 sm:px-6 flex flex-col h-[calc(100vh-64px)] pt-0">
           <div className="flex-1 flex flex-col border-0 overflow-hidden bg-background">
-            <div className="flex-1 flex flex-col p-6 overflow-hidden">
+            <div className="flex-1 flex flex-col p-4 overflow-hidden">
               <AIChat />
             </div>
           </div>
