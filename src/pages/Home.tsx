@@ -1,9 +1,11 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { AIChat } from '@/components/ai-chat/AIChat';
 import StatisticsBar from '@/components/StatisticsBar';
 
 const Home: React.FC = () => {
+  const [isChatActive, setIsChatActive] = useState(false);
+  
   // Sample data for statistics - in a real app, this would come from an API or state
   const statsData = {
     ciCompletionPercentage: 78,
@@ -16,16 +18,18 @@ const Home: React.FC = () => {
     <div className="min-h-screen flex flex-col bg-background dark:bg-background">
       <main className="flex-1 w-full mx-auto flex flex-col">
         <div className="max-w-7xl w-full mx-auto px-4 sm:px-6 flex flex-col h-[calc(100vh-64px)] pt-6">
-          <StatisticsBar 
-            ciCompletionPercentage={statsData.ciCompletionPercentage}
-            blockedPackages={statsData.blockedPackages}
-            totalPackages={statsData.totalPackages}
-            dataConsumption={statsData.dataConsumption}
-          />
+          {!isChatActive && (
+            <StatisticsBar 
+              ciCompletionPercentage={statsData.ciCompletionPercentage}
+              blockedPackages={statsData.blockedPackages}
+              totalPackages={statsData.totalPackages}
+              dataConsumption={statsData.dataConsumption}
+            />
+          )}
           
           <div className="flex-1 flex flex-col border-0 overflow-hidden bg-background dark:bg-background">
             <div className="flex-1 flex flex-col p-4 overflow-hidden">
-              <AIChat />
+              <AIChat onChatStateChange={setIsChatActive} />
             </div>
           </div>
         </div>
