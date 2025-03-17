@@ -9,12 +9,16 @@ interface AIChatProps {
   onChatStateChange?: (isChatActive: boolean) => void;
   initialInputValue?: string;
   clearInitialInputValue?: () => void;
+  shouldSendMessage?: boolean;
+  clearShouldSendMessage?: () => void;
 }
 
 export const AIChat: React.FC<AIChatProps> = ({ 
   onChatStateChange, 
   initialInputValue = '', 
-  clearInitialInputValue 
+  clearInitialInputValue,
+  shouldSendMessage = false,
+  clearShouldSendMessage
 }) => {
   const location = useLocation();
   const {
@@ -56,6 +60,16 @@ export const AIChat: React.FC<AIChatProps> = ({
       }, 200);
     }
   }, [location.state, resetMessages]);
+
+  // Handle the shouldSendMessage flag
+  useEffect(() => {
+    if (shouldSendMessage && inputValue && !isProcessing && clearShouldSendMessage) {
+      // Send the message with the current input value
+      handleSendMessage(inputValue);
+      // Clear the flag to prevent sending again
+      clearShouldSendMessage();
+    }
+  }, [shouldSendMessage, inputValue, isProcessing, handleSendMessage, clearShouldSendMessage]);
 
   // Simulate typing effect for AI responses
   const simulateTypingResponse = (text: string) => {
@@ -121,25 +135,22 @@ export const AIChat: React.FC<AIChatProps> = ({
     // Update input value
     setInputValue(initialInputValue);
     
-    // Send message after a delay to ensure state updates have settled
-    const timer = setTimeout(() => {
-      handleSendMessage(initialInputValue);
-      
-      // Clear initialInputValue to prevent reprocessing
-      if (clearInitialInputValue) {
+    // Clear initialInputValue to prevent reprocessing
+    if (clearInitialInputValue) {
+      setTimeout(() => {
         clearInitialInputValue();
-      }
-      
-      // Release processing lock after sufficient delay
+        // Release processing lock after sufficient delay
+        setTimeout(() => {
+          processingRef.current = false;
+        }, 500);
+      }, 200);
+    } else {
+      // Release processing lock after sufficient delay if no clearInitialInputValue function
       setTimeout(() => {
         processingRef.current = false;
-      }, 500);
-    }, 200);
-    
-    return () => {
-      clearTimeout(timer);
-    };
-  }, [initialInputValue, clearInitialInputValue, setInputValue, handleSendMessage]);
+      }, 700);
+    }
+  }, [initialInputValue, clearInitialInputValue, setInputValue]);
 
   // Notify parent about chat state changes
   useEffect(() => {

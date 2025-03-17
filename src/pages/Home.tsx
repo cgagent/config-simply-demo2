@@ -7,6 +7,7 @@ import { useLocation } from 'react-router-dom';
 const Home: React.FC = () => {
   const [isChatActive, setIsChatActive] = useState(false);
   const [chatInputValue, setChatInputValue] = useState('');
+  const [shouldSendMessage, setShouldSendMessage] = useState(false);
   const location = useLocation();
   const initialRender = useRef(true);
   const queryCooldownRef = useRef(false);
@@ -33,6 +34,7 @@ const Home: React.FC = () => {
       console.log("Resetting chat state from location state change");
       setIsChatActive(false);
       setChatInputValue('');
+      setShouldSendMessage(false);
       // Clear the state to avoid repeating this action
       window.history.replaceState({}, document.title);
     }
@@ -51,11 +53,13 @@ const Home: React.FC = () => {
     
     // First completely clear the previous value
     setChatInputValue('');
+    setIsChatActive(true);
     
     // Wait to ensure the clear has processed before setting new value
     setTimeout(() => {
       setChatInputValue(query);
-      setIsChatActive(true);
+      // Set flag to send the message automatically
+      setShouldSendMessage(true);
       
       // Release cooldown after a sufficient delay
       setTimeout(() => {
@@ -84,6 +88,8 @@ const Home: React.FC = () => {
                 onChatStateChange={setIsChatActive}
                 initialInputValue={chatInputValue}
                 clearInitialInputValue={() => setChatInputValue('')}
+                shouldSendMessage={shouldSendMessage}
+                clearShouldSendMessage={() => setShouldSendMessage(false)}
               />
             </div>
           </div>
