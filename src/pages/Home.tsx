@@ -3,12 +3,14 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { AIChat } from '@/components/ai-chat/AIChat';
 import StatisticsBar from '@/components/StatisticsBar';
 import { useLocation } from 'react-router-dom';
+import { useToast } from '@/hooks/use-toast';
 
 const Home: React.FC = () => {
   const [isChatActive, setIsChatActive] = useState(false);
   const [chatInputValue, setChatInputValue] = useState('');
   const [shouldSendMessage, setShouldSendMessage] = useState(false);
   const location = useLocation();
+  const { toast } = useToast();
   const initialRender = useRef(true);
   const queryCooldownRef = useRef(false);
   const lastQueryRef = useRef('');
@@ -40,35 +42,52 @@ const Home: React.FC = () => {
     }
   }, [location]);
 
-  // Handler for statistics panel queries with debounce
+  // Handler for statistics panel queries with improved reliability
   const handleChatQuery = useCallback((query: string) => {
     // Prevent rapid sequential clicks and reprocessing the same query
-    if (queryCooldownRef.current || query === lastQueryRef.current) return;
+    if (queryCooldownRef.current) {
+      console.log("Ignoring query during cooldown period:", query);
+      return;
+    }
     
-    // Set cooldown flag and store current query
+    // Set cooldown flag immediately
     queryCooldownRef.current = true;
+    console.log("Setting cooldown for query:", query);
+    
+    // Check if this is the same query as last time
+    if (query === lastQueryRef.current && isChatActive) {
+      console.log("Ignoring duplicate query:", query);
+      queryCooldownRef.current = false;
+      return;
+    }
+    
+    // Store current query
     lastQueryRef.current = query;
+    console.log("Chat query being processed:", query);
     
-    console.log("Chat query received:", query);
-    
-    // First completely clear the previous value
-    setChatInputValue('');
-    
-    // Immediately activate the chat to skip the initial screen
+    // First activate the chat to ensure we're in conversation mode
     setIsChatActive(true);
     
-    // Wait to ensure the clear has processed before setting new value
+    // Wait a moment for state to update
     setTimeout(() => {
-      setChatInputValue(query);
-      // Set flag to send the message automatically
-      setShouldSendMessage(true);
+      // Clear previous input
+      setChatInputValue('');
       
-      // Release cooldown after a sufficient delay
+      // Set new input value after a brief delay
       setTimeout(() => {
-        queryCooldownRef.current = false;
-      }, 2000); // Extended to 2 seconds to prevent quick repeated clicks
-    }, 150);
-  }, []);
+        setChatInputValue(query);
+        
+        // Set flag to send the message automatically
+        setShouldSendMessage(true);
+        
+        // Release cooldown after a sufficient delay
+        setTimeout(() => {
+          queryCooldownRef.current = false;
+          console.log("Cooldown period ended for query:", query);
+        }, 3000); // Extended to 3 seconds to prevent quick repeated clicks
+      }, 100);
+    }, 100);
+  }, [isChatActive]);
 
   return (
     <div className="min-h-screen flex flex-col bg-background dark:bg-background">

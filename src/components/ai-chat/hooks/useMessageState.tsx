@@ -1,5 +1,5 @@
 
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 import { Message } from '../constants';
 
 export const useMessageState = () => {
@@ -7,34 +7,42 @@ export const useMessageState = () => {
   const [isProcessing, setIsProcessing] = useState(false);
   const [inputValue, setInputValue] = useState('');
 
-  const addMessage = (message: Message) => {
+  const addMessage = useCallback((message: Message) => {
     setMessages(prev => [...prev, message]);
-  };
+  }, []);
 
-  const addUserMessage = (content: string) => {
+  const addUserMessage = useCallback((content: string) => {
+    if (!content.trim()) return;
+    
     const userMessage: Message = {
       id: Date.now().toString(),
       role: 'user',
       content
     };
     
+    console.log("Adding user message:", content);
     addMessage(userMessage);
-  };
+  }, [addMessage]);
 
-  const addBotMessage = (content: string) => {
+  const addBotMessage = useCallback((content: string) => {
+    if (!content) return;
+    
     const botMessage: Message = {
       id: (Date.now() + 1).toString(),
       role: 'bot',
       content
     };
     
+    console.log("Adding bot message");
     addMessage(botMessage);
-  };
+  }, [addMessage]);
 
-  const resetMessages = () => {
+  const resetMessages = useCallback(() => {
+    console.log("Resetting messages");
     setMessages([]);
     setInputValue('');
-  };
+    setIsProcessing(false);
+  }, []);
 
   return {
     messages,

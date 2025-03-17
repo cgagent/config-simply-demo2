@@ -1,5 +1,5 @@
 
-import { useEffect, useRef } from 'react';
+import { useState, useEffect, useRef } from 'react';
 
 interface UseInitialInputProps {
   initialInputValue: string;
@@ -14,51 +14,41 @@ export const useInitialInput = ({
   setInputValue,
   isProcessing
 }: UseInitialInputProps) => {
-  // Track last processed input
-  const lastProcessedInputRef = useRef<string>('');
-  // Processing flag to prevent loops
-  const processingRef = useRef(false);
+  const [hasInitialInput, setHasInitialInput] = useState(false);
+  const previousInputRef = useRef('');
+  const processingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   
-  // Handle initialInputValue changes safely
   useEffect(() => {
-    // Skip if empty, already processing, or already processed this exact input
-    if (!initialInputValue || 
-        initialInputValue.trim() === '' || 
-        processingRef.current ||
-        initialInputValue === lastProcessedInputRef.current) {
-      return;
-    }
-    
-    console.log("Processing new initial input value:", initialInputValue);
-    
-    // Set processing flag to prevent re-entrant processing
-    processingRef.current = true;
-    
-    // Update lastProcessed reference
-    lastProcessedInputRef.current = initialInputValue;
-    
-    // Update input value
-    setInputValue(initialInputValue);
-    
-    // Clear initialInputValue to prevent reprocessing
-    if (clearInitialInputValue) {
-      setTimeout(() => {
-        clearInitialInputValue();
-        // Release processing lock after sufficient delay
-        setTimeout(() => {
-          processingRef.current = false;
+    // If we get a new initial input value that's different from what we've seen before
+    if (initialInputValue && initialInputValue !== previousInputRef.current) {
+      console.log("Processing new initial input value:", initialInputValue);
+      previousInputRef.current = initialInputValue;
+      
+      // Clear any existing timeout
+      if (processingTimeoutRef.current) {
+        clearTimeout(processingTimeoutRef.current);
+        processingTimeoutRef.current = null;
+      }
+      
+      // Set the input value with a brief delay
+      setInputValue(initialInputValue);
+      setHasInitialInput(true);
+      
+      // Set a timeout to clear the initial input value after it has been processed
+      if (clearInitialInputValue) {
+        processingTimeoutRef.current = setTimeout(() => {
+          clearInitialInputValue();
+          processingTimeoutRef.current = null;
         }, 500);
-      }, 200);
-    } else {
-      // Release processing lock after sufficient delay if no clearInitialInputValue function
-      setTimeout(() => {
-        processingRef.current = false;
-      }, 700);
+      }
     }
-  }, [initialInputValue, clearInitialInputValue, setInputValue]);
+    
+    // If we don't have an initial input value anymore, update our state accordingly
+    if (!initialInputValue && hasInitialInput && !isProcessing) {
+      previousInputRef.current = '';
+      setHasInitialInput(false);
+    }
+  }, [initialInputValue, clearInitialInputValue, setInputValue, hasInitialInput, isProcessing]);
 
-  // Check if we have initial input
-  const hasInitialInput = initialInputValue && initialInputValue.trim() !== '';
-  
   return { hasInitialInput };
 };
