@@ -58,10 +58,6 @@ const StatisticsBar: React.FC<StatisticsBarProps> = ({
         <p className="text-2xl font-bold mb-2">{ciCompletionPercentage}%</p>
         <Progress value={ciCompletionPercentage} className="h-2" />
         <p className="text-xs text-muted-foreground mt-2">Current CI Status</p>
-        <div className="flex items-center text-primary text-xs mt-2 font-medium">
-          <span>View details</span>
-          <ArrowRight className="h-3 w-3 ml-1" />
-        </div>
       </Card>
       
       <Card 
@@ -74,10 +70,6 @@ const StatisticsBar: React.FC<StatisticsBarProps> = ({
         </div>
         <p className="text-2xl font-bold">{blockedPackages}</p>
         <p className="text-xs text-muted-foreground mt-2">Last 30 days</p>
-        <div className="flex items-center text-destructive text-xs mt-2 font-medium">
-          <span>Ask AI about blocked packages</span>
-          <ArrowRight className="h-3 w-3 ml-1" />
-        </div>
       </Card>
       
       <Card 
@@ -90,10 +82,6 @@ const StatisticsBar: React.FC<StatisticsBarProps> = ({
         </div>
         <p className="text-2xl font-bold">{formatNumber(totalPackages)}</p>
         <p className="text-xs text-muted-foreground mt-2">Last 30 days</p>
-        <div className="flex items-center text-blue-500 text-xs mt-2 font-medium">
-          <span>Ask AI about package usage</span>
-          <ArrowRight className="h-3 w-3 ml-1" />
-        </div>
       </Card>
       
       <Card 
@@ -106,10 +94,6 @@ const StatisticsBar: React.FC<StatisticsBarProps> = ({
         </div>
         <p className="text-2xl font-bold">{formatNumber(dataConsumption)} MB</p>
         <p className="text-xs text-muted-foreground mt-2">Last 30 days</p>
-        <div className="flex items-center text-amber-500 text-xs mt-2 font-medium">
-          <span>Ask AI about data usage</span>
-          <ArrowRight className="h-3 w-3 ml-1" />
-        </div>
       </Card>
     </div>
   );

@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { InitialChatScreen } from './InitialChatScreen';
 import { ConversationScreen } from './ConversationScreen';
 import { useMessageHandler } from './hooks/useMessageHandler';
@@ -34,17 +34,56 @@ export const AIChat: React.FC<AIChatProps> = ({
     showCIConfig,
     repository
   } = useMessageHandler();
+  
+  const [isTyping, setIsTyping] = useState(false);
+  const [displayedInput, setDisplayedInput] = useState('');
+  const [fullInput, setFullInput] = useState('');
+  const typingSpeed = 50; // milliseconds per character
+  const typingTimerRef = useRef<number | null>(null);
+
+  // Simulate typing effect
+  const simulateTyping = (text: string) => {
+    setIsTyping(true);
+    setFullInput(text);
+    setDisplayedInput('');
+    
+    let currentIndex = 0;
+    
+    const typeNextCharacter = () => {
+      if (currentIndex < text.length) {
+        setDisplayedInput(prev => prev + text.charAt(currentIndex));
+        currentIndex++;
+        typingTimerRef.current = window.setTimeout(typeNextCharacter, typingSpeed);
+      } else {
+        setIsTyping(false);
+        // Send the message after typing animation completes
+        handleSendMessage(text);
+        // Clear the initial value to prevent re-sending
+        if (clearInitialInputValue) {
+          clearInitialInputValue();
+        }
+      }
+    };
+    
+    typeNextCharacter();
+  };
+
+  // Clean up typing animation on unmount
+  useEffect(() => {
+    return () => {
+      if (typingTimerRef.current) {
+        clearTimeout(typingTimerRef.current);
+      }
+    };
+  }, []);
 
   // Listen for initial input value changes
   useEffect(() => {
     if (initialInputValue && initialInputValue.trim() !== '') {
+      // Set the input value immediately for display
       setInputValue(initialInputValue);
-      // Automatically send the message if it comes from a statistics panel
-      handleSendMessage(initialInputValue);
-      // Clear the initial value to prevent re-sending
-      if (clearInitialInputValue) {
-        clearInitialInputValue();
-      }
+      // Start typing animation
+      simulateTyping(initialInputValue);
     }
   }, [initialInputValue, clearInitialInputValue]);
 
@@ -66,10 +105,10 @@ export const AIChat: React.FC<AIChatProps> = ({
   if (messages.length === 0) {
     return (
       <InitialChatScreen
-        isProcessing={isProcessing}
-        inputValue={inputValue}
-        setInputValue={setInputValue}
-        onSendMessage={handleSendMessage}
+        isProcessing={isProcessing || isTyping}
+        inputValue={isTyping ? displayedInput : inputValue}
+        setInputValue={isTyping ? () => {} : setInputValue}
+        onSendMessage={isTyping ? () => {} : handleSendMessage}
         onSelectQuery={handleSelectQuery}
       />
     );
@@ -97,10 +136,10 @@ export const AIChat: React.FC<AIChatProps> = ({
       </div>
       <ConversationScreen
         messages={messages}
-        isProcessing={isProcessing}
-        inputValue={inputValue}
-        setInputValue={setInputValue}
-        onSendMessage={handleSendMessage}
+        isProcessing={isProcessing || isTyping}
+        inputValue={isTyping ? displayedInput : inputValue}
+        setInputValue={isTyping ? () => {} : setInputValue}
+        onSendMessage={isTyping ? () => {} : handleSendMessage}
         onSelectQuery={handleSelectQuery}
         showCIConfig={showCIConfig}
         repository={repository}
