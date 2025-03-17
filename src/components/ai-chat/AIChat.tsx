@@ -34,14 +34,15 @@ export const AIChat: React.FC<AIChatProps> = ({
   const typingSpeed = 15; // milliseconds per character - faster than before
   const typingTimerRef = useRef<number | null>(null);
   const latestMessageRef = useRef<string | null>(null);
-  const initialInputProcessedRef = useRef(false);
+  // Track last processed input to compare with new inputs
+  const lastProcessedInputRef = useRef<string>('');
 
   // Check location state for reset flag
   useEffect(() => {
     if (location.state && location.state.resetChat) {
       console.log("AIChat detected reset state, clearing messages");
       resetMessages();
-      initialInputProcessedRef.current = false; // Reset this flag when messages are reset
+      lastProcessedInputRef.current = ''; // Reset this when messages are reset
     }
   }, [location.state, resetMessages]);
 
@@ -90,13 +91,18 @@ export const AIChat: React.FC<AIChatProps> = ({
 
   // Listen for initial input value changes and send it immediately
   useEffect(() => {
-    // Only process if we have an initialInputValue and haven't processed it yet
-    if (initialInputValue && initialInputValue.trim() !== '' && !initialInputProcessedRef.current) {
-      console.log("Processing initial input value:", initialInputValue);
-      // Mark as processed to prevent re-sending
-      initialInputProcessedRef.current = true;
+    // Only process if we have an initialInputValue and it's different from the last processed one
+    if (initialInputValue && initialInputValue.trim() !== '' && 
+        initialInputValue !== lastProcessedInputRef.current) {
+      
+      console.log("Processing new initial input value:", initialInputValue);
+      
+      // Store the current input as processed
+      lastProcessedInputRef.current = initialInputValue;
+      
       // Set the input value
       setInputValue(initialInputValue);
+      
       // Send the message with a small delay to ensure state updates have processed
       setTimeout(() => {
         handleSendMessage(initialInputValue);
@@ -108,10 +114,10 @@ export const AIChat: React.FC<AIChatProps> = ({
     }
   }, [initialInputValue, clearInitialInputValue, setInputValue, handleSendMessage]);
 
-  // Reset the initialInputProcessedRef when messages are reset
+  // Reset the lastProcessedInputRef when messages are reset
   useEffect(() => {
     if (messages.length === 0) {
-      initialInputProcessedRef.current = false;
+      lastProcessedInputRef.current = '';
     }
   }, [messages]);
 

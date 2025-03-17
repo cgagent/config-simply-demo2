@@ -39,8 +39,14 @@ const Home: React.FC = () => {
   // Handler for statistics panel queries
   const handleChatQuery = (query: string) => {
     console.log("Chat query received:", query);
-    setChatInputValue(query);
-    setIsChatActive(true);
+    // First reset the current value to ensure re-triggering even if same query
+    setChatInputValue('');
+    
+    // Use setTimeout to ensure the state update happens in a new cycle
+    setTimeout(() => {
+      setChatInputValue(query);
+      setIsChatActive(true);
+    }, 10);
   };
 
   return (
