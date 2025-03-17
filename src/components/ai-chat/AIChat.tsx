@@ -35,33 +35,26 @@ export const AIChat: React.FC<AIChatProps> = ({
     repository
   } = useMessageHandler();
   
-  const [isTyping, setIsTyping] = useState(false);
-  const [displayedInput, setDisplayedInput] = useState('');
-  const [fullInput, setFullInput] = useState('');
-  const typingSpeed = 50; // milliseconds per character
+  const [displayedResponse, setDisplayedResponse] = useState('');
+  const [isAnimatingResponse, setIsAnimatingResponse] = useState(false);
+  const typingSpeed = 15; // milliseconds per character - faster than before
   const typingTimerRef = useRef<number | null>(null);
+  const latestMessageRef = useRef<string | null>(null);
 
-  // Simulate typing effect
-  const simulateTyping = (text: string) => {
-    setIsTyping(true);
-    setFullInput(text);
-    setDisplayedInput('');
+  // Simulate typing effect for AI responses
+  const simulateTypingResponse = (text: string) => {
+    setIsAnimatingResponse(true);
+    setDisplayedResponse('');
     
     let currentIndex = 0;
     
     const typeNextCharacter = () => {
       if (currentIndex < text.length) {
-        setDisplayedInput(prev => prev + text.charAt(currentIndex));
+        setDisplayedResponse(prev => prev + text.charAt(currentIndex));
         currentIndex++;
         typingTimerRef.current = window.setTimeout(typeNextCharacter, typingSpeed);
       } else {
-        setIsTyping(false);
-        // Send the message after typing animation completes
-        handleSendMessage(text);
-        // Clear the initial value to prevent re-sending
-        if (clearInitialInputValue) {
-          clearInitialInputValue();
-        }
+        setIsAnimatingResponse(false);
       }
     };
     
@@ -77,13 +70,31 @@ export const AIChat: React.FC<AIChatProps> = ({
     };
   }, []);
 
-  // Listen for initial input value changes
+  // Listen for new bot messages to animate them
+  useEffect(() => {
+    const botMessages = messages.filter(m => m.role === 'bot');
+    if (botMessages.length > 0) {
+      const latestBotMessage = botMessages[botMessages.length - 1];
+      
+      // Only animate if this is a new message we haven't seen yet
+      if (latestBotMessage.content !== latestMessageRef.current) {
+        latestMessageRef.current = latestBotMessage.content;
+        simulateTypingResponse(latestBotMessage.content);
+      }
+    }
+  }, [messages]);
+
+  // Listen for initial input value changes and send it immediately
   useEffect(() => {
     if (initialInputValue && initialInputValue.trim() !== '') {
-      // Set the input value immediately for display
+      // Set the input value
       setInputValue(initialInputValue);
-      // Start typing animation
-      simulateTyping(initialInputValue);
+      // Send the message immediately
+      handleSendMessage(initialInputValue);
+      // Clear the initial value to prevent re-sending
+      if (clearInitialInputValue) {
+        clearInitialInputValue();
+      }
     }
   }, [initialInputValue, clearInitialInputValue]);
 
@@ -105,13 +116,29 @@ export const AIChat: React.FC<AIChatProps> = ({
   if (messages.length === 0) {
     return (
       <InitialChatScreen
-        isProcessing={isProcessing || isTyping}
-        inputValue={isTyping ? displayedInput : inputValue}
-        setInputValue={isTyping ? () => {} : setInputValue}
-        onSendMessage={isTyping ? () => {} : handleSendMessage}
+        isProcessing={isProcessing}
+        inputValue={inputValue}
+        setInputValue={setInputValue}
+        onSendMessage={handleSendMessage}
         onSelectQuery={handleSelectQuery}
       />
     );
+  }
+
+  // Create a modified messages array with the animated content for the last bot message
+  const displayMessages = [...messages];
+  if (isAnimatingResponse && displayMessages.length > 0) {
+    // Find the last bot message
+    for (let i = displayMessages.length - 1; i >= 0; i--) {
+      if (displayMessages[i].role === 'bot') {
+        // Replace its content with the currently animated content
+        displayMessages[i] = {
+          ...displayMessages[i],
+          content: displayedResponse
+        };
+        break;
+      }
+    }
   }
 
   // Chat state (after user has sent at least one message)
@@ -135,11 +162,11 @@ export const AIChat: React.FC<AIChatProps> = ({
         </Breadcrumb>
       </div>
       <ConversationScreen
-        messages={messages}
-        isProcessing={isProcessing || isTyping}
-        inputValue={isTyping ? displayedInput : inputValue}
-        setInputValue={isTyping ? () => {} : setInputValue}
-        onSendMessage={isTyping ? () => {} : handleSendMessage}
+        messages={displayMessages}
+        isProcessing={isProcessing}
+        inputValue={inputValue}
+        setInputValue={setInputValue}
+        onSendMessage={handleSendMessage}
         onSelectQuery={handleSelectQuery}
         showCIConfig={showCIConfig}
         repository={repository}
