@@ -19,14 +19,13 @@ const queryClient = new QueryClient();
 const MainLayout = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  const [isChatActive, setIsChatActive] = useState(false);
 
   // Handler for resetting to home page (closing chat if active)
   const handleHomeClick = () => {
     if (location.pathname === '/home') {
       // We're on home, notify home component to reset the chat
       // The state update will be picked up by the Home component
-      navigate('/home', { state: { resetChat: true } });
+      navigate('/home', { state: { resetChat: true }, replace: true });
     }
   };
 

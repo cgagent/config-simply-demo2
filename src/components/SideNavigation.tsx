@@ -33,9 +33,13 @@ const SideNavigation: React.FC<SideNavigationProps> = ({ className, onHomeLinkCl
   };
 
   const handleNavClick = (path: string) => {
-    if (path === '/home' && location.pathname === '/home' && onHomeLinkClick) {
-      // If we're already on home and clicked home again, trigger the callback
-      onHomeLinkClick();
+    if (path === '/home') {
+      // Always trigger the callback for home, regardless of current location
+      if (onHomeLinkClick) {
+        onHomeLinkClick();
+      } else {
+        navigate(path);
+      }
     } else {
       navigate(path);
     }
