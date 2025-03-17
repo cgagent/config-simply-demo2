@@ -17,14 +17,17 @@ const Home: React.FC = () => {
     dataConsumption: 1528
   };
 
-  // Check for resetChat state from navigation
+  // Check for resetChat state from navigation and also reset on each visit to home
   useEffect(() => {
+    // Reset chat whenever location changes to home
+    setIsChatActive(false);
+    
+    // Also handle explicit reset from navigation state
     if (location.state && location.state.resetChat) {
-      setIsChatActive(false);
       // Clear the state to avoid repeating this action
       window.history.replaceState({}, document.title);
     }
-  }, [location.state]);
+  }, [location.pathname, location.state]);
 
   // Handler for statistics panel queries
   const handleChatQuery = (query: string) => {
