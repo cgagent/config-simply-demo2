@@ -9,6 +9,7 @@ const Home: React.FC = () => {
   const [chatInputValue, setChatInputValue] = useState('');
   const location = useLocation();
   const initialRender = useRef(true);
+  const queryCooldownRef = useRef(false);
   
   // Sample data for statistics - in a real app, this would come from an API or state
   const statsData = {
@@ -38,15 +39,26 @@ const Home: React.FC = () => {
 
   // Handler for statistics panel queries
   const handleChatQuery = (query: string) => {
+    if (queryCooldownRef.current) return;
+    
+    // Set cooldown flag to prevent rapid clicks
+    queryCooldownRef.current = true;
+    
     console.log("Chat query received:", query);
-    // First reset the current value to ensure re-triggering even if same query
+    // First reset the current value
     setChatInputValue('');
     
-    // Use setTimeout to ensure the state update happens in a new cycle
+    // Wait for state update to clear
     setTimeout(() => {
+      // Then set the new value and activate chat
       setChatInputValue(query);
       setIsChatActive(true);
-    }, 10);
+      
+      // Release cooldown after a delay
+      setTimeout(() => {
+        queryCooldownRef.current = false;
+      }, 500);
+    }, 50);
   };
 
   return (

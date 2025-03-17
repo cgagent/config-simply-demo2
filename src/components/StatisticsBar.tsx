@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useCallback } from 'react';
 import { Card } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { CheckCircle, Package, PackageX, Database } from 'lucide-react';
@@ -23,27 +23,27 @@ const StatisticsBar: React.FC<StatisticsBarProps> = ({
 }) => {
   const navigate = useNavigate();
 
-  const handleCICompletionClick = () => {
+  const handleCICompletionClick = useCallback(() => {
     navigate('/repositories');
-  };
+  }, [navigate]);
 
-  const handleBlockedPackagesClick = () => {
+  const handleBlockedPackagesClick = useCallback(() => {
     if (onChatQuery) {
       onChatQuery("Show me detailed information about blocked packages in the last 30 days");
     }
-  };
+  }, [onChatQuery]);
 
-  const handleTotalPackagesClick = () => {
+  const handleTotalPackagesClick = useCallback(() => {
     if (onChatQuery) {
       onChatQuery("What are the most popular packages in my organization?");
     }
-  };
+  }, [onChatQuery]);
 
-  const handleDataConsumptionClick = () => {
+  const handleDataConsumptionClick = useCallback(() => {
     if (onChatQuery) {
       onChatQuery("Provide a breakdown of data consumption over the last 30 days");
     }
-  };
+  }, [onChatQuery]);
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">

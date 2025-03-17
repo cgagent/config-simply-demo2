@@ -34,8 +34,10 @@ export const AIChat: React.FC<AIChatProps> = ({
   const typingSpeed = 15; // milliseconds per character - faster than before
   const typingTimerRef = useRef<number | null>(null);
   const latestMessageRef = useRef<string | null>(null);
-  // Track last processed input to compare with new inputs
+  // Track last processed input
   const lastProcessedInputRef = useRef<string>('');
+  // Flag to prevent useEffect loops
+  const isInitialQueryProcessingRef = useRef(false);
 
   // Check location state for reset flag
   useEffect(() => {
@@ -43,6 +45,7 @@ export const AIChat: React.FC<AIChatProps> = ({
       console.log("AIChat detected reset state, clearing messages");
       resetMessages();
       lastProcessedInputRef.current = ''; // Reset this when messages are reset
+      isInitialQueryProcessingRef.current = false;
     }
   }, [location.state, resetMessages]);
 
@@ -91,11 +94,20 @@ export const AIChat: React.FC<AIChatProps> = ({
 
   // Listen for initial input value changes and send it immediately
   useEffect(() => {
-    // Only process if we have an initialInputValue and it's different from the last processed one
-    if (initialInputValue && initialInputValue.trim() !== '' && 
+    // Prevent processing if we're already in the middle of processing
+    if (isInitialQueryProcessingRef.current) {
+      return;
+    }
+    
+    // Only process if we have a new initialInputValue that's different from last processed
+    if (initialInputValue && 
+        initialInputValue.trim() !== '' && 
         initialInputValue !== lastProcessedInputRef.current) {
       
       console.log("Processing new initial input value:", initialInputValue);
+      
+      // Set flag to prevent re-entry during processing
+      isInitialQueryProcessingRef.current = true;
       
       // Store the current input as processed
       lastProcessedInputRef.current = initialInputValue;
@@ -110,6 +122,10 @@ export const AIChat: React.FC<AIChatProps> = ({
         if (clearInitialInputValue) {
           clearInitialInputValue();
         }
+        // Reset processing flag after a delay to allow for state updates
+        setTimeout(() => {
+          isInitialQueryProcessingRef.current = false;
+        }, 100);
       }, 100);
     }
   }, [initialInputValue, clearInitialInputValue, setInputValue, handleSendMessage]);
@@ -118,6 +134,7 @@ export const AIChat: React.FC<AIChatProps> = ({
   useEffect(() => {
     if (messages.length === 0) {
       lastProcessedInputRef.current = '';
+      isInitialQueryProcessingRef.current = false;
     }
   }, [messages]);
 
