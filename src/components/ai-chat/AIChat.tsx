@@ -3,6 +3,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { InitialChatScreen } from './InitialChatScreen';
 import { ConversationScreen } from './ConversationScreen';
 import { useMessageHandler } from './hooks/useMessageHandler';
+import { useLocation } from 'react-router-dom';
 
 interface AIChatProps {
   onChatStateChange?: (isChatActive: boolean) => void;
@@ -15,6 +16,7 @@ export const AIChat: React.FC<AIChatProps> = ({
   initialInputValue = '', 
   clearInitialInputValue 
 }) => {
+  const location = useLocation();
   const {
     messages,
     isProcessing,
@@ -23,7 +25,8 @@ export const AIChat: React.FC<AIChatProps> = ({
     handleSendMessage,
     handleSelectQuery,
     showCIConfig,
-    repository
+    repository,
+    resetMessages
   } = useMessageHandler();
   
   const [displayedResponse, setDisplayedResponse] = useState('');
@@ -31,6 +34,14 @@ export const AIChat: React.FC<AIChatProps> = ({
   const typingSpeed = 15; // milliseconds per character - faster than before
   const typingTimerRef = useRef<number | null>(null);
   const latestMessageRef = useRef<string | null>(null);
+
+  // Check location state for reset flag
+  useEffect(() => {
+    if (location.state && location.state.resetChat) {
+      console.log("AIChat detected reset state, clearing messages");
+      resetMessages();
+    }
+  }, [location.state, resetMessages]);
 
   // Simulate typing effect for AI responses
   const simulateTypingResponse = (text: string) => {
@@ -87,7 +98,7 @@ export const AIChat: React.FC<AIChatProps> = ({
         clearInitialInputValue();
       }
     }
-  }, [initialInputValue, clearInitialInputValue]);
+  }, [initialInputValue, clearInitialInputValue, setInputValue, handleSendMessage]);
 
   // Notify parent component about chat state changes
   useEffect(() => {

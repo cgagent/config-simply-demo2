@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { AIChat } from '@/components/ai-chat/AIChat';
 import StatisticsBar from '@/components/StatisticsBar';
 import { useLocation } from 'react-router-dom';
@@ -8,6 +8,7 @@ const Home: React.FC = () => {
   const [isChatActive, setIsChatActive] = useState(false);
   const [chatInputValue, setChatInputValue] = useState('');
   const location = useLocation();
+  const initialRender = useRef(true);
   
   // Sample data for statistics - in a real app, this would come from an API or state
   const statsData = {
@@ -19,26 +20,26 @@ const Home: React.FC = () => {
 
   // Reset chat when navigating to home
   useEffect(() => {
-    // Reset chat whenever location changes to home or when there's an explicit reset request
-    if (location.pathname === '/home') {
-      if (location.state && location.state.resetChat) {
-        setIsChatActive(false);
-        setChatInputValue('');
-        // Clear the state to avoid repeating this action
-        window.history.replaceState({}, document.title);
-      }
+    // Skip the initial render to avoid resetting on first load
+    if (initialRender.current) {
+      initialRender.current = false;
+      return;
     }
-  }, [location.pathname, location.state]);
+
+    // Reset chat whenever location state has resetChat flag
+    if (location.pathname === '/home' && location.state && location.state.resetChat) {
+      console.log("Resetting chat state from location state change");
+      setIsChatActive(false);
+      setChatInputValue('');
+      // Clear the state to avoid repeating this action
+      window.history.replaceState({}, document.title);
+    }
+  }, [location]);
 
   // Handler for statistics panel queries
   const handleChatQuery = (query: string) => {
     setChatInputValue(query);
     setIsChatActive(true);
-  };
-
-  const handleResetChat = () => {
-    setIsChatActive(false);
-    setChatInputValue('');
   };
 
   return (

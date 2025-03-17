@@ -14,6 +14,14 @@ export const useMessageHandler = () => {
   const { toast } = useToast();
   const navigate = useNavigate();
 
+  // Add a function to reset messages
+  const resetMessages = () => {
+    setMessages([]);
+    setShowCIConfig(false);
+    setRepository(null);
+    setInputValue('');
+  };
+
   const handleSendMessage = async (content: string) => {
     if (!content.trim()) return;
     
@@ -132,6 +140,7 @@ bad-actor-addon: Had a payload to exfiltrate private data.`;
     handleSendMessage,
     handleSelectQuery,
     showCIConfig,
-    repository
+    repository,
+    resetMessages // Export the new reset function
   };
 };
