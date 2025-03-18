@@ -1,28 +1,34 @@
 
 import { useState, useRef, useEffect } from 'react';
+import { Message } from '../constants';
 
 export interface UseTypingAnimationProps {
-  messages: Array<{ role: string; content: string, id: string }>;
+  messages: Message[];
   typingSpeed?: number;
 }
 
-export const useTypingAnimation = ({ messages, typingSpeed = 15 }: UseTypingAnimationProps) => {
+export const useTypingAnimation = ({ messages, typingSpeed = 3 }: UseTypingAnimationProps) => {
   const [displayedResponse, setDisplayedResponse] = useState('');
   const [isAnimatingResponse, setIsAnimatingResponse] = useState(false);
   const typingTimerRef = useRef<number | null>(null);
   const latestMessageRef = useRef<string | null>(null);
 
-  // Simulate typing effect for AI responses
+  // Simulate typing effect for AI responses with faster speed
   const simulateTypingResponse = (text: string) => {
     setIsAnimatingResponse(true);
     setDisplayedResponse('');
     
+    // For faster typing, we can process multiple characters per iteration
+    const charsPerIteration = 3; 
     let currentIndex = 0;
     
     const typeNextCharacter = () => {
       if (currentIndex < text.length) {
-        setDisplayedResponse(prev => prev + text.charAt(currentIndex));
-        currentIndex++;
+        // Add multiple characters at once for faster typing
+        const endIndex = Math.min(currentIndex + charsPerIteration, text.length);
+        const nextChars = text.substring(currentIndex, endIndex);
+        setDisplayedResponse(prev => prev + nextChars);
+        currentIndex = endIndex;
         typingTimerRef.current = window.setTimeout(typeNextCharacter, typingSpeed);
       } else {
         setIsAnimatingResponse(false);

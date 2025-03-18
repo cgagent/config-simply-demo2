@@ -66,7 +66,7 @@ export const AIChat: React.FC<AIChatProps> = ({
   // Handle typing animation
   const { getAnimatedMessages } = useTypingAnimation({ 
     messages,
-    typingSpeed: 15
+    typingSpeed: 3 // Increased typing speed (lower number = faster)
   });
   
   // Get messages with typing animation applied
