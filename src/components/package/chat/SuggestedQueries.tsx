@@ -1,6 +1,7 @@
 
 import React from 'react';
 import { Button } from '@/components/ui/button';
+import { ArrowUp } from 'lucide-react';
 
 interface SuggestedQueriesProps {
   queries: string[];
@@ -17,9 +18,10 @@ export const SuggestedQueries: React.FC<SuggestedQueriesProps> = ({ queries, onS
             key={index}
             variant="outline"
             size="sm"
-            className="text-xs"
+            className="text-xs flex items-center gap-1"
             onClick={() => onSelectQuery(query)}
           >
+            <ArrowUp className="h-3 w-3" />
             {query}
           </Button>
         ))}

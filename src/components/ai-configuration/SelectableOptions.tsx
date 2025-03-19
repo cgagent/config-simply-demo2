@@ -1,6 +1,7 @@
 
 import React from 'react';
 import { Button } from '@/components/ui/button';
+import { ArrowUp } from 'lucide-react';
 import { ChatOption } from './types';
 
 interface SelectableOptionsProps {
@@ -21,9 +22,10 @@ export const SelectableOptions: React.FC<SelectableOptionsProps> = ({
           key={option.id}
           variant="outline"
           size="sm"
-          className="text-xs rounded-full px-4 hover:bg-primary hover:text-primary-foreground transition-colors"
+          className="text-xs rounded-full px-4 hover:bg-primary hover:text-primary-foreground transition-colors flex items-center gap-1"
           onClick={() => onSelectOption(option)}
         >
+          <ArrowUp className="h-3 w-3" />
           {option.label}
         </Button>
       ))}
