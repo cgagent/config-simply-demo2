@@ -19,7 +19,8 @@ import {
   ChevronRight,
   Home,
   ServerCog,
-  Users
+  Users,
+  BellIcon
 } from 'lucide-react';
 
 interface NavBarProps {
@@ -29,6 +30,7 @@ interface NavBarProps {
 
 const NavBar: React.FC<NavBarProps> = ({ className, onHomeLinkClick }) => {
   const [expanded, setExpanded] = useState(false);
+  const [hasNotifications, setHasNotifications] = useState(true);
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -54,6 +56,14 @@ const NavBar: React.FC<NavBarProps> = ({ className, onHomeLinkClick }) => {
     } else {
       navigate(path);
     }
+  };
+  
+  const handleNotificationClick = () => {
+    // Toggle notification state for demo purposes
+    setHasNotifications(!hasNotifications);
+    
+    // In a real app, you would open a notification panel or navigate to notifications
+    console.log('Notification clicked');
   };
   
   return (
@@ -102,9 +112,27 @@ const NavBar: React.FC<NavBarProps> = ({ className, onHomeLinkClick }) => {
         </ul>
       </nav>
       
-      <div className="mt-auto px-4">
+      <div className="mt-auto px-2 space-y-2">
+        {/* Notification Button */}
+        <button 
+          onClick={handleNotificationClick}
+          className="flex items-center justify-center w-full px-3 py-2 rounded-md text-sm font-medium transition-colors text-green-100/80 hover:bg-green-800/30 hover:text-white"
+        >
+          <div className="relative">
+            <BellIcon className="w-5 h-5" />
+            {hasNotifications && (
+              <span className="absolute -top-1 -right-1 flex h-2 w-2">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
+              </span>
+            )}
+          </div>
+          {expanded && <span className="ml-3">Notifications</span>}
+        </button>
+        
+        {/* User Dropdown */}
         <DropdownMenu>
-          <DropdownMenuTrigger className="flex items-center gap-2 outline-none w-full">
+          <DropdownMenuTrigger className="flex items-center gap-2 outline-none w-full px-2 py-2 rounded-md hover:bg-green-800/30">
             <Avatar className="h-8 w-8 border-2 border-green-600/30">
               <AvatarImage src="https://github.com/shadcn.png" />
               <AvatarFallback>JD</AvatarFallback>
