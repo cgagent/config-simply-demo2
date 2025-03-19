@@ -28,7 +28,7 @@ export const ChatInput: React.FC<ChatInputProps> = ({
   const staticPlaceholder = "Ask me anything...";
   
   const rotatingPlaceholders = [
-    "set up your CI with FlyFrog",
+    "set up your CI with JFrog",
     "show you what are the most common packages in your organization in the last...",
     "find a package that does...",
     "identify what packages are vulnerable and used in your organization",
@@ -55,7 +55,7 @@ export const ChatInput: React.FC<ChatInputProps> = ({
   useEffect(() => {
     if (!isInitialState) return;
     
-    const prefix = "Ask FlyFrog to ";
+    const prefix = "Ask JFrog to ";
     
     if (isTyping) {
       if (currentSuggestion.length < rotatingPlaceholders[currentIndex].length) {
@@ -113,7 +113,7 @@ export const ChatInput: React.FC<ChatInputProps> = ({
   };
 
   const placeholder = isInitialState 
-    ? `Ask FlyFrog to ${currentSuggestion}`
+    ? `Ask JFrog to ${currentSuggestion}`
     : staticPlaceholder;
 
   return (
