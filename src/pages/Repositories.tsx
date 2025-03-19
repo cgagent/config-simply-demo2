@@ -35,8 +35,8 @@ const RepositoriesPage: React.FC = () => {
       isConfigured: true,
       packageTypeStatus: {
         'npm': true,
-        'docker': true,
-        'python': false
+        'docker': true
+  
       },
       workflows: [
         { 

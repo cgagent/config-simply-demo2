@@ -8,16 +8,15 @@ export const useConfigChat = (repositoryName?: string) => {
     {
       id: '1',
       role: 'bot',
-      content: `Hi! I'm your JFrog CI configuration assistant. I can help you set up CI integration for ${repositoryName || 'your repository'}. What CI server are you using?`
+      content: `Great! I'm here to help you configure JFrog with your CI workflow. I see that you using GitHub Actions. and i see that you have several package managers in your git repository. Which package managers do you would like to configure?`
     }
   ]);
   const [isProcessing, setIsProcessing] = useState(false);
   const [options, setOptions] = useState<ChatOption[]>([
-    { id: 'github', label: 'GitHub Actions', value: 'I use GitHub Actions' },
-    { id: 'circleci', label: 'Circle CI', value: 'I use Circle CI' },
-    { id: 'jenkins', label: 'Jenkins', value: 'I use Jenkins' },
-    { id: 'gitlab', label: 'GitLab CI', value: 'I use GitLab CI' },
-    { id: 'azure', label: 'Azure DevOps', value: 'I use Azure DevOps' }
+    { id: 'npm', label: 'npm', value: 'Great! Let\'s configure your npm package manager' },
+    { id: 'docker', label: 'Docker', value: 'I use Circle CI' },
+    { id: 'maven', label: 'Maven', value: 'I use Jenkins' },
+    { id: 'pypi', label: 'PyPi', value: 'I use GitLab CI' },
   ]);
   const { toast } = useToast();
 
@@ -149,7 +148,7 @@ Once you add this file to your repository and merge it to your main branch, JFro
       } else {
         response = `I understand you're asking about "${content}". To configure JFrog with your CI workflow, I need to know which CI server you're using and which package managers your project uses. Could you provide more details?`;
         newOptions = [
-          { id: 'github', label: 'GitHub Actions', value: 'I use GitHub Actions' },
+          { id: 'npm', label: 'GitHub Actions', value: "Great! Let's configure your npm package manager" },
           { id: 'circleci', label: 'Circle CI', value: 'I use Circle CI' },
           { id: 'jenkins', label: 'Jenkins', value: 'I use Jenkins' },
           { id: 'gitlab', label: 'GitLab CI', value: 'I use GitLab CI' },

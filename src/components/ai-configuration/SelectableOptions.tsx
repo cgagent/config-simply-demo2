@@ -29,7 +29,7 @@ export const SelectableOptions: React.FC<SelectableOptionsProps> = ({
             onClick={() => onSelectOption(option)}
           >
             {option.label}
-            <ArrowUp className="h-3 w-3 ml-1 flex-shrink-0" />
+        
           </Button>
         );
       })}
