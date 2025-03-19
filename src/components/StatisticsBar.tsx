@@ -1,3 +1,4 @@
+
 import React, { useCallback } from 'react';
 import { Card } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
@@ -24,8 +25,8 @@ const StatisticsBar: React.FC<StatisticsBarProps> = ({
   const navigate = useNavigate();
 
   const handleCICompletionClick = useCallback(() => {
-    console.log('Navigating to CI Configuration page');
-    navigate('/ci-configuration', { replace: true });
+    console.log('Navigating to CI page');
+    navigate('/repositories', { replace: true });
   }, [navigate]);
 
   const handleBlockedPackagesClick = useCallback(() => {
