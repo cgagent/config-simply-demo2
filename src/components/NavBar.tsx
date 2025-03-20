@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { cn } from '@/lib/utils';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
@@ -26,13 +26,21 @@ import {
 interface NavBarProps {
   className?: string;
   onHomeLinkClick?: () => void;
+  onExpandChange?: (expanded: boolean) => void;
 }
 
-const NavBar: React.FC<NavBarProps> = ({ className, onHomeLinkClick }) => {
+const NavBar: React.FC<NavBarProps> = ({ className, onHomeLinkClick, onExpandChange }) => {
   const [expanded, setExpanded] = useState(false);
   const [hasNotifications, setHasNotifications] = useState(true);
   const location = useLocation();
   const navigate = useNavigate();
+
+  // Notify parent component when expanded state changes
+  useEffect(() => {
+    if (onExpandChange) {
+      onExpandChange(expanded);
+    }
+  }, [expanded, onExpandChange]);
 
   const navItems = [
     { name: 'Home', path: '/home', icon: <Home className="w-5 h-5" /> },
@@ -66,6 +74,10 @@ const NavBar: React.FC<NavBarProps> = ({ className, onHomeLinkClick }) => {
     console.log('Notification clicked');
   };
   
+  const handleToggleExpand = () => {
+    setExpanded(!expanded);
+  };
+
   return (
     <div className={cn(
       "h-screen fixed left-0 top-0 z-50 flex flex-col py-4 border-r shadow-lg transition-all duration-300",
@@ -81,7 +93,7 @@ const NavBar: React.FC<NavBarProps> = ({ className, onHomeLinkClick }) => {
           </span>
         )}
         <button 
-          onClick={() => setExpanded(!expanded)} 
+          onClick={handleToggleExpand} 
           className="p-1.5 rounded-full bg-blue-500/20 hover:bg-blue-500/30 text-blue-100 transition-colors backdrop-blur-md"
         >
           {expanded ? 

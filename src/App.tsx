@@ -19,6 +19,7 @@ const queryClient = new QueryClient();
 const MainLayout = () => {
   const location = useLocation();
   const navigate = useNavigate();
+  const [sidebarExpanded, setSidebarExpanded] = useState(false);
 
   // Handler for resetting to home page (closing chat if active)
   const handleHomeClick = () => {
@@ -31,8 +32,15 @@ const MainLayout = () => {
 
   return (
     <div className="flex h-screen space-gradient tech-grid">
-      <NavBar onHomeLinkClick={handleHomeClick} />
-      <div className="flex-1 ml-16 transition-all duration-300 overflow-auto">
+      <NavBar 
+        onHomeLinkClick={handleHomeClick} 
+        onExpandChange={setSidebarExpanded} 
+      />
+      <div 
+        className={`flex-1 transition-all duration-300 overflow-auto ${
+          sidebarExpanded ? 'ml-56' : 'ml-16'
+        }`}
+      >
         <Outlet />
       </div>
     </div>

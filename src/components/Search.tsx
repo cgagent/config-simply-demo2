@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { cn } from '@/lib/utils';
 import { Search as SearchIcon, X } from 'lucide-react';
@@ -28,13 +27,21 @@ const Search = React.forwardRef<HTMLInputElement, SearchProps>(
 
     return (
       <div className={cn(
-        "relative flex items-center w-full max-w-md",
+        "relative flex items-center w-full max-w-md group",
         className
       )}>
-        <SearchIcon className="absolute left-3 h-4 w-4 text-muted-foreground" />
+        <SearchIcon className="absolute left-3 h-4 w-4 text-blue-400 z-10" />
         <input
           type="text"
-          className="h-10 w-full rounded-full bg-white px-10 text-sm ring-1 ring-muted/20 transition-all focus-visible:ring-2 focus-visible:ring-primary/30"
+          className={cn(
+            "h-10 w-full rounded-full px-10 text-sm",
+            "bg-blue-950/60 text-blue-100",
+            "border border-blue-500/30 shadow-sm",
+            "transition-all duration-200",
+            "focus-visible:ring-2 focus-visible:ring-blue-500/50 focus-visible:border-blue-400/50",
+            "focus-visible:shadow-[0_0_10px_rgba(59,130,246,0.3)]",
+            "placeholder:text-blue-300/50"
+          )}
           value={value}
           onChange={handleChange}
           placeholder="Search repositories..."
@@ -44,10 +51,10 @@ const Search = React.forwardRef<HTMLInputElement, SearchProps>(
         {value && (
           <button 
             onClick={handleClear}
-            className="absolute right-3 h-4 w-4 text-muted-foreground hover:text-foreground"
+            className="absolute right-3 h-5 w-5 text-blue-400 hover:text-blue-200 transition-colors"
             aria-label="Clear search"
           >
-            <X className="h-4 w-4" />
+            <X className="h-5 w-5" />
           </button>
         )}
       </div>
