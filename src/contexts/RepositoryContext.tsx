@@ -118,7 +118,7 @@ export const RepositoryProvider: React.FC<RepositoryProviderProps> = ({ children
             workflows: repo.workflows.length > 0 ? repo.workflows : [
               {
                 id: `w${Date.now()}`,
-                name: 'CI/CD Pipeline',
+                name: 'workflow-npm.yml',
                 status: 'active',
                 buildNumber: 1,
                 lastRun: 'Just now',

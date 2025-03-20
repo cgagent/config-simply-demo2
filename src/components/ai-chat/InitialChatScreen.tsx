@@ -21,13 +21,17 @@ export const InitialChatScreen: React.FC<InitialChatScreenProps> = ({
 }) => {
   return (
     <div className="flex flex-col items-center justify-center h-full pt-0">
-      <div className="flex items-center justify-center mb-1">
-        <div className="relative h-16 w-16 bg-primary/10 rounded-full flex items-center justify-center">
-          <FlyFrogIcon />
+      <div className="flex items-center justify-center mb-4">
+        <div className="relative h-20 w-20 bg-blue-900/50 rounded-full flex items-center justify-center shadow-lg border border-blue-700/30 space-glow">
+          <div className="animate-pulse">
+            <FlyFrogIcon />
+          </div>
         </div>
       </div>
-      <h1 className="text-2xl font-bold text-center mb-3">What do you want to do?</h1>
-      <div className="w-full max-w-xl">
+      <h1 className="text-2xl font-bold text-center mb-6 text-blue-100 space-glow">
+        How can I assist you today?
+      </h1>
+      <div className="w-auto max-w-xl px-6">
         <ChatInput 
           isProcessing={isProcessing} 
           onSendMessage={onSendMessage}
@@ -35,7 +39,10 @@ export const InitialChatScreen: React.FC<InitialChatScreenProps> = ({
           value={inputValue}
           setValue={setInputValue}
         />
-        <div className="mt-3">
+        <div className="mt-6">
+          <p className="text-blue-200/70 mb-3 text-sm text-center">
+            Or try one of these suggestions:
+          </p>
           <SuggestedQueries 
             queries={SUGGESTED_QUERIES} 
             onSelectQuery={onSelectQuery} 

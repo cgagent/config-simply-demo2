@@ -1,4 +1,3 @@
-
 import React, { useCallback } from 'react';
 import { Card } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
@@ -49,108 +48,121 @@ const StatisticsBar: React.FC<StatisticsBarProps> = ({
 
   const cardVariants = {
     initial: { opacity: 0, y: 10 },
-    animate: { opacity: 1, y: 0, transition: { duration: 0.3 } },
-    hover: { scale: 1.02, boxShadow: "0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)" }
+    animate: { opacity: 1, y: 0 },
+    hover: { y: -5, boxShadow: '0 10px 15px -3px rgba(0, 0, 100, 0.1)' }
   };
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-      <motion.div
-        initial="initial"
-        animate="animate"
-        whileHover="hover"
-        variants={cardVariants}
-        transition={{ duration: 0.2 }}
-        custom={0}
-      >
-        <Card 
-          className="p-4 flex flex-col cursor-pointer transition-all duration-300 
-                    border-l-4 border-l-primary rounded-xl overflow-hidden backdrop-blur-sm
-                    bg-white/90 dark:bg-gray-800/80 dark:border-l-primary/90 dark:text-gray-100" 
+    <div className="p-6 space-y-6">
+      <h2 className="text-2xl font-semibold mb-4 text-blue-100 space-glow">
+        Platform Insights
+      </h2>
+      
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        {/* CI Completion Card */}
+        <motion.div
+          variants={cardVariants}
+          initial="initial"
+          animate="animate"
+          whileHover="hover"
+          transition={{ duration: 0.3 }}
+          className="cursor-pointer"
           onClick={handleCICompletionClick}
         >
-          <div className="flex justify-between items-center mb-2">
-            <h3 className="text-sm font-medium text-muted-foreground dark:text-gray-300">CI Completion</h3>
-            <CheckCircle className="h-5 w-5 text-primary dark:text-primary/90" />
-          </div>
-          <p className="text-2xl font-bold mb-2 dark:text-white">{ciCompletionPercentage}%</p>
-          <Progress 
-            value={ciCompletionPercentage} 
-            className="h-2 dark:bg-gray-700" 
-            indicatorClassName="bg-gradient-to-r from-primary/80 to-primary dark:from-primary/70 dark:to-primary/90" 
-          />
-          <p className="text-xs text-muted-foreground mt-2 dark:text-gray-400">Current CI Status</p>
-        </Card>
-      </motion.div>
-      
-      <motion.div
-        initial="initial"
-        animate="animate"
-        whileHover="hover"
-        variants={cardVariants}
-        transition={{ duration: 0.2, delay: 0.1 }}
-        custom={1}
-      >
-        <Card 
-          className="p-4 flex flex-col cursor-pointer transition-all duration-300 
-                   border-l-4 border-l-destructive rounded-xl overflow-hidden backdrop-blur-sm
-                   bg-white/90 dark:bg-gray-800/80 dark:border-l-destructive/90 dark:text-gray-100"
+          <Card className="space-card p-6 h-full flex flex-col justify-between backdrop-blur-sm">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-sm font-medium text-blue-100/80">CI Completion</h3>
+              <CheckCircle className="h-5 w-5 text-blue-400" />
+            </div>
+            <div className="mb-2">
+              <div className="flex items-center justify-between mb-1.5">
+                <span className="text-xl font-semibold text-white space-glow">{ciCompletionPercentage}%</span>
+                <span className="text-xs text-blue-200/70">of total</span>
+              </div>
+              <Progress 
+                value={ciCompletionPercentage} 
+                className="h-1.5 bg-blue-950/60" 
+                indicatorClassName="bg-gradient-to-r from-blue-600 to-blue-400"
+              />
+            </div>
+            <p className="text-xs text-blue-200/60 mt-2">
+              Click to view CI configuration details
+            </p>
+          </Card>
+        </motion.div>
+
+        {/* Blocked Packages Card */}
+        <motion.div
+          variants={cardVariants}
+          initial="initial"
+          animate="animate"
+          whileHover="hover"
+          transition={{ duration: 0.3, delay: 0.1 }}
+          className="cursor-pointer"
           onClick={handleBlockedPackagesClick}
         >
-          <div className="flex justify-between items-center mb-2">
-            <h3 className="text-sm font-medium text-muted-foreground dark:text-gray-300">Blocked Packages</h3>
-            <PackageX className="h-5 w-5 text-destructive dark:text-destructive/90" />
-          </div>
-          <p className="text-2xl font-bold dark:text-white">{blockedPackages}</p>
-          <p className="text-xs text-muted-foreground mt-2 dark:text-gray-400">Last 30 days</p>
-        </Card>
-      </motion.div>
-      
-      <motion.div
-        initial="initial"
-        animate="animate"
-        whileHover="hover"
-        variants={cardVariants}
-        transition={{ duration: 0.2, delay: 0.2 }}
-        custom={2}
-      >
-        <Card 
-          className="p-4 flex flex-col cursor-pointer transition-all duration-300 
-                   border-l-4 border-l-blue-500 rounded-xl overflow-hidden backdrop-blur-sm
-                   bg-white/90 dark:bg-gray-800/80 dark:border-l-blue-500/80 dark:text-gray-100"
+          <Card className="space-card p-6 h-full flex flex-col justify-between backdrop-blur-sm">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-sm font-medium text-blue-100/80">Blocked Packages</h3>
+              <PackageX className="h-5 w-5 text-red-400" />
+            </div>
+            <div>
+              <span className="text-xl font-semibold text-white space-glow">{blockedPackages}</span>
+              <p className="text-xs text-blue-200/60 mt-2">
+                Packages blocked due to security vulnerabilities
+              </p>
+            </div>
+          </Card>
+        </motion.div>
+
+        {/* Total Packages Card */}
+        <motion.div
+          variants={cardVariants}
+          initial="initial"
+          animate="animate"
+          whileHover="hover"
+          transition={{ duration: 0.3, delay: 0.2 }}
+          className="cursor-pointer"
           onClick={handleTotalPackagesClick}
         >
-          <div className="flex justify-between items-center mb-2">
-            <h3 className="text-sm font-medium text-muted-foreground dark:text-gray-300">Total Packages</h3>
-            <Package className="h-5 w-5 text-blue-500 dark:text-blue-400" />
-          </div>
-          <p className="text-2xl font-bold dark:text-white">{formatNumber(totalPackages)}</p>
-          <p className="text-xs text-muted-foreground mt-2 dark:text-gray-400">Last 30 days</p>
-        </Card>
-      </motion.div>
-      
-      <motion.div
-        initial="initial"
-        animate="animate"
-        whileHover="hover"
-        variants={cardVariants}
-        transition={{ duration: 0.2, delay: 0.3 }}
-        custom={3}
-      >
-        <Card 
-          className="p-4 flex flex-col cursor-pointer transition-all duration-300 
-                   border-l-4 border-l-amber-500 rounded-xl overflow-hidden backdrop-blur-sm
-                   bg-white/90 dark:bg-gray-800/80 dark:border-l-amber-500/80 dark:text-gray-100"
+          <Card className="space-card p-6 h-full flex flex-col justify-between backdrop-blur-sm">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-sm font-medium text-blue-100/80">Total Packages</h3>
+              <Package className="h-5 w-5 text-blue-400" />
+            </div>
+            <div>
+              <span className="text-xl font-semibold text-white space-glow">{formatNumber(totalPackages)}</span>
+              <p className="text-xs text-blue-200/60 mt-2">
+                Total packages in your repositories
+              </p>
+            </div>
+          </Card>
+        </motion.div>
+
+        {/* Data Consumption Card */}
+        <motion.div
+          variants={cardVariants}
+          initial="initial"
+          animate="animate"
+          whileHover="hover"
+          transition={{ duration: 0.3, delay: 0.3 }}
+          className="cursor-pointer"
           onClick={handleDataConsumptionClick}
         >
-          <div className="flex justify-between items-center mb-2">
-            <h3 className="text-sm font-medium text-muted-foreground dark:text-gray-300">Data Consumption</h3>
-            <Database className="h-5 w-5 text-amber-500 dark:text-amber-400" />
-          </div>
-          <p className="text-2xl font-bold dark:text-white">{formatNumber(dataConsumption)} MB</p>
-          <p className="text-xs text-muted-foreground mt-2 dark:text-gray-400">Last 30 days</p>
-        </Card>
-      </motion.div>
+          <Card className="space-card p-6 h-full flex flex-col justify-between backdrop-blur-sm">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-sm font-medium text-blue-100/80">Data Consumption</h3>
+              <Database className="h-5 w-5 text-blue-400" />
+            </div>
+            <div>
+              <span className="text-xl font-semibold text-white space-glow">{dataConsumption} GB</span>
+              <p className="text-xs text-blue-200/60 mt-2">
+                Used storage in the last 30 days
+              </p>
+            </div>
+          </Card>
+        </motion.div>
+      </div>
     </div>
   );
 };

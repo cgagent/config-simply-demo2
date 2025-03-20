@@ -44,8 +44,8 @@ export const ConversationScreen: React.FC<ConversationScreenProps> = ({
       </div>
       
       {showCIConfig && (
-        <div className="border-t border-border pt-2 bg-card rounded-lg shadow-sm mb-4">
-          <h3 className="text-lg font-semibold px-4 py-2">CI Configuration Assistant</h3>
+        <div className="border-t border-blue-800/30 pt-2 space-card rounded-lg shadow-lg mb-4">
+          <h3 className="text-lg font-semibold px-4 py-2 text-blue-100 space-glow">CI Configuration Assistant</h3>
           <div className="p-4 max-h-[500px] overflow-y-auto">
             <AIConfigurationChat 
               repositoryName="infrastructure" 
@@ -55,14 +55,7 @@ export const ConversationScreen: React.FC<ConversationScreenProps> = ({
         </div>
       )}
       
-      <div className="mb-4 mt-2">
-        <SuggestedQueries 
-          queries={SUGGESTED_QUERIES} 
-          onSelectQuery={onSelectQuery} 
-        />
-      </div>
-      
-      <div className="pt-4 border-t">
+      <div className="pt-2">
         <ChatInput 
           isProcessing={isProcessing} 
           onSendMessage={onSendMessage} 
@@ -70,6 +63,16 @@ export const ConversationScreen: React.FC<ConversationScreenProps> = ({
           value={inputValue}
           setValue={setInputValue}
         />
+        
+        {!isProcessing && (
+          <div className="mt-4 mb-2">
+            <p className="text-blue-200/70 mb-2 text-xs">Quick questions:</p>
+            <SuggestedQueries 
+              queries={SUGGESTED_QUERIES} 
+              onSelectQuery={onSelectQuery} 
+            />
+          </div>
+        )}
       </div>
     </div>
   );

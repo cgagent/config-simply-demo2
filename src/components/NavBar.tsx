@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { cn } from '@/lib/utils';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -19,6 +18,7 @@ import {
   ChevronRight,
   Home,
   Infinity,
+  Cog,
   Users,
   BellIcon
 } from 'lucide-react';
@@ -36,7 +36,7 @@ const NavBar: React.FC<NavBarProps> = ({ className, onHomeLinkClick }) => {
 
   const navItems = [
     { name: 'Home', path: '/home', icon: <Home className="w-5 h-5" /> },
-    { name: 'CI', path: '/repositories', icon: <Infinity className="w-5 h-5" /> },
+    { name: 'CI', path: '/repositories', icon: <Cog className="w-5 h-5" /> },
     { name: 'User Management', path: '/users', icon: <Users className="w-5 h-5" /> },
   ];
 
@@ -68,16 +68,21 @@ const NavBar: React.FC<NavBarProps> = ({ className, onHomeLinkClick }) => {
   
   return (
     <div className={cn(
-      "h-screen fixed left-0 top-0 z-50 flex flex-col py-4 border-r border-green-900/30 shadow-sm transition-all duration-300",
-      "bg-gradient-to-b from-black via-black to-black",
+      "h-screen fixed left-0 top-0 z-50 flex flex-col py-4 border-r shadow-lg transition-all duration-300",
+      "bg-gradient-to-b from-blue-950 via-blue-900/90 to-gray-950",
+      "border-blue-800/30",
       expanded ? "w-56" : "w-16",
       className
     )}>
       <div className="flex items-center justify-between px-4 mb-6">
-        {expanded && <span className="text-lg font-semibold text-white">Dashboard</span>}
+        {expanded && (
+          <span className="text-lg font-semibold text-blue-100 space-glow">
+            Dashboard
+          </span>
+        )}
         <button 
           onClick={() => setExpanded(!expanded)} 
-          className="p-1.5 rounded-full bg-green-800/20 hover:bg-green-800/40 text-white transition-colors"
+          className="p-1.5 rounded-full bg-blue-500/20 hover:bg-blue-500/30 text-blue-100 transition-colors backdrop-blur-md"
         >
           {expanded ? 
             <ChevronLeft className="h-5 w-5" /> : 
@@ -99,8 +104,8 @@ const NavBar: React.FC<NavBarProps> = ({ className, onHomeLinkClick }) => {
                   className={cn(
                     "flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium transition-colors w-full text-left",
                     active 
-                      ? "bg-green-600/50 text-white" 
-                      : "text-green-100/80 hover:bg-green-800/30 hover:text-white"
+                      ? "bg-blue-600/30 text-white space-glow backdrop-blur-sm border border-blue-400/20" 
+                      : "text-blue-100/80 hover:bg-blue-800/30 hover:text-white"
                   )}
                 >
                   <span>{item.icon}</span>
@@ -116,14 +121,14 @@ const NavBar: React.FC<NavBarProps> = ({ className, onHomeLinkClick }) => {
         {/* Notification Button */}
         <button 
           onClick={handleNotificationClick}
-          className="flex items-center justify-center w-full px-3 py-2 rounded-md text-sm font-medium transition-colors text-green-100/80 hover:bg-green-800/30 hover:text-white"
+          className="flex items-center justify-center w-full px-3 py-2 rounded-md text-sm font-medium transition-colors text-blue-100/80 hover:bg-blue-800/30 hover:text-white"
         >
           <div className="relative">
             <BellIcon className="w-5 h-5" />
             {hasNotifications && (
               <span className="absolute -top-1 -right-1 flex h-2 w-2">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
-                <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-blue-500"></span>
               </span>
             )}
           </div>
@@ -132,19 +137,19 @@ const NavBar: React.FC<NavBarProps> = ({ className, onHomeLinkClick }) => {
         
         {/* User Dropdown */}
         <DropdownMenu>
-          <DropdownMenuTrigger className="flex items-center gap-2 outline-none w-full px-2 py-2 rounded-md hover:bg-green-800/30">
-            <Avatar className="h-8 w-8 border-2 border-green-600/30">
+          <DropdownMenuTrigger className="flex items-center gap-2 outline-none w-full px-2 py-2 rounded-md hover:bg-blue-800/30">
+            <Avatar className="h-8 w-8 border-2 border-blue-500/30 ring-2 ring-blue-400/20">
               <AvatarImage src="https://github.com/shadcn.png" />
               <AvatarFallback>JD</AvatarFallback>
             </Avatar>
             {expanded && (
               <div className="text-left">
                 <p className="text-sm font-medium text-white">John Doe</p>
-                <p className="text-xs text-green-200/80">Admin</p>
+                <p className="text-xs text-blue-200/80">Admin</p>
               </div>
             )}
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="w-56">
+          <DropdownMenuContent align="end" className="w-56 space-card">
             <DropdownMenuLabel>My Account</DropdownMenuLabel>
             <DropdownMenuSeparator />
             <DropdownMenuItem className="cursor-pointer">

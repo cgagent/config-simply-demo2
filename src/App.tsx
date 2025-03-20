@@ -30,7 +30,7 @@ const MainLayout = () => {
   };
 
   return (
-    <div className="flex h-screen bg-gradient-to-br from-background to-background/80">
+    <div className="flex h-screen space-gradient tech-grid">
       <NavBar onHomeLinkClick={handleHomeClick} />
       <div className="flex-1 ml-16 transition-all duration-300 overflow-auto">
         <Outlet />
