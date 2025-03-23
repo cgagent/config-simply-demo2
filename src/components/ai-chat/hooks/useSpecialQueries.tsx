@@ -31,7 +31,7 @@ bad-actor-addon: Had a payload to exfiltrate private data.`;
     // For other queries, use the general AI response simulator
     return {
       handled: false,
-      getResponse: () => simulateAIResponse(content.trim())
+      getResponse: () => simulateAIResponse(content)
     };
   };
 

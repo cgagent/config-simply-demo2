@@ -14,11 +14,13 @@ export const processUserQuery = (
     return `📊 **Most Popular Packages in Your Organization**
 
 🔄 **axios**
+
 - 📦 Most common version: 1.5.1 (published on 2024-08-31)
 - 🆕 Latest Version published: 1.8.3
 - ⚠️ Your org version 1.5.1 has known vulnerabilities:
 
   🚨 **CVE-2024-39338**
+
   📝 Description - axios 1.5.1 allows SSRF via unexpected behavior where requests for path relative URLs get processed as protocol relative URLs
   🔴 Severity: High
 
