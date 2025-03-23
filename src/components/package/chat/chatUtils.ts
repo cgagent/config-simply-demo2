@@ -11,21 +11,21 @@ export const processUserQuery = (
   const lowerQuery = query.toLowerCase();
   
   if (lowerQuery.includes('popular package') || lowerQuery.includes('my organization') || lowerQuery.includes('secured')) {
-    return `Here are the most popular packages used in your organization:
+    return `📊 **Most Popular Packages in Your Organization**
 
-**axios**
-- Most common version: 1.5.1 (published on 2024-08-31)
-- Latest Version published: 1.8.3
-- Your org version 1.5.1 has known vulnerabilities:
+🔄 **axios**
+- 📦 Most common version: 1.5.1 (published on 2024-08-31)
+- 🆕 Latest Version published: 1.8.3
+- ⚠️ Your org version 1.5.1 has known vulnerabilities:
 
-**CVE-2024-39338**
-Description - axios 1.5.1 allows SSRF via unexpected behavior where requests for path relative URLs get processed as protocol relative URLs
-Severity: High
+  🚨 **CVE-2024-39338**
+  📝 Description - axios 1.5.1 allows SSRF via unexpected behavior where requests for path relative URLs get processed as protocol relative URLs
+  🔴 Severity: High
 
-**lodash**
-- Most common version: 4.17.21
-- Latest version: 4.17.21
-- Your most common version is secured`;
+🔄 **lodash**
+- 📦 Most common version: 4.17.21
+- 🆕 Latest version: 4.17.21
+- ✅ Your most common version is secured`;
   }
   else if (lowerQuery.includes('latest') && lowerQuery.includes('download')) {
     return getTopDownloadedPackages(packages);
