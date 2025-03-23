@@ -54,10 +54,6 @@ const StatisticsBar: React.FC<StatisticsBarProps> = ({
 
   return (
     <div className="p-6 space-y-6">
-      <h2 className="text-2xl font-semibold mb-4 text-blue-100 space-glow">
-        Platform Insights
-      </h2>
-      
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         {/* CI Completion Card */}
         <motion.div
@@ -103,13 +99,13 @@ const StatisticsBar: React.FC<StatisticsBarProps> = ({
         >
           <Card className="space-card p-6 h-full flex flex-col justify-between backdrop-blur-sm">
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-sm font-medium text-blue-100/80">Prevented Packages</h3>
+              <h3 className="text-sm font-medium text-blue-100/80">Malicious Packages</h3>
               <PackageX className="h-5 w-5 text-red-400" />
             </div>
             <div>
-              <span className="text-xl font-semibold text-white space-glow">{blockedPackages} / 1010</span>
+              <span className="text-xl items-center font-semibold text-white space-glow">{blockedPackages}</span>
               <p className="text-xs text-blue-200/60 mt-2">
-                Packages blocked due to security vulnerabilities
+                Malicious packages blocked from entering your organization in the past month
               </p>
             </div>
           </Card>
@@ -127,7 +123,7 @@ const StatisticsBar: React.FC<StatisticsBarProps> = ({
         >
           <Card className="space-card p-6 h-full flex flex-col justify-between backdrop-blur-sm">
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-sm font-medium text-blue-100/80">My Packages</h3>
+              <h3 className="text-sm font-medium text-blue-100/80">Total Packages</h3>
               <Package className="h-5 w-5 text-blue-400" />
             </div>
             <div>
@@ -137,7 +133,7 @@ const StatisticsBar: React.FC<StatisticsBarProps> = ({
             <br></br>
             <span className="text-sm font-semibold text-white space-glow"> <img src="/lovable-uploads/npm.png" className="w-4 h-4 inline-block mr-2"></img>  {formatNumber(120)}</span>
               <p className="text-xs text-blue-200/60 mt-2">
-                Total packages in your repositories
+                Packages stored in your organization
               </p>
             </div>
           </Card>

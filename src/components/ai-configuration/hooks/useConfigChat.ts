@@ -21,9 +21,9 @@ export const useConfigChat = (
 
 ⬇️  Downloaded from JFrog
 ⬆️  Published to JFrog
-🔍  Scanned for security vulnerabilities
+🔍  Scanned for malicious packages
 
-I've noticed that you use GitHub Actions and have several package managers in your Git repository. 
+I see you're using GitHub Actions and various package managers in your Git repo.
 Let's select the package managers you would like to configure from the list below:`
     }
   ]);
@@ -235,7 +235,7 @@ jobs:
 Your npm packages will now be:
 ✅ Downloaded from JFrog 
 ✅ Published to your JFrog
-✅ Scanned for security vulnerabilities
+✅ Scanned for malicious packages
 
 Your CI workflow is now fully integrated with JFrog!`;
 
