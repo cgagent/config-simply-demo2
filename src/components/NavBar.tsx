@@ -140,13 +140,13 @@ const NavBar: React.FC<NavBarProps> = ({ className, onHomeLinkClick, onExpandCha
         {/* Notification Button */}
         <button 
           onClick={handleNotificationClick}
-          className="flex items-center justify-center w-full px-3 py-2 rounded-md text-sm font-medium transition-colors text-blue-100/80 hover:bg-blue-800/30 hover:text-white"
+          className="flex items-center justify-center w-full px-3 py-2 rounded-md text-sm font-medium  text-blue-100/80 hover:bg-blue-800/30 hover:text-white"
         >
           <div className="relative">
             <BellIcon className="w-5 h-5" />
             {hasNotifications && (
               <span className="absolute -top-1 -right-1 flex h-2 w-2">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
+                <span className=" absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
                 <span className="relative inline-flex rounded-full h-2 w-2 bg-blue-500"></span>
               </span>
             )}
