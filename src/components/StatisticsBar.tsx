@@ -137,7 +137,7 @@ const StatisticsBar: React.FC<StatisticsBarProps> = ({
             <br></br>
             <span className="text-sm font-semibold text-white space-glow"> <img src="/lovable-uploads/npm.png" className="w-4 h-4 inline-block mr-2"></img>  {formatNumber(120)}</span>
               <p className="text-xs text-blue-200/60 mt-2">
-                Total packages in your repositories
+                Packages stored in your organization
               </p>
             </div>
           </Card>
