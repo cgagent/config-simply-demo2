@@ -74,37 +74,40 @@ bad-actor-addon: Had a payload to exfiltrate private data.`;
     
     Here are 3 recommended npm packages for making HTTP requests:
 
-1. **axios**
+📦 **axios**
    
    • Description: Promise based HTTP client for the browser and node.js
    
    • Latest version: 1.8.3
    
-   • [GitHub Repository](https://github.com/axios/axios)
+   • [GitHub Repository](https://github.com/axios/axios) 🔗
    
-   • [NPM Package Page](https://www.npmjs.com/package/axios)
+   • [NPM Package Page](https://www.npmjs.com/package/axios) 🔗
 
 
-2. **node-fetch**
+📦 **node-fetch**
    
    • Description: A light-weight module that brings window.fetch to node.js
    
    • Latest version: 3.3.2
    
-   • [GitHub Repository](https://github.com/node-fetch/node-fetch)
+   • [GitHub Repository](https://github.com/node-fetch/node-fetch) 🔗
    
-   • [NPM Package Page](https://www.npmjs.com/package/node-fetch)
+   • [NPM Package Page](https://www.npmjs.com/package/node-fetch) 🔗
 
 
-3. **request**
+📦 **request**
    
    • Description: Simplified HTTP request client
    
    • Latest version: 2.88.2
    
-   • [GitHub Repository](https://github.com/request/request)
+   • [GitHub Repository](https://github.com/request/request) 🔗
    
-   • [Homepage](https://request.js.org/)`;
+   • [Homepage](https://request.js.org/) 🔗
+
+   ![Request Catalog](/lovable-uploads/req_catalog.png)
+    `;
   }
   else if (lowerQuery.includes('sbom') || lowerQuery.includes('report for') || lowerQuery.includes('last 30 days')) {
     return `Here is the SBOM report for your packages from the last 30 days:
