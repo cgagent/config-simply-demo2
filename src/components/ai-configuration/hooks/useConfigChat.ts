@@ -251,7 +251,7 @@ Your CI workflow is now fully integrated with JFrog!`;
         // Update options to show what's next
         setOptions([
           { id: 'docker', label: 'Configure Docker', value: 'I also want to configure Docker' },
-          { id: 'view_diff', label: 'View CI connections', value: 'I want to see the Repositories' },
+          { id: 'view_diff', label: 'My CI connections', value: 'I want to see the Repositories' },
           { id: 'done', label: 'That\'s all I need', value: 'Thanks, that\'s all I need for now' }
         ]);
 
