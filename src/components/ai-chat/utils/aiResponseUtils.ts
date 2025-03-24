@@ -80,9 +80,9 @@ bad-actor-addon: Had a payload to exfiltrate private data.`;
    
    • Latest version: 1.8.3
    
-   • [GitHub Repository](https://github.com/axios/axios) 🔗
+   🔗 [GitHub Repository](https://github.com/axios/axios) 
    
-   • [NPM Package Page](https://www.npmjs.com/package/axios) 🔗
+   🔗 [NPM Package Page](https://www.npmjs.com/package/axios) 
 
 
 📦 **node-fetch**
@@ -91,9 +91,9 @@ bad-actor-addon: Had a payload to exfiltrate private data.`;
    
    • Latest version: 3.3.2
    
-   • [GitHub Repository](https://github.com/node-fetch/node-fetch) 🔗
+   🔗 [GitHub Repository](https://github.com/node-fetch/node-fetch) 
    
-   • [NPM Package Page](https://www.npmjs.com/package/node-fetch) 🔗
+   🔗[NPM Package Page](https://www.npmjs.com/package/node-fetch) 
 
 
 📦 **request**
@@ -102,9 +102,9 @@ bad-actor-addon: Had a payload to exfiltrate private data.`;
    
    • Latest version: 2.88.2
    
-   • [GitHub Repository](https://github.com/request/request) 🔗
+   🔗 [GitHub Repository](https://github.com/request/request) 
    
-   • [NPM Package Page](https://www.npmjs.com/package/node-fetch) 🔗
+   🔗 [NPM Package Page](https://www.npmjs.com/package/node-fetch) 
 
    ![Request Catalog](/lovable-uploads/req_catalog.png)
     `;
