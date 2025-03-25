@@ -8,6 +8,7 @@ import { useToast } from '@/hooks/use-toast';
 import { Button } from '@/components/ui/button';
 import CVECard from '../CVECard';
 
+
 interface ChatMessageProps {
   message: Message;
 }
@@ -26,6 +27,7 @@ export const ChatMessage: React.FC<ChatMessageProps> = ({ message }) => {
   };
 
   return (
+   
     <motion.div
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
@@ -40,6 +42,7 @@ export const ChatMessage: React.FC<ChatMessageProps> = ({ message }) => {
             : "bg-blue-950/30 border-blue-800/30 mr-8 rounded-tl-none"
         )}
       >
+   
         <div className={cn(
           "flex-shrink-0 h-8 w-8 rounded-full flex items-center justify-center",
           isUser ? "bg-blue-600 text-white" : "bg-blue-900 text-blue-200 ring-2 ring-blue-500/30"

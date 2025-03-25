@@ -6,7 +6,7 @@ export const SUGGESTED_QUERIES = [
   },
   {
     label: "Check for risks",
-    query: "Identify which packages are at risk and currently used in my organization"
+    query: "Identify which packages are at risk in my organization"
   },
   {
     label: "Open source packages",
