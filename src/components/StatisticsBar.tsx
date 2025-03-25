@@ -1,7 +1,7 @@
 import React, { useCallback } from 'react';
 import { Card } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
-import { CheckCircle, Package, PackageX, Database, MonitorDot } from 'lucide-react';
+import { CheckCircle, Package, PackageX, Database, ShieldBan, MonitorDot, Biohazard, Skull } from 'lucide-react';
 import { formatNumber } from '@/lib/formatters';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
@@ -99,8 +99,8 @@ const StatisticsBar: React.FC<StatisticsBarProps> = ({
         >
           <Card className="space-card p-6 h-full flex flex-col justify-between backdrop-blur-sm">
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-sm font-medium text-blue-100/80">Malicious Packages</h3>
-              <PackageX className="h-5 w-5 text-red-400" />
+              <h3 className="text-sm font-medium text-blue-100/80">Blocked Malicious Packages</h3>
+              <ShieldBan className="h-5 w-5 text-red-400" />
             </div>
             <div>
               <span className="text-xl items-center font-semibold text-white space-glow">{blockedPackages}</span>
@@ -151,13 +151,15 @@ const StatisticsBar: React.FC<StatisticsBarProps> = ({
         >
           <Card className="space-card p-6 h-full flex flex-col justify-between backdrop-blur-sm">
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-sm font-medium text-blue-100/80">Developers</h3>
+              <h3 className="text-sm font-medium text-blue-100/80">Connected Developers</h3>
               <MonitorDot className="h-5 w-5 text-blue-400" />
             </div>
             <div>
-              <span className="text-xl font-semibold text-white space-glow">21 / 30</span>
+              <span className="text-xl font-semibold">21 / 30</span>
+              <br></br>
+          
               <p className="text-xs text-blue-200/60 mt-2">
-                Developers connected to JFrog
+              ⚠️ 9 Developers are not protected
               </p>
             </div>
           </Card>

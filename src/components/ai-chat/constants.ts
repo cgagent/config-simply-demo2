@@ -5,15 +5,15 @@ export const SUGGESTED_QUERIES = [
     query: "I would like to set up my CI to work with JFrog. Can you set it up for me?"
   },
   {
-    label: "Common packages",
-    query: "What are the most common packages used in my organization in the last 30 days?"
+    label: "Check for risks",
+    query: "Identify which packages are at risk and currently used in my organization"
   },
   {
     label: "Open source packages",
     query: "Can you find a package that handles HTTP requests without critical vulnerabilities?"
   },
   {
-    label: "Check vulnerabilities",
+    label: "Common packages",
     query: "Identify which packages are vulnerable and currently used in my organization."
   }
 ];

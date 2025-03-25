@@ -63,7 +63,7 @@ export const PackageSummary: React.FC<PackageSummaryProps> = ({
       <div className="bg-white p-6 rounded-lg border border-border shadow-sm">
         <div className="flex justify-between items-start">
           <div>
-            <p className="text-sm font-medium text-muted-foreground">Malicious Packages</p>
+            <p className="text-sm font-medium text-muted-foreground">Blocked Malicious packages</p>
             <p className="text-2xl font-semibold mt-1">{maliciousPackages}</p>
           </div>
           <div className="p-2 bg-amber-100 rounded-full">

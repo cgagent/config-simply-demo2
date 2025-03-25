@@ -34,7 +34,7 @@ malware-lib: Contained scripts to inject ransomware.
 bad-actor-addon: Had a payload to exfiltrate private data.`;
   }
 
-  if (lowerQuery.includes('hello') || lowerQuery.includes('hi')) {
+  if ( (lowerQuery.includes('hello') || lowerQuery.includes('hi')) && !lowerQuery.includes('are at risk')) {
     return "Hello! How can I assist you today?";
   }
   else if (lowerQuery.includes('repository') || lowerQuery.includes('repositories')) {
@@ -46,16 +46,10 @@ bad-actor-addon: Had a payload to exfiltrate private data.`;
   else if (lowerQuery.includes('user') || lowerQuery.includes('account')) {
     return "User management allows you to control access to your organization's resources. You can add users, define roles, and set permissions in the User Management section.";
   }
-  else if (lowerQuery.includes('popular package') || lowerQuery.includes('my organization') || lowerQuery.includes('secured')) {
+  else if (lowerQuery.includes('are at risk') || lowerQuery.includes('my organization') || lowerQuery.includes('secured')) {
     const response = 
 `
-# Most popular packages in your organization are:
-
-### 📦 lodash
-• **Most common version:** 4.17.21
-• **Latest version published:** 4.17.21
-• **Vulnerabilities:** None
-• **Status:** Secured
+# One package with risks was detected:
 
 ### 📦 axios
 • **Most common version:** 1.5.1
@@ -63,9 +57,6 @@ bad-actor-addon: Had a payload to exfiltrate private data.`;
 • **Vulnerabilities:** Your org version 1.5.1 has known vulnerabilities: CVE-2024-39338
 • **Vulnerability description:** axios 1.5.1 allows SSRF via unexpected behavior where requests for path relative URLs get processed as protocol relative URLs
 • **Severity:** High
-
-![Axios CVE](/lovable-uploads/axios_cve.png)
-
     `;
     return response;
   }

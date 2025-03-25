@@ -6,6 +6,7 @@ import { Message } from './constants';
 import { motion } from 'framer-motion';
 import { useToast } from '@/hooks/use-toast';
 import { Button } from '@/components/ui/button';
+import CVECard from '../CVECard';
 
 interface ChatMessageProps {
   message: Message;
@@ -38,8 +39,6 @@ export const ChatMessage: React.FC<ChatMessageProps> = ({ message }) => {
             ? "bg-blue-800/30 text-white border-blue-700/30 ml-8 rounded-tr-none" 
             : "bg-blue-950/30 border-blue-800/30 mr-8 rounded-tl-none"
         )}
-        whileHover={{ scale: 1.01 }}
-        transition={{ duration: 0.2 }}
       >
         <div className={cn(
           "flex-shrink-0 h-8 w-8 rounded-full flex items-center justify-center",
@@ -69,6 +68,28 @@ export const ChatMessage: React.FC<ChatMessageProps> = ({ message }) => {
             <ReactMarkdown className="whitespace-pre-wrap">
               {message.content}
             </ReactMarkdown>
+          
+      {message.content.includes("One package with risks was detected") && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 1.5, duration: 0.5 }}
+        >
+          <CVECard
+            cveId="CVE-2024-39338"
+            description="This CVE is enriched by JFrog Research and provides more accurate information"
+            severity="High"
+            packageName="axios"
+            packageVersion="1.5.1"
+            fixVersion="1.7.4"
+            cveRelation="Non-Transitive"
+            cvssScore="7.5 (v3)"
+            epssScore="0.09%"
+            percentile="22.52%"
+          />
+        </motion.div>
+      )}
+ 
           </div>
         </div>
       </motion.div>
