@@ -11,7 +11,7 @@ interface WorkflowItemProps {
 const WorkflowItem: React.FC<WorkflowItemProps> = ({ workflow }) => {
   return (
     <div className="grid grid-cols-12 gap-2 px-6 py-3 border-t border-border/50 pl-10">
-      <div className="col-span-6 flex items-center gap-2">
+      <div className="col-span-5 flex items-center gap-2">
         <div className="flex flex-col">
           <div className="flex items-center gap-2">
             <GitPullRequest className="h-4 w-4 text-muted-foreground" />
