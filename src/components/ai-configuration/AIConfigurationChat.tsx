@@ -27,10 +27,10 @@ const AIConfigurationChat: React.FC<AIConfigurationChatProps> = ({
   } = useConfigChat(repositoryName, (path) => navigate(path), onMergeSuccess);
 
   return (
-    <div className="flex flex-col flex-1 bg-blue-950/30 border border-blue-800/30 rounded-lg overflow-hidden shadow-lg space-card">
-      <div className="p-3 border-b border-blue-700/30">
+    <div className="flex-1 overflow-y-auto py-4 space-y-5 rounded-md bg-gradient-to-b from-gray-100/95 to-white/95 border border-border/50 shadow-md dark:from-gray-850/95 dark:to-gray-900/95 dark:border-gray-800">
+      <div className="p-3 border-b border-none bg-none">
         <h3 className="text-blue-100 font-medium flex items-center space-glow">
-          <div className="w-8 h-8 mr-2 flex items-center justify-center bg-blue-100/30 rounded-full backdrop-blur-sm border border-blue-600/20 shadow-inner">
+          <div className="w-8 h-8 mr-2 flex items-center justify-center rounded-full backdrop-blur-sm border border-blue-600/20 shadow-inner">
             <FlyFrogIcon className="w-5 h-5 text-blue-300" />
           </div>
           JFrog AI Configuration Assistant

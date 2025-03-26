@@ -48,7 +48,7 @@ export const MessageList: React.FC<MessageListProps> = ({ messages, isProcessing
     <motion.div 
       className={cn(
         "flex-1 overflow-y-auto p-4 space-y-5 rounded-md",
-        "bg-blue-950/20 border border-blue-800/30 shadow-md backdrop-blur-sm"
+        " shadow-md backdrop-blur-sm"
       )}
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
@@ -56,7 +56,7 @@ export const MessageList: React.FC<MessageListProps> = ({ messages, isProcessing
     >
       {messages.length === 0 && (
         <div className="h-full flex items-center justify-center">
-          <p className="text-blue-200 text-center font-medium bg-blue-800/10 px-4 py-2 rounded-lg border border-blue-700/20 shadow-inner backdrop-blur-sm">
+          <p className="text-blue-200 text-center font-medium bg-none px-4 py-2 rounded-lg border-none  shadow-inner backdrop-blur-sm">
             No messages yet. Start typing to begin.
           </p>
         </div>

@@ -48,7 +48,7 @@ export const MessageItem: React.FC<MessageItemProps> = ({ message }) => {
         <div className="flex items-center mb-2">
           <div className={cn(
             "p-1 rounded-full border",
-            isBot ? "bg-blue-800/30 border-blue-700/30" : "bg-blue-700/80 border-blue-600/30"
+            isBot ? "bg-blue-800/30 border-none" : "bg-blue-700/80 border-blue-600/30"
           )}>
             {isBot ? (
               <Bot className="w-4 h-4 mr-1 text-blue-300" />
