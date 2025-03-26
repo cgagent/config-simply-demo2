@@ -339,7 +339,7 @@ You can review the changes below:
 \`\`\`diff
 ${diffOutput}
 \`\`\`
-You can review the changes on GitHub, or simply merge the pull request directly from this chat.`;
+Additionaly, you can review the changes on GitHub, or simply merge the pull request directly from this chat.`;
 
         // Response with the diff view
         const botResponse: Message = {
