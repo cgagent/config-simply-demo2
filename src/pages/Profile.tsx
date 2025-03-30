@@ -31,7 +31,6 @@ const ProfilePage: React.FC = () => {
     developerApp: true
   });
 
-  const [isEditing, setIsEditing] = useState(false);
   const [editValues, setEditValues] = useState({
     firstName: user.firstName,
     lastName: user.lastName,
@@ -70,6 +69,9 @@ const ProfilePage: React.FC = () => {
       ...prev,
       avatarUrl: url
     }));
+    
+    // Apply avatar change immediately
+    handleSave();
   };
 
   const handleSave = () => {
@@ -93,8 +95,11 @@ const ProfilePage: React.FC = () => {
       title: "Profile updated",
       description: "Your profile has been updated successfully."
     });
-    
-    setIsEditing(false);
+  };
+
+  // Auto-save when user stops typing
+  const handleBlur = () => {
+    handleSave();
   };
 
   return (
@@ -112,15 +117,52 @@ const ProfilePage: React.FC = () => {
 
         <Card className="border border-blue-200/20 bg-gradient-to-b from-blue-950/50 to-gray-950/80 shadow-lg">
           <CardHeader className="flex flex-row items-center gap-4 pb-2">
-            <Avatar className="h-16 w-16 border-2 border-blue-500/30 ring-4 ring-blue-400/10">
-              <AvatarImage src={editValues.avatarUrl} alt={`${user.firstName} ${user.lastName}`} />
-              <AvatarFallback className="text-lg">
-                {user.firstName[0]}{user.lastName[0]}
-              </AvatarFallback>
-            </Avatar>
+            <div className="relative group">
+              <Avatar className="h-16 w-16 border-2 border-blue-500/30 ring-4 ring-blue-400/10 cursor-pointer">
+                <AvatarImage src={editValues.avatarUrl} alt={`${user.firstName} ${user.lastName}`} />
+                <AvatarFallback className="text-lg">
+                  {user.firstName[0]}{user.lastName[0]}
+                </AvatarFallback>
+              </Avatar>
+              <div className="absolute -bottom-1 -right-1 bg-blue-500 rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                <UserCircle className="h-4 w-4 text-white" />
+              </div>
+              
+              {/* Avatar selector popup */}
+              <div className="absolute top-full left-0 mt-2 hidden group-hover:flex flex-wrap gap-3 bg-gray-900/90 p-3 rounded-lg border border-blue-500/20 backdrop-blur-md z-10 w-64">
+                <p className="w-full text-sm text-blue-300 mb-1">Select Avatar</p>
+                {avatarOptions.map(avatar => (
+                  <div 
+                    key={avatar.id}
+                    className={`cursor-pointer p-1 rounded-full ${editValues.avatarUrl === avatar.url ? 'bg-blue-500 ring-2 ring-blue-300' : 'bg-transparent hover:bg-blue-900/30'}`}
+                    onClick={() => handleAvatarSelect(avatar.url)}
+                  >
+                    <Avatar className="h-12 w-12">
+                      <AvatarImage src={avatar.url} alt={avatar.label} />
+                      <AvatarFallback>{avatar.label[0]}</AvatarFallback>
+                    </Avatar>
+                  </div>
+                ))}
+              </div>
+            </div>
             <div>
               <CardTitle className="text-2xl font-bold text-white">
-                {user.firstName} {user.lastName}
+                <Input
+                  name="firstName"
+                  value={editValues.firstName}
+                  onChange={handleInputChange}
+                  onBlur={handleBlur}
+                  className="bg-transparent border-none p-0 text-2xl font-bold text-white focus-visible:ring-0 w-auto inline-block mr-2"
+                  placeholder="First Name"
+                />
+                <Input
+                  name="lastName"
+                  value={editValues.lastName}
+                  onChange={handleInputChange}
+                  onBlur={handleBlur}
+                  className="bg-transparent border-none p-0 text-2xl font-bold text-white focus-visible:ring-0 w-auto inline-block"
+                  placeholder="Last Name"
+                />
               </CardTitle>
               <CardDescription className="text-blue-300/80">
                 {user.role}
@@ -131,116 +173,47 @@ const ProfilePage: React.FC = () => {
           <Separator className="bg-blue-500/20" />
           
           <CardContent className="pt-6 space-y-6">
-            {isEditing ? (
-              <div className="space-y-4">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="firstName">First Name</Label>
-                    <Input
-                      id="firstName"
-                      name="firstName"
-                      value={editValues.firstName}
-                      onChange={handleInputChange}
-                      placeholder="First Name"
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="lastName">Last Name</Label>
-                    <Input
-                      id="lastName"
-                      name="lastName"
-                      value={editValues.lastName}
-                      onChange={handleInputChange}
-                      placeholder="Last Name"
-                    />
-                  </div>
+            <div className="space-y-4">
+              <div className="flex items-center gap-3">
+                <div className="bg-blue-900/30 p-2 rounded-full">
+                  <Mail className="h-5 w-5 text-blue-300" />
                 </div>
-                
-                <div className="space-y-2">
-                  <Label>Select Avatar</Label>
-                  <div className="flex flex-wrap gap-3">
-                    {avatarOptions.map(avatar => (
-                      <div 
-                        key={avatar.id}
-                        className={`cursor-pointer p-1 rounded-full ${editValues.avatarUrl === avatar.url ? 'bg-blue-500 ring-2 ring-blue-300' : 'bg-transparent hover:bg-blue-900/30'}`}
-                        onClick={() => handleAvatarSelect(avatar.url)}
-                      >
-                        <Avatar className="h-12 w-12">
-                          <AvatarImage src={avatar.url} alt={avatar.label} />
-                          <AvatarFallback>{avatar.label[0]}</AvatarFallback>
-                        </Avatar>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-                
-                <div className="flex justify-end gap-2 pt-4">
-                  <Button variant="outline" onClick={() => {
-                    setIsEditing(false);
-                    setEditValues({
-                      firstName: user.firstName,
-                      lastName: user.lastName,
-                      avatarUrl: 'https://github.com/shadcn.png'
-                    });
-                  }}>
-                    Cancel
-                  </Button>
-                  <Button onClick={handleSave}>
-                    Save Changes
-                  </Button>
+                <div>
+                  <p className="text-sm text-blue-300/60">Email Address</p>
+                  <p className="text-white font-medium">{user.email}</p>
                 </div>
               </div>
-            ) : (
-              <>
-                <div className="space-y-4">
-                  <div className="flex items-center gap-3">
-                    <div className="bg-blue-900/30 p-2 rounded-full">
-                      <Mail className="h-5 w-5 text-blue-300" />
-                    </div>
-                    <div>
-                      <p className="text-sm text-blue-300/60">Email Address</p>
-                      <p className="text-white font-medium">{user.email}</p>
-                    </div>
-                  </div>
-                  
-                  <div className="flex items-center gap-3">
-                    <div className="bg-blue-900/30 p-2 rounded-full">
-                      <UserCircle className="h-5 w-5 text-blue-300" />
-                    </div>
-                    <div>
-                      <p className="text-sm text-blue-300/60">Role</p>
-                      <p className="text-white font-medium">{user.role}</p>
-                    </div>
-                  </div>
-                  
-                  <div className="flex items-center gap-3">
-                    <div className="bg-blue-900/30 p-2 rounded-full">
-                      <Calendar className="h-5 w-5 text-blue-300" />
-                    </div>
-                    <div>
-                      <p className="text-sm text-blue-300/60">Last Login</p>
-                      <p className="text-white font-medium">{formatDate(user.lastLoginDate)}</p>
-                    </div>
-                  </div>
-                  
-                  <div className="flex items-center gap-3">
-                    <div className="bg-blue-900/30 p-2 rounded-full">
-                      <User className="h-5 w-5 text-blue-300" />
-                    </div>
-                    <div>
-                      <p className="text-sm text-blue-300/60">Developer App</p>
-                      <p className="text-white font-medium">{user.developerApp ? 'Using' : 'Not Using'}</p>
-                    </div>
-                  </div>
+              
+              <div className="flex items-center gap-3">
+                <div className="bg-blue-900/30 p-2 rounded-full">
+                  <UserCircle className="h-5 w-5 text-blue-300" />
                 </div>
-                
-                <div className="flex justify-end">
-                  <Button onClick={() => setIsEditing(true)} variant="default" className="bg-blue-600 hover:bg-blue-700">
-                    Edit Profile
-                  </Button>
+                <div>
+                  <p className="text-sm text-blue-300/60">Role</p>
+                  <p className="text-white font-medium">{user.role}</p>
                 </div>
-              </>
-            )}
+              </div>
+              
+              <div className="flex items-center gap-3">
+                <div className="bg-blue-900/30 p-2 rounded-full">
+                  <Calendar className="h-5 w-5 text-blue-300" />
+                </div>
+                <div>
+                  <p className="text-sm text-blue-300/60">Last Login</p>
+                  <p className="text-white font-medium">{formatDate(user.lastLoginDate)}</p>
+                </div>
+              </div>
+              
+              <div className="flex items-center gap-3">
+                <div className="bg-blue-900/30 p-2 rounded-full">
+                  <User className="h-5 w-5 text-blue-300" />
+                </div>
+                <div>
+                  <p className="text-sm text-blue-300/60">Developer App</p>
+                  <p className="text-white font-medium">{user.developerApp ? 'Using' : 'Not Using'}</p>
+                </div>
+              </div>
+            </div>
           </CardContent>
         </Card>
       </div>
