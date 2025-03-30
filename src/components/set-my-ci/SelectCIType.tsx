@@ -1,7 +1,6 @@
 
 import React from 'react';
 import { Github, Code } from 'lucide-react';
-import { Button } from '@/components/ui/button';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Info } from 'lucide-react';
 
@@ -14,13 +13,11 @@ interface SelectCITypeProps {
 
 const SelectCIType: React.FC<SelectCITypeProps> = ({
   selectedCI,
-  onSelectCI,
-  onNextStep,
-  canProceed
+  onSelectCI
 }) => {
   return (
     <div className="bg-white p-6 rounded-lg border border-border shadow-sm">
-      <h2 className="text-xl font-semibold mb-4">Select CI System</h2>
+      <h2 className="text-xl font-semibold mb-4">Step 1: Select CI System</h2>
       
       <Alert className="mb-6 bg-blue-50 border-blue-200">
         <Info className="h-5 w-5 text-blue-500" />
@@ -58,15 +55,6 @@ const SelectCIType: React.FC<SelectCITypeProps> = ({
             </p>
           </div>
         </div>
-      </div>
-      
-      <div className="mt-6 flex justify-end">
-        <Button 
-          onClick={onNextStep} 
-          disabled={!canProceed}
-        >
-          Continue
-        </Button>
       </div>
     </div>
   );

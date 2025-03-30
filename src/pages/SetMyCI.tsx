@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import StepIndicator from '@/components/ci-configuration/StepIndicator';
 import { Button } from '@/components/ui/button';
@@ -11,7 +11,6 @@ import ImplementationGuide from '@/components/set-my-ci/ImplementationGuide';
 
 const SetMyCI = () => {
   const navigate = useNavigate();
-  const [currentStep, setCurrentStep] = useState(1);
   const [selectedCI, setSelectedCI] = useState<'github' | 'other' | null>(null);
   const [selectedPackages, setSelectedPackages] = useState<string[]>([]);
   
@@ -28,16 +27,6 @@ const SetMyCI = () => {
     navigate('/home');
   };
 
-  // Move to next step
-  const handleNextStep = () => {
-    setCurrentStep(currentStep + 1);
-  };
-
-  // Move to previous step
-  const handlePreviousStep = () => {
-    setCurrentStep(currentStep - 1);
-  };
-
   // Handle CI selection
   const handleCISelect = (ci: 'github' | 'other') => {
     setSelectedCI(ci);
@@ -50,13 +39,6 @@ const SetMyCI = () => {
     } else {
       setSelectedPackages([...selectedPackages, packageType]);
     }
-  };
-
-  // Check if user can proceed to next step
-  const canProceed = () => {
-    if (currentStep === 1) return selectedCI !== null;
-    if (currentStep === 2) return selectedPackages.length > 0;
-    return true;
   };
 
   return (
@@ -81,44 +63,45 @@ const SetMyCI = () => {
           <div className="flex flex-col md:flex-row gap-8">
             {/* Step indicator on the left */}
             <div className="md:w-64 flex-shrink-0">
-              <StepIndicator currentStep={currentStep} steps={steps} />
+              <StepIndicator 
+                currentStep={selectedCI ? (selectedPackages.length > 0 ? 3 : 2) : 1} 
+                steps={steps} 
+              />
             </div>
 
-            {/* Step Content on the right */}
-            <div className="flex-1">
-              {currentStep === 1 && (
-                <SelectCIType
-                  selectedCI={selectedCI}
-                  onSelectCI={handleCISelect}
-                  onNextStep={handleNextStep}
-                  canProceed={canProceed()}
-                />
-              )}
+            {/* All steps displayed on the right */}
+            <div className="flex-1 space-y-8">
+              <SelectCIType
+                selectedCI={selectedCI}
+                onSelectCI={handleCISelect}
+                canProceed={true}
+                onNextStep={() => {}}
+              />
 
-              {currentStep === 2 && (
+              {selectedCI && (
                 <SelectPackageManagers
                   selectedPackages={selectedPackages}
                   onTogglePackage={handleTogglePackage}
-                  onNextStep={handleNextStep}
-                  onPreviousStep={handlePreviousStep}
-                  canProceed={canProceed()}
+                  canProceed={true}
+                  onNextStep={() => {}}
+                  onPreviousStep={() => {}}
                 />
               )}
 
-              {currentStep === 3 && (
+              {selectedCI && selectedPackages.length > 0 && (
                 <CISnippetDisplay
-                  selectedCI={selectedCI || 'github'}
+                  selectedCI={selectedCI}
                   selectedPackages={selectedPackages}
-                  onNextStep={handleNextStep}
-                  onPreviousStep={handlePreviousStep}
+                  onNextStep={() => {}}
+                  onPreviousStep={() => {}}
                 />
               )}
 
-              {currentStep === 4 && (
+              {selectedCI && selectedPackages.length > 0 && (
                 <ImplementationGuide
-                  selectedCI={selectedCI || 'github'}
+                  selectedCI={selectedCI}
                   selectedPackages={selectedPackages}
-                  onPreviousStep={handlePreviousStep}
+                  onPreviousStep={() => {}}
                   onFinish={handleGoBack}
                 />
               )}

@@ -13,7 +13,6 @@ interface ImplementationGuideProps {
 const ImplementationGuide: React.FC<ImplementationGuideProps> = ({
   selectedCI,
   selectedPackages,
-  onPreviousStep,
   onFinish
 }) => {
   const steps = selectedCI === 'github' 
@@ -120,9 +119,6 @@ const ImplementationGuide: React.FC<ImplementationGuideProps> = ({
       </div>
       
       <div className="mt-8 flex justify-end">
-        <Button variant="outline" className="mr-2" onClick={onPreviousStep}>
-          Back
-        </Button>
         <Button onClick={onFinish}>
           Finish
         </Button>

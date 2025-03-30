@@ -1,7 +1,6 @@
 
 import React from 'react';
 import { Package, Check } from 'lucide-react';
-import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 
 interface SelectPackageManagersProps {
@@ -23,14 +22,11 @@ const packageManagers = [
 
 const SelectPackageManagers: React.FC<SelectPackageManagersProps> = ({
   selectedPackages,
-  onTogglePackage,
-  onNextStep,
-  onPreviousStep,
-  canProceed
+  onTogglePackage
 }) => {
   return (
     <div className="bg-white p-6 rounded-lg border border-border shadow-sm">
-      <h2 className="text-xl font-semibold mb-4">Select Package Managers</h2>
+      <h2 className="text-xl font-semibold mb-4">Step 2: Select Package Managers</h2>
       <p className="text-muted-foreground mb-6">
         Choose the package managers used in your project. You can select multiple options.
       </p>
@@ -80,15 +76,6 @@ const SelectPackageManagers: React.FC<SelectPackageManagersProps> = ({
           </div>
         </div>
       )}
-      
-      <div className="mt-8 flex justify-end">
-        <Button variant="outline" className="mr-2" onClick={onPreviousStep}>
-          Back
-        </Button>
-        <Button onClick={onNextStep} disabled={!canProceed}>
-          Continue
-        </Button>
-      </div>
     </div>
   );
 };

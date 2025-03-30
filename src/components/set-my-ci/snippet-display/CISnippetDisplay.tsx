@@ -1,7 +1,6 @@
 
 import React, { useState } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { useToast } from '@/hooks/use-toast';
@@ -24,9 +23,7 @@ interface CISnippetDisplayProps {
 
 const CISnippetDisplay: React.FC<CISnippetDisplayProps> = ({
   selectedCI,
-  selectedPackages,
-  onNextStep,
-  onPreviousStep
+  selectedPackages
 }) => {
   const [showFullSnippet, setShowFullSnippet] = useState(false);
   const { toast } = useToast();
@@ -97,15 +94,6 @@ const CISnippetDisplay: React.FC<CISnippetDisplayProps> = ({
           </TabsContent>
         </Tabs>
       )}
-      
-      <div className="mt-8 flex justify-end">
-        <Button variant="outline" className="mr-2" onClick={onPreviousStep}>
-          Back
-        </Button>
-        <Button onClick={onNextStep}>
-          Continue
-        </Button>
-      </div>
     </div>
   );
 };
