@@ -11,6 +11,7 @@ import Home from "./pages/Home";
 import Repositories from "./pages/Repositories";
 import CIConfiguration from "./pages/CIConfiguration";
 import Users from "./pages/Users";
+import Profile from "./pages/Profile";
 import NotFound from "./pages/NotFound";
 import { useEffect, useState } from "react";
 import { RepositoryProvider, useRepositories } from "./contexts/RepositoryContext";
@@ -88,6 +89,7 @@ const App = () => {
                 <Route path="/repositories" element={<Repositories />} />
                 <Route path="/ci-configuration" element={<CIConfiguration />} />
                 <Route path="/users" element={<Users />} />
+                <Route path="/profile" element={<Profile />} />
               </Route>
               
               {/* Catch-all route */}

@@ -36,7 +36,6 @@ const NavBar: React.FC<NavBarProps> = ({ className, onHomeLinkClick, onExpandCha
   const location = useLocation();
   const navigate = useNavigate();
 
-  // Notify parent component when expanded state changes
   useEffect(() => {
     if (onExpandChange) {
       onExpandChange(expanded);
@@ -51,19 +50,16 @@ const NavBar: React.FC<NavBarProps> = ({ className, onHomeLinkClick, onExpandCha
 
   const handleNavClick = (path: string) => {
     if (path === '/home') {
-      // If we're already on home, we need to force a reset
       if (location.pathname === '/home') {
         navigate('/home', { state: { resetChat: true }, replace: true });
       } else {
         navigate('/home');
       }
       
-      // Always call the callback if provided
       if (onHomeLinkClick) {
         onHomeLinkClick();
       }
     } else if (path === '/repositories' && location.pathname === '/ci-configuration') {
-      // If navigating from CI configuration to repositories, trigger the callback
       if (onNavigateFromCI) {
         onNavigateFromCI();
       }
@@ -74,10 +70,7 @@ const NavBar: React.FC<NavBarProps> = ({ className, onHomeLinkClick, onExpandCha
   };
   
   const handleNotificationClick = () => {
-    // Toggle notification state for demo purposes
     setHasNotifications(!hasNotifications);
-    
-    // In a real app, you would open a notification panel or navigate to notifications
     console.log('Notification clicked');
   };
   
@@ -137,7 +130,6 @@ const NavBar: React.FC<NavBarProps> = ({ className, onHomeLinkClick, onExpandCha
       </nav>
       
       <div className="mt-auto px-2 space-y-2">
-        {/* Notification Button */}
         <button 
           onClick={handleNotificationClick}
           className="flex items-center justify-center w-full px-3 py-2 rounded-md text-sm font-medium  text-blue-100/80 hover:bg-blue-800/30 hover:text-white"
@@ -149,7 +141,6 @@ const NavBar: React.FC<NavBarProps> = ({ className, onHomeLinkClick, onExpandCha
           {expanded && <span className="ml-3">Notifications</span>}
         </button>
         
-        {/* User Dropdown */}
         <DropdownMenu>
           <DropdownMenuTrigger className="flex items-center gap-2 outline-none w-full px-2 py-2 rounded-md hover:bg-blue-800/30">
             <Avatar className="h-8 w-8 border-2 border-blue-500/30 ring-2 ring-blue-400/20">
@@ -166,9 +157,9 @@ const NavBar: React.FC<NavBarProps> = ({ className, onHomeLinkClick, onExpandCha
           <DropdownMenuContent align="end" className="w-56 space-card">
             <DropdownMenuLabel>My Account</DropdownMenuLabel>
             <DropdownMenuSeparator />
-            <DropdownMenuItem className="cursor-pointer">
+            <DropdownMenuItem className="cursor-pointer" onClick={() => navigate('/profile')}>
               <UserCircle className="mr-2 h-4 w-4" />
-              <span>Profile</span>
+              <span>My Profile</span>
             </DropdownMenuItem>
             <DropdownMenuItem className="cursor-pointer">
               <UserPlus className="mr-2 h-4 w-4" />
