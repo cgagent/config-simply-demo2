@@ -48,20 +48,20 @@ const CISnippetDisplay: React.FC<CISnippetDisplayProps> = ({
   };
 
   return (
-    <div className="bg-white p-6 rounded-lg border border-gray-200 shadow-md">
-      <h2 className="text-2xl font-bold mb-4 text-gray-900">Step 3: Configuration Snippet</h2>
-      <p className="text-gray-700 text-lg mb-6">
-        Here's the code snippet you need to add to your CI configuration. Copy the snippet and integrate it into your workflow.
+    <div className="bg-white p-4 rounded-lg border border-gray-200 shadow-sm">
+      <h2 className="text-xl font-bold mb-2 text-gray-900">Step 3: Configuration Snippet</h2>
+      <p className="text-gray-700 text-sm mb-3">
+        Here's the code snippet you need to add to your CI configuration.
       </p>
       
-      <div className="flex items-center justify-end mb-6">
-        <div className="flex items-center space-x-3">
+      <div className="flex items-center justify-end mb-3">
+        <div className="flex items-center space-x-2">
           <Switch 
             id="full-snippet"
             checked={showFullSnippet}
             onCheckedChange={setShowFullSnippet}
           />
-          <Label htmlFor="full-snippet" className="text-base font-medium text-gray-800">
+          <Label htmlFor="full-snippet" className="text-sm font-medium text-gray-800">
             Show full workflow file
           </Label>
         </div>
@@ -73,10 +73,10 @@ const CISnippetDisplay: React.FC<CISnippetDisplayProps> = ({
           onCopy={copyToClipboard} 
         />
       ) : (
-        <Tabs defaultValue="setup" className="mt-6">
-          <TabsList className="mb-6 bg-gray-50 p-1 border border-gray-200">
-            <TabsTrigger value="setup" className="text-base data-[state=active]:bg-gray-700 data-[state=active]:text-white">JFrog Setup</TabsTrigger>
-            <TabsTrigger value="packages" className="text-base data-[state=active]:bg-gray-700 data-[state=active]:text-white">Package Configuration</TabsTrigger>
+        <Tabs defaultValue="setup" className="mt-3">
+          <TabsList className="mb-3 bg-gray-50 p-1 border border-gray-200">
+            <TabsTrigger value="setup" className="text-sm data-[state=active]:bg-gray-700 data-[state=active]:text-white">JFrog Setup</TabsTrigger>
+            <TabsTrigger value="packages" className="text-sm data-[state=active]:bg-gray-700 data-[state=active]:text-white">Package Config</TabsTrigger>
           </TabsList>
           
           <TabsContent value="setup">
