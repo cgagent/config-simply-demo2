@@ -33,24 +33,23 @@ const SetMyCI = () => {
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-background">
-      <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 py-8 mt-16">
+    <div className="min-h-screen flex flex-col bg-gradient-to-br from-blue-50 to-white">
+      <main className="flex-1 max-w-5xl w-full mx-auto px-4 sm:px-6 py-10 mt-16">
         <div className="animate-fadeIn">
-          <div className="flex items-center mb-6">
+          <div className="flex items-center mb-8">
             <Button 
-              variant="ghost" 
-              className="mr-4" 
+              variant="outline" 
+              className="mr-4 text-blue-700 border-blue-300" 
               onClick={handleGoBack}
             >
-              <ChevronLeft className="h-4 w-4 mr-1" />
+              <ChevronLeft className="h-5 w-5 mr-1" />
               Back to home
             </Button>
-            <h1 className="text-2xl font-bold">
+            <h1 className="text-3xl font-bold text-blue-900">
               Set My CI
             </h1>
           </div>
 
-          {/* Content section - removed the left step indicator */}
           <div className="space-y-8">
             <SelectCIType
               selectedCI={selectedCI}

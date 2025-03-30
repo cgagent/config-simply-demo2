@@ -48,20 +48,20 @@ const CISnippetDisplay: React.FC<CISnippetDisplayProps> = ({
   };
 
   return (
-    <div className="bg-white p-6 rounded-lg border border-border shadow-sm">
-      <h2 className="text-xl font-semibold mb-4">Step 3: Configuration Snippet</h2>
-      <p className="text-muted-foreground mb-6">
+    <div className="bg-white p-6 rounded-lg border border-blue-200 shadow-md">
+      <h2 className="text-2xl font-bold mb-4 text-blue-900">Step 3: Configuration Snippet</h2>
+      <p className="text-blue-700 text-lg mb-6">
         Here's the code snippet you need to add to your CI configuration. Copy the snippet and integrate it into your workflow.
       </p>
       
-      <div className="flex items-center justify-end mb-4">
-        <div className="flex items-center space-x-2">
+      <div className="flex items-center justify-end mb-6">
+        <div className="flex items-center space-x-3">
           <Switch 
             id="full-snippet"
             checked={showFullSnippet}
             onCheckedChange={setShowFullSnippet}
           />
-          <Label htmlFor="full-snippet">
+          <Label htmlFor="full-snippet" className="text-base font-medium text-blue-800">
             Show full workflow file
           </Label>
         </div>
@@ -74,9 +74,9 @@ const CISnippetDisplay: React.FC<CISnippetDisplayProps> = ({
         />
       ) : (
         <Tabs defaultValue="setup" className="mt-6">
-          <TabsList className="mb-4">
-            <TabsTrigger value="setup">JFrog Setup</TabsTrigger>
-            <TabsTrigger value="packages">Package Configuration</TabsTrigger>
+          <TabsList className="mb-6 bg-blue-50 p-1 border border-blue-200">
+            <TabsTrigger value="setup" className="text-base data-[state=active]:bg-blue-600 data-[state=active]:text-white">JFrog Setup</TabsTrigger>
+            <TabsTrigger value="packages" className="text-base data-[state=active]:bg-blue-600 data-[state=active]:text-white">Package Configuration</TabsTrigger>
           </TabsList>
           
           <TabsContent value="setup">
