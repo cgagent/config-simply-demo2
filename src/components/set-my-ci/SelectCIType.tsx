@@ -20,7 +20,7 @@ const SelectCIType: React.FC<SelectCITypeProps> = ({
 }) => {
   return (
     <div className="bg-white p-6 rounded-lg border border-border shadow-sm">
-      <h2 className="text-xl font-semibold mb-4">Step 1: Select CI System</h2>
+      <h2 className="text-xl font-semibold mb-4">Select CI System</h2>
       
       <Alert className="mb-6 bg-blue-50 border-blue-200">
         <Info className="h-5 w-5 text-blue-500" />
@@ -32,27 +32,31 @@ const SelectCIType: React.FC<SelectCITypeProps> = ({
         </AlertDescription>
       </Alert>
       
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+      <div className="space-y-6 mb-8">
         <div 
-          className={`flex flex-col items-center border rounded-lg p-6 cursor-pointer hover:bg-muted transition-colors ${selectedCI === 'github' ? 'border-primary ring-2 ring-primary/20' : 'border-border'}`}
+          className={`flex items-center border rounded-lg p-6 cursor-pointer hover:bg-muted transition-colors ${selectedCI === 'github' ? 'border-primary ring-2 ring-primary/20' : 'border-border'}`}
           onClick={() => onSelectCI('github')}
         >
-          <Github className="h-12 w-12 mb-4" />
-          <h3 className="font-medium">GitHub Actions</h3>
-          <p className="text-sm text-muted-foreground text-center mt-2">
-            Configure JFrog with GitHub Actions workflows
-          </p>
+          <Github className="h-12 w-12 mr-6" />
+          <div>
+            <h3 className="font-medium">GitHub Actions</h3>
+            <p className="text-sm text-muted-foreground mt-1">
+              Configure JFrog with GitHub Actions workflows
+            </p>
+          </div>
         </div>
         
         <div 
-          className={`flex flex-col items-center border rounded-lg p-6 cursor-pointer hover:bg-muted transition-colors ${selectedCI === 'other' ? 'border-primary ring-2 ring-primary/20' : 'border-border'}`}
+          className={`flex items-center border rounded-lg p-6 cursor-pointer hover:bg-muted transition-colors ${selectedCI === 'other' ? 'border-primary ring-2 ring-primary/20' : 'border-border'}`}
           onClick={() => onSelectCI('other')}
         >
-          <Code className="h-12 w-12 mb-4" />
-          <h3 className="font-medium">Other CI Systems</h3>
-          <p className="text-sm text-muted-foreground text-center mt-2">
-            Circle CI, Jenkins, GitLab CI, and others
-          </p>
+          <Code className="h-12 w-12 mr-6" />
+          <div>
+            <h3 className="font-medium">Other CI Systems</h3>
+            <p className="text-sm text-muted-foreground mt-1">
+              Circle CI, Jenkins, GitLab CI, and others
+            </p>
+          </div>
         </div>
       </div>
       

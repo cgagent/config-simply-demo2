@@ -77,46 +77,53 @@ const SetMyCI = () => {
             </h1>
           </div>
 
-          {/* Step indicator */}
-          <StepIndicator currentStep={currentStep} steps={steps} />
+          {/* Layout with steps on the left and content on the right */}
+          <div className="flex flex-col md:flex-row gap-8">
+            {/* Step indicator on the left */}
+            <div className="md:w-64 flex-shrink-0">
+              <StepIndicator currentStep={currentStep} steps={steps} />
+            </div>
 
-          {/* Step Content */}
-          {currentStep === 1 && (
-            <SelectCIType
-              selectedCI={selectedCI}
-              onSelectCI={handleCISelect}
-              onNextStep={handleNextStep}
-              canProceed={canProceed()}
-            />
-          )}
+            {/* Step Content on the right */}
+            <div className="flex-1">
+              {currentStep === 1 && (
+                <SelectCIType
+                  selectedCI={selectedCI}
+                  onSelectCI={handleCISelect}
+                  onNextStep={handleNextStep}
+                  canProceed={canProceed()}
+                />
+              )}
 
-          {currentStep === 2 && (
-            <SelectPackageManagers
-              selectedPackages={selectedPackages}
-              onTogglePackage={handleTogglePackage}
-              onNextStep={handleNextStep}
-              onPreviousStep={handlePreviousStep}
-              canProceed={canProceed()}
-            />
-          )}
+              {currentStep === 2 && (
+                <SelectPackageManagers
+                  selectedPackages={selectedPackages}
+                  onTogglePackage={handleTogglePackage}
+                  onNextStep={handleNextStep}
+                  onPreviousStep={handlePreviousStep}
+                  canProceed={canProceed()}
+                />
+              )}
 
-          {currentStep === 3 && (
-            <CISnippetDisplay
-              selectedCI={selectedCI || 'github'}
-              selectedPackages={selectedPackages}
-              onNextStep={handleNextStep}
-              onPreviousStep={handlePreviousStep}
-            />
-          )}
+              {currentStep === 3 && (
+                <CISnippetDisplay
+                  selectedCI={selectedCI || 'github'}
+                  selectedPackages={selectedPackages}
+                  onNextStep={handleNextStep}
+                  onPreviousStep={handlePreviousStep}
+                />
+              )}
 
-          {currentStep === 4 && (
-            <ImplementationGuide
-              selectedCI={selectedCI || 'github'}
-              selectedPackages={selectedPackages}
-              onPreviousStep={handlePreviousStep}
-              onFinish={handleGoBack}
-            />
-          )}
+              {currentStep === 4 && (
+                <ImplementationGuide
+                  selectedCI={selectedCI || 'github'}
+                  selectedPackages={selectedPackages}
+                  onPreviousStep={handlePreviousStep}
+                  onFinish={handleGoBack}
+                />
+              )}
+            </div>
+          </div>
         </div>
       </main>
     </div>

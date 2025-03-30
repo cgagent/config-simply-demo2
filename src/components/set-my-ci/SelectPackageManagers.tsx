@@ -30,29 +30,27 @@ const SelectPackageManagers: React.FC<SelectPackageManagersProps> = ({
 }) => {
   return (
     <div className="bg-white p-6 rounded-lg border border-border shadow-sm">
-      <h2 className="text-xl font-semibold mb-4">Step 2: Select Package Managers</h2>
+      <h2 className="text-xl font-semibold mb-4">Select Package Managers</h2>
       <p className="text-muted-foreground mb-6">
         Choose the package managers used in your project. You can select multiple options.
       </p>
       
-      <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-6">
+      <div className="space-y-3 mb-6">
         {packageManagers.map((pkg) => (
           <div 
             key={pkg.id}
-            className={`border rounded-lg p-4 cursor-pointer hover:bg-muted transition-colors ${
+            className={`flex items-center border rounded-lg p-4 cursor-pointer hover:bg-muted transition-colors ${
               selectedPackages.includes(pkg.id) 
                 ? 'border-primary ring-2 ring-primary/20 bg-primary/5' 
                 : 'border-border'
             }`}
             onClick={() => onTogglePackage(pkg.id)}
           >
-            <div className="flex items-center">
-              <Package className="h-5 w-5 mr-2" />
-              <span className="font-medium">{pkg.name}</span>
-              {selectedPackages.includes(pkg.id) && (
-                <Check className="h-4 w-4 ml-auto text-primary" />
-              )}
-            </div>
+            <Package className="h-5 w-5 mr-3" />
+            <span className="font-medium">{pkg.name}</span>
+            {selectedPackages.includes(pkg.id) && (
+              <Check className="h-4 w-4 ml-auto text-primary" />
+            )}
           </div>
         ))}
       </div>
