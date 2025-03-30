@@ -81,7 +81,7 @@ const CISnippetDisplay: React.FC<CISnippetDisplayProps> = ({
       <div className="border-b border-gray-200 pb-2 mb-3">
         <Toggle
           variant="outline"
-          className="text-xs h-8 px-3 data-[state=on]:bg-blue-600 data-[state=on]:text-white"
+          className="text-xs h-8 px-3 data-[state=on]:bg-gradient-to-r data-[state=on]:from-blue-800 data-[state=on]:to-blue-600 data-[state=on]:text-white data-[state=on]:border-blue-700 hover:bg-blue-50"
           pressed={viewMode === 'full'}
           onPressedChange={(pressed) => setViewMode(pressed ? 'full' : 'snippet')}
         >
