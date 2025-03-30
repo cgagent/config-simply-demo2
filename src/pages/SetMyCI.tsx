@@ -48,15 +48,7 @@ const SetMyCI = () => {
     } else {
       setSelectedPackages([...selectedPackages, packageType]);
     }
-    
-    // Show toast on selection change
-    toast({
-      title: selectedPackages.includes(packageType) 
-        ? `Removed ${packageType}` 
-        : `Added ${packageType}`,
-      description: "Configuration updated automatically",
-      duration: 2000
-    });
+    // Toast notifications removed
   };
 
   return (

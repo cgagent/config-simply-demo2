@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
+import { Skeleton } from '@/components/ui/skeleton';
 import { useToast } from '@/hooks/use-toast';
 import SetupSnippetTab from './SetupSnippetTab';
 import PackageSnippetTab from './PackageSnippetTab';
@@ -31,17 +32,26 @@ const CISnippetDisplay: React.FC<CISnippetDisplayProps> = ({
     packageSpecific: '',
     full: ''
   });
+  const [isUpdating, setIsUpdating] = useState(false);
   const { toast } = useToast();
   
   // Update snippets whenever selectedPackages changes
   useEffect(() => {
-    setSnippets({
-      setup: generateJFrogSetupSnippet(selectedCI),
-      packageSpecific: generatePackageSpecificSnippets(selectedPackages),
-      full: selectedCI === 'github' 
-        ? generateFullGitHubSnippet(selectedPackages) 
-        : generateFullOtherCISnippet(selectedPackages)
-    });
+    setIsUpdating(true);
+    
+    // Small timeout to show the loading state
+    const timer = setTimeout(() => {
+      setSnippets({
+        setup: generateJFrogSetupSnippet(selectedCI),
+        packageSpecific: generatePackageSpecificSnippets(selectedPackages),
+        full: selectedCI === 'github' 
+          ? generateFullGitHubSnippet(selectedPackages) 
+          : generateFullOtherCISnippet(selectedPackages)
+      });
+      setIsUpdating(false);
+    }, 300);
+    
+    return () => clearTimeout(timer);
   }, [selectedCI, selectedPackages]);
 
   // Copy to clipboard
@@ -56,7 +66,12 @@ const CISnippetDisplay: React.FC<CISnippetDisplayProps> = ({
 
   return (
     <div className="bg-white p-3 rounded-lg border border-gray-200 shadow-sm">
-      <h2 className="text-lg font-bold mb-1 text-gray-900">Step 3: Configuration Snippet</h2>
+      <div className="flex items-center justify-between mb-1">
+        <h2 className="text-lg font-bold text-gray-900">Step 3: Configuration Snippet</h2>
+        {isUpdating && (
+          <span className="text-xs text-gray-500 animate-pulse">Updating...</span>
+        )}
+      </div>
       <p className="text-gray-700 text-xs mb-2">
         Here's the code snippet you need to add to your CI configuration.
       </p>
@@ -74,7 +89,12 @@ const CISnippetDisplay: React.FC<CISnippetDisplayProps> = ({
         </div>
       </div>
       
-      {showFullSnippet ? (
+      {isUpdating ? (
+        <div className="space-y-2">
+          <Skeleton className="h-6 w-full" />
+          <Skeleton className="h-40 w-full" />
+        </div>
+      ) : showFullSnippet ? (
         <FullSnippetView 
           snippet={snippets.full} 
           onCopy={copyToClipboard} 
