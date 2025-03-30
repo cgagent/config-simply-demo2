@@ -33,19 +33,19 @@ const SetMyCI = () => {
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-gradient-to-br from-blue-50 to-white">
+    <div className="min-h-screen flex flex-col bg-gradient-to-br from-gray-50 to-white">
       <main className="flex-1 max-w-5xl w-full mx-auto px-4 sm:px-6 py-10 mt-16">
         <div className="animate-fadeIn">
           <div className="flex items-center mb-8">
             <Button 
               variant="outline" 
-              className="mr-4 text-blue-700 border-blue-300" 
+              className="mr-4 text-gray-700 border-gray-300" 
               onClick={handleGoBack}
             >
               <ChevronLeft className="h-5 w-5 mr-1" />
               Back to home
             </Button>
-            <h1 className="text-3xl font-bold text-blue-900">
+            <h1 className="text-3xl font-bold text-gray-900">
               Set My CI
             </h1>
           </div>

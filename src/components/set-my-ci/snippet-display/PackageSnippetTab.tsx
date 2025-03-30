@@ -11,16 +11,16 @@ interface PackageSnippetTabProps {
 
 const PackageSnippetTab: React.FC<PackageSnippetTabProps> = ({ snippet, onCopy }) => {
   return (
-    <div className="bg-blue-50 rounded-md p-5 border border-blue-300 shadow-sm">
+    <div className="bg-gray-50 rounded-md p-5 border border-gray-300 shadow-sm">
       <div className="flex justify-between items-center mb-4">
-        <Label className="text-base font-semibold text-blue-800">Package-specific configuration:</Label>
+        <Label className="text-base font-semibold text-gray-800">Package-specific configuration:</Label>
         <Button 
           variant="outline" 
           size="sm" 
-          className="bg-white border-blue-300 hover:bg-blue-100" 
+          className="bg-white border-gray-300 hover:bg-gray-100" 
           onClick={() => onCopy(snippet, "Package configuration copied")}
         >
-          <CopyIcon className="h-4 w-4 mr-2 text-blue-600" />
+          <CopyIcon className="h-4 w-4 mr-2 text-gray-600" />
           Copy
         </Button>
       </div>
