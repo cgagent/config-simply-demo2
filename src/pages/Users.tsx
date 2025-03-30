@@ -78,12 +78,12 @@ const UsersPage: React.FC = () => {
           : `${userData.firstName} ${userData.lastName}'s information has been updated.`
       });
     } else {
-      const newUser = {
+      const newUser: User = {
         ...userData,
         id: String(Date.now()),
         lastLoginDate: new Date().toISOString(),
         developerApp: false,
-        status: 'pending'
+        status: 'pending' as const // Use const assertion to fix type error
       };
       setUsers([...users, newUser]);
       toast({
