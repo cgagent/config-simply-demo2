@@ -61,18 +61,24 @@ const MainLayout = () => {
   );
 };
 
-const App = () => {
-  // Set dark mode as default
+// Theme setup component that uses hooks properly
+const ThemeSetup = () => {
   useEffect(() => {
-    // First add dark mode class immediately
+    // Add dark mode class immediately
     document.documentElement.classList.add('dark');
     
     // Then add transitions after a small delay to prevent initial transition
-    setTimeout(() => {
+    const timer = setTimeout(() => {
       document.documentElement.classList.add('init-transitions');
-    },100);
+    }, 100);
+    
+    return () => clearTimeout(timer);
   }, []);
+  
+  return null;
+};
 
+const App = () => {
   return (
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
@@ -80,6 +86,7 @@ const App = () => {
         <Sonner />
         <RepositoryProvider>
           <BrowserRouter>
+            <ThemeSetup />
             <Routes>
               <Route path="/" element={<Auth />} />
               <Route path="/account-setup" element={<AccountSetup />} />
