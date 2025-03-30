@@ -32,7 +32,7 @@ const CISnippetDisplay: React.FC<CISnippetDisplayProps> = ({
     packageSpecific: '',
     full: ''
   });
-  const [isUpdating, setIsUpdating] = useState(false);
+  const [isUpdating, setIsUpdating] = useState(true); // Set to true initially
   const { toast } = useToast();
   
   // Update snippets whenever selectedPackages changes
@@ -65,7 +65,7 @@ const CISnippetDisplay: React.FC<CISnippetDisplayProps> = ({
   };
 
   return (
-    <div className="bg-white p-3 rounded-lg border border-gray-200 shadow-sm">
+    <div className="bg-white p-3 rounded-lg border border-gray-200 shadow-sm animate-fadeIn">
       <div className="flex items-center justify-between mb-1">
         <h2 className="text-lg font-bold text-gray-900">Step 3: Configuration Snippet</h2>
         {isUpdating && (
