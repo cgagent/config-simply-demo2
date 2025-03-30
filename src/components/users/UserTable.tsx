@@ -8,7 +8,7 @@ import {
   TableRow, 
   TableCell 
 } from '@/components/ui/table';
-import { Calendar, Mail, AlertCircle } from 'lucide-react';
+import { Calendar, Mail } from 'lucide-react';
 import { User } from '@/types/user';
 import UserRoleCell from './UserRoleCell';
 import UserDeveloperAppCell from './UserDeveloperAppCell';
@@ -60,10 +60,7 @@ const UserTable: React.FC<UserTableProps> = ({
                   {user.status === 'pending' ? (
                     <Tooltip>
                       <TooltipTrigger asChild>
-                        <div className="flex items-center">
-                          <AlertCircle className="h-8 w-8 text-blue-400" />
-                          <Badge className="ml-2 bg-blue-500/80" variant="secondary">Pending</Badge>
-                        </div>
+                        <Badge className="bg-blue-500/80" variant="secondary">Pending</Badge>
                       </TooltipTrigger>
                       <TooltipContent>
                         <p className="text-xs">User hasn't completed registration</p>
