@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { ChevronLeft } from 'lucide-react';
 import SelectCIType from '@/components/set-my-ci/SelectCIType';
 import SelectPackageManagers from '@/components/set-my-ci/SelectPackageManagers';
-import CISnippetDisplay from '@/components/set-my-ci/CISnippetDisplay';
+import CISnippetDisplay from '@/components/set-my-ci/snippet-display';
 import ImplementationGuide from '@/components/set-my-ci/ImplementationGuide';
 
 const SetMyCI = () => {
