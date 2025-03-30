@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { 
   Table, 
@@ -9,7 +8,7 @@ import {
   TableCell 
 } from '@/components/ui/table';
 import { Button } from '@/components/ui/button';
-import { UserPlus, UserCog, Calendar, Mail, Shield, Code, Check, X } from 'lucide-react';
+import { UserPlus, UserCog, Calendar, Mail, Shield, Code, Check, X, Trash2 } from 'lucide-react';
 import UserForm from '@/components/UserForm';
 import { User } from '@/types/user';
 import { useToast } from '@/components/ui/use-toast';
@@ -25,6 +24,16 @@ import {
   TooltipContent,
   TooltipTrigger
 } from '@/components/ui/tooltip';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 const UsersPage: React.FC = () => {
   const { toast } = useToast();
@@ -60,6 +69,8 @@ const UsersPage: React.FC = () => {
 
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [editingUser, setEditingUser] = useState<User | null>(null);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [userToDelete, setUserToDelete] = useState<User | null>(null);
 
   const handleAddUser = () => {
     setEditingUser(null);
@@ -122,6 +133,24 @@ const UsersPage: React.FC = () => {
     }).format(date);
   };
 
+  const handleDeleteClick = (user: User) => {
+    setUserToDelete(user);
+    setDeleteDialogOpen(true);
+  };
+
+  const handleDeleteUser = () => {
+    if (userToDelete) {
+      setUsers(users.filter(user => user.id !== userToDelete.id));
+      toast({
+        title: "User deleted",
+        description: `${userToDelete.firstName} ${userToDelete.lastName} has been removed from JFrog.`,
+        variant: "destructive"
+      });
+      setDeleteDialogOpen(false);
+      setUserToDelete(null);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-background p-6">
       <div className="animate-fadeIn max-w-7xl mx-auto">
@@ -142,6 +171,7 @@ const UsersPage: React.FC = () => {
                 <TableHead className="text-foreground font-semibold">Role</TableHead>
                 <TableHead className="text-foreground font-semibold">Last Login</TableHead>
                 <TableHead className="text-foreground font-semibold">Developer App</TableHead>
+                <TableHead className="text-foreground font-semibold w-20">Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -223,6 +253,25 @@ const UsersPage: React.FC = () => {
                       )}
                     </div>
                   </TableCell>
+                  <TableCell>
+                    <div className="flex justify-center">
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <Button 
+                            onClick={() => handleDeleteClick(user)} 
+                            variant="ghost" 
+                            size="icon"
+                            className="text-red-500 hover:text-red-700 hover:bg-red-100/30"
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          <p className="text-xs">Delete user</p>
+                        </TooltipContent>
+                      </Tooltip>
+                    </div>
+                  </TableCell>
                 </TableRow>
               ))}
             </TableBody>
@@ -238,6 +287,32 @@ const UsersPage: React.FC = () => {
           onSubmit={handleFormSubmit}
         />
       )}
+
+      <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Are you sure you want to delete this user?</AlertDialogTitle>
+            <AlertDialogDescription>
+              {userToDelete && (
+                <>
+                  This will permanently remove <span className="font-semibold">{userToDelete.firstName} {userToDelete.lastName}</span> from JFrog.
+                  <br /><br />
+                  This user will no longer be assigned and cannot use JFrog anymore.
+                </>
+              )}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction 
+              onClick={handleDeleteUser} 
+              className="bg-red-600 hover:bg-red-700 text-white"
+            >
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };
