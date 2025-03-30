@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { 
   Card, 
@@ -12,13 +12,16 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { User, UserCircle, Mail, Calendar } from 'lucide-react';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { toast } from "@/components/ui/use-toast";
 
 const ProfilePage: React.FC = () => {
   const navigate = useNavigate();
   
   // In a real app, this would come from authentication context
   // For now we'll use hardcoded data matching the NavBar user
-  const currentUser = {
+  const [user, setUser] = useState({
     id: '1',
     firstName: 'John',
     lastName: 'Doe',
@@ -26,7 +29,22 @@ const ProfilePage: React.FC = () => {
     role: 'Admin',
     lastLoginDate: new Date().toISOString(),
     developerApp: true
-  };
+  });
+
+  const [isEditing, setIsEditing] = useState(false);
+  const [editValues, setEditValues] = useState({
+    firstName: user.firstName,
+    lastName: user.lastName,
+    avatarUrl: 'https://github.com/shadcn.png'
+  });
+
+  // Avatar options - in a real app these would be from a proper source
+  const avatarOptions = [
+    { id: 'avatar1', url: 'https://github.com/shadcn.png', label: 'Default' },
+    { id: 'avatar2', url: 'https://i.pravatar.cc/150?img=1', label: 'Avatar 1' },
+    { id: 'avatar3', url: 'https://i.pravatar.cc/150?img=2', label: 'Avatar 2' },
+    { id: 'avatar4', url: 'https://i.pravatar.cc/150?img=3', label: 'Avatar 3' },
+  ];
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
@@ -37,6 +55,46 @@ const ProfilePage: React.FC = () => {
       hour: '2-digit',
       minute: '2-digit'
     }).format(date);
+  };
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setEditValues(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  };
+
+  const handleAvatarSelect = (url: string) => {
+    setEditValues(prev => ({
+      ...prev,
+      avatarUrl: url
+    }));
+  };
+
+  const handleSave = () => {
+    if (!editValues.firstName || !editValues.lastName) {
+      toast({
+        title: "Error",
+        description: "First name and last name are required.",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    // In a real app, this would be an API call
+    setUser(prev => ({
+      ...prev,
+      firstName: editValues.firstName,
+      lastName: editValues.lastName,
+    }));
+    
+    toast({
+      title: "Profile updated",
+      description: "Your profile has been updated successfully."
+    });
+    
+    setIsEditing(false);
   };
 
   return (
@@ -55,17 +113,17 @@ const ProfilePage: React.FC = () => {
         <Card className="border border-blue-200/20 bg-gradient-to-b from-blue-950/50 to-gray-950/80 shadow-lg">
           <CardHeader className="flex flex-row items-center gap-4 pb-2">
             <Avatar className="h-16 w-16 border-2 border-blue-500/30 ring-4 ring-blue-400/10">
-              <AvatarImage src="https://github.com/shadcn.png" alt={`${currentUser.firstName} ${currentUser.lastName}`} />
+              <AvatarImage src={editValues.avatarUrl} alt={`${user.firstName} ${user.lastName}`} />
               <AvatarFallback className="text-lg">
-                {currentUser.firstName[0]}{currentUser.lastName[0]}
+                {user.firstName[0]}{user.lastName[0]}
               </AvatarFallback>
             </Avatar>
             <div>
               <CardTitle className="text-2xl font-bold text-white">
-                {currentUser.firstName} {currentUser.lastName}
+                {user.firstName} {user.lastName}
               </CardTitle>
               <CardDescription className="text-blue-300/80">
-                {currentUser.role}
+                {user.role}
               </CardDescription>
             </div>
           </CardHeader>
@@ -73,53 +131,116 @@ const ProfilePage: React.FC = () => {
           <Separator className="bg-blue-500/20" />
           
           <CardContent className="pt-6 space-y-6">
-            <div className="space-y-4">
-              <div className="flex items-center gap-3">
-                <div className="bg-blue-900/30 p-2 rounded-full">
-                  <Mail className="h-5 w-5 text-blue-300" />
+            {isEditing ? (
+              <div className="space-y-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="firstName">First Name</Label>
+                    <Input
+                      id="firstName"
+                      name="firstName"
+                      value={editValues.firstName}
+                      onChange={handleInputChange}
+                      placeholder="First Name"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="lastName">Last Name</Label>
+                    <Input
+                      id="lastName"
+                      name="lastName"
+                      value={editValues.lastName}
+                      onChange={handleInputChange}
+                      placeholder="Last Name"
+                    />
+                  </div>
                 </div>
-                <div>
-                  <p className="text-sm text-blue-300/60">Email Address</p>
-                  <p className="text-white font-medium">{currentUser.email}</p>
+                
+                <div className="space-y-2">
+                  <Label>Select Avatar</Label>
+                  <div className="flex flex-wrap gap-3">
+                    {avatarOptions.map(avatar => (
+                      <div 
+                        key={avatar.id}
+                        className={`cursor-pointer p-1 rounded-full ${editValues.avatarUrl === avatar.url ? 'bg-blue-500 ring-2 ring-blue-300' : 'bg-transparent hover:bg-blue-900/30'}`}
+                        onClick={() => handleAvatarSelect(avatar.url)}
+                      >
+                        <Avatar className="h-12 w-12">
+                          <AvatarImage src={avatar.url} alt={avatar.label} />
+                          <AvatarFallback>{avatar.label[0]}</AvatarFallback>
+                        </Avatar>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+                
+                <div className="flex justify-end gap-2 pt-4">
+                  <Button variant="outline" onClick={() => {
+                    setIsEditing(false);
+                    setEditValues({
+                      firstName: user.firstName,
+                      lastName: user.lastName,
+                      avatarUrl: 'https://github.com/shadcn.png'
+                    });
+                  }}>
+                    Cancel
+                  </Button>
+                  <Button onClick={handleSave}>
+                    Save Changes
+                  </Button>
                 </div>
               </div>
-              
-              <div className="flex items-center gap-3">
-                <div className="bg-blue-900/30 p-2 rounded-full">
-                  <UserCircle className="h-5 w-5 text-blue-300" />
+            ) : (
+              <>
+                <div className="space-y-4">
+                  <div className="flex items-center gap-3">
+                    <div className="bg-blue-900/30 p-2 rounded-full">
+                      <Mail className="h-5 w-5 text-blue-300" />
+                    </div>
+                    <div>
+                      <p className="text-sm text-blue-300/60">Email Address</p>
+                      <p className="text-white font-medium">{user.email}</p>
+                    </div>
+                  </div>
+                  
+                  <div className="flex items-center gap-3">
+                    <div className="bg-blue-900/30 p-2 rounded-full">
+                      <UserCircle className="h-5 w-5 text-blue-300" />
+                    </div>
+                    <div>
+                      <p className="text-sm text-blue-300/60">Role</p>
+                      <p className="text-white font-medium">{user.role}</p>
+                    </div>
+                  </div>
+                  
+                  <div className="flex items-center gap-3">
+                    <div className="bg-blue-900/30 p-2 rounded-full">
+                      <Calendar className="h-5 w-5 text-blue-300" />
+                    </div>
+                    <div>
+                      <p className="text-sm text-blue-300/60">Last Login</p>
+                      <p className="text-white font-medium">{formatDate(user.lastLoginDate)}</p>
+                    </div>
+                  </div>
+                  
+                  <div className="flex items-center gap-3">
+                    <div className="bg-blue-900/30 p-2 rounded-full">
+                      <User className="h-5 w-5 text-blue-300" />
+                    </div>
+                    <div>
+                      <p className="text-sm text-blue-300/60">Developer App</p>
+                      <p className="text-white font-medium">{user.developerApp ? 'Using' : 'Not Using'}</p>
+                    </div>
+                  </div>
                 </div>
-                <div>
-                  <p className="text-sm text-blue-300/60">Role</p>
-                  <p className="text-white font-medium">{currentUser.role}</p>
+                
+                <div className="flex justify-end">
+                  <Button onClick={() => setIsEditing(true)} variant="default" className="bg-blue-600 hover:bg-blue-700">
+                    Edit Profile
+                  </Button>
                 </div>
-              </div>
-              
-              <div className="flex items-center gap-3">
-                <div className="bg-blue-900/30 p-2 rounded-full">
-                  <Calendar className="h-5 w-5 text-blue-300" />
-                </div>
-                <div>
-                  <p className="text-sm text-blue-300/60">Last Login</p>
-                  <p className="text-white font-medium">{formatDate(currentUser.lastLoginDate)}</p>
-                </div>
-              </div>
-              
-              <div className="flex items-center gap-3">
-                <div className="bg-blue-900/30 p-2 rounded-full">
-                  <User className="h-5 w-5 text-blue-300" />
-                </div>
-                <div>
-                  <p className="text-sm text-blue-300/60">Developer App</p>
-                  <p className="text-white font-medium">{currentUser.developerApp ? 'Using' : 'Not Using'}</p>
-                </div>
-              </div>
-            </div>
-            
-            <div className="flex justify-end">
-              <Button variant="default" className="bg-blue-600 hover:bg-blue-700">
-                Edit Profile
-              </Button>
-            </div>
+              </>
+            )}
           </CardContent>
         </Card>
       </div>
