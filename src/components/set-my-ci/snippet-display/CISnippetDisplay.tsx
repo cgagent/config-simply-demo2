@@ -68,11 +68,15 @@ const CISnippetDisplay: React.FC<CISnippetDisplayProps> = ({
   return (
     <div className="bg-white p-3 rounded-lg border border-gray-200 shadow-sm">
       <div className="flex items-center justify-between mb-1">
-        <h2 className="text-lg font-bold text-gray-900">Step 3: Configuration Snippet</h2>
+        <div className="flex items-center gap-2">
+          <h2 className="text-lg font-bold text-gray-900">Step 3: Configuration Snippet</h2>
+          {isUpdating && (
+            <LoaderCircle className="animate-spin h-5 w-5 text-blue-500" />
+          )}
+        </div>
         {isUpdating && (
-          <div className="flex items-center text-xs text-gray-500 gap-1">
-            <LoaderCircle className="animate-spin h-3 w-3" />
-            <span>Updating...</span>
+          <div className="text-xs text-blue-500 font-medium">
+            Updating snippets...
           </div>
         )}
       </div>
