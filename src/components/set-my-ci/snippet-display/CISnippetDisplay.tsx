@@ -1,10 +1,10 @@
+
 import React, { useState, useEffect } from 'react';
 import { Label } from '@/components/ui/label';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useToast } from '@/hooks/use-toast';
 import { Button } from '@/components/ui/button';
-import { Switch } from '@/components/ui/switch';
-import { Copy, Code, FileText } from 'lucide-react';
+import { Toggle } from '@/components/ui/toggle';
 import FullSnippetView from './FullSnippetView';
 import { 
   generateJFrogSetupSnippet,
@@ -32,10 +32,13 @@ const CISnippetDisplay: React.FC<CISnippetDisplayProps> = ({
   const [isUpdating, setIsUpdating] = useState(true); // Set to true initially
   const { toast } = useToast();
   
+  // Update snippets whenever selectedPackages changes
   useEffect(() => {
     setIsUpdating(true);
     
+    // Small timeout to show the loading state
     const timer = setTimeout(() => {
+      // Combine the setup and package specific into one basic snippet
       const setupSnippet = generateJFrogSetupSnippet(selectedCI);
       const packageSnippet = generatePackageSpecificSnippets(selectedPackages);
       
@@ -51,6 +54,7 @@ const CISnippetDisplay: React.FC<CISnippetDisplayProps> = ({
     return () => clearTimeout(timer);
   }, [selectedCI, selectedPackages]);
 
+  // Copy to clipboard
   const copyToClipboard = (text: string, message: string) => {
     navigator.clipboard.writeText(text).then(() => {
       toast({
@@ -75,32 +79,14 @@ const CISnippetDisplay: React.FC<CISnippetDisplayProps> = ({
       </p>
       
       <div className="border-b border-gray-200 pb-2 mb-3">
-        <div className="flex gap-2 items-center">
-          <div className="bg-gray-100 p-0.5 rounded-md flex text-xs">
-            <button
-              onClick={() => setViewMode('snippet')}
-              className={`flex items-center px-3 py-1.5 rounded-md ${
-                viewMode === 'snippet' 
-                  ? 'bg-gradient-to-r from-blue-800 to-blue-600 text-white shadow-sm' 
-                  : 'text-gray-700 hover:bg-gray-200'
-              }`}
-            >
-              <Code size={14} className="mr-1.5" />
-              Basic Snippet
-            </button>
-            <button
-              onClick={() => setViewMode('full')}
-              className={`flex items-center px-3 py-1.5 rounded-md ${
-                viewMode === 'full' 
-                  ? 'bg-gradient-to-r from-blue-800 to-blue-600 text-white shadow-sm' 
-                  : 'text-gray-700 hover:bg-gray-200'
-              }`}
-            >
-              <FileText size={14} className="mr-1.5" />
-              Full Workflow
-            </button>
-          </div>
-        </div>
+        <Toggle
+          variant="outline"
+          className="text-xs h-8 px-3 data-[state=on]:bg-gradient-to-r data-[state=on]:from-blue-800 data-[state=on]:to-blue-600 data-[state=on]:text-white data-[state=on]:border-blue-700 hover:bg-blue-50"
+          pressed={viewMode === 'full'}
+          onPressedChange={(pressed) => setViewMode(pressed ? 'full' : 'snippet')}
+        >
+          {viewMode === 'snippet' ? 'Show Full Workflow' : 'Show Basic Snippet'}
+        </Toggle>
       </div>
       
       {isUpdating ? (
@@ -121,7 +107,10 @@ const CISnippetDisplay: React.FC<CISnippetDisplayProps> = ({
               className="bg-white border border-gray-300 hover:bg-gray-100 text-gray-700 px-2 py-1 rounded text-xs flex items-center"
               onClick={() => copyToClipboard(snippets.basic, "Snippet copied to clipboard")}
             >
-              <Copy size={12} className="mr-1" />
+              <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-1">
+                <rect width="14" height="14" x="8" y="8" rx="2" ry="2" />
+                <path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2" />
+              </svg>
               Copy
             </button>
           </div>

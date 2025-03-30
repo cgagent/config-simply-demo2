@@ -1,21 +1,54 @@
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { ChevronLeft } from 'lucide-react';
-import AIConfigurationChat from '@/components/ai-configuration/AIConfigurationChat';
+import SelectCIType from '@/components/set-my-ci/SelectCIType';
+import SelectPackageManagers from '@/components/set-my-ci/SelectPackageManagers';
+import CISnippetDisplay from '@/components/set-my-ci/snippet-display';
+import ImplementationGuide from '@/components/set-my-ci/ImplementationGuide';
+import { useToast } from '@/hooks/use-toast';
 
 const SetMyCI = () => {
   const navigate = useNavigate();
+  const { toast } = useToast();
+  const [selectedCI, setSelectedCI] = useState<'github' | 'other' | null>(null);
+  const [selectedPackages, setSelectedPackages] = useState<string[]>([]);
+  const [showSection, setShowSection] = useState({
+    ciType: true,
+    packageManagers: false,
+    snippetDisplay: false,
+    implementationGuide: false
+  });
+  
+  // Update sections visibility based on selections
+  useEffect(() => {
+    setShowSection({
+      ciType: true,
+      packageManagers: !!selectedCI,
+      snippetDisplay: !!selectedCI && selectedPackages.length > 0,
+      implementationGuide: !!selectedCI && selectedPackages.length > 0
+    });
+  }, [selectedCI, selectedPackages]);
   
   // Handle going back to previous page
   const handleGoBack = () => {
     navigate('/home');
   };
 
-  // Handle successful merge
-  const handleMergeSuccess = (repoName: string, packageType: string) => {
-    console.log(`Successfully merged CI configuration for ${repoName} with ${packageType}`);
+  // Handle CI selection
+  const handleCISelect = (ci: 'github' | 'other') => {
+    setSelectedCI(ci);
+  };
+
+  // Toggle package manager selection
+  const handleTogglePackage = (packageType: string) => {
+    if (selectedPackages.includes(packageType)) {
+      setSelectedPackages(selectedPackages.filter(p => p !== packageType));
+    } else {
+      setSelectedPackages([...selectedPackages, packageType]);
+    }
+    // Toast notifications removed
   };
 
   return (
@@ -36,20 +69,43 @@ const SetMyCI = () => {
             </h1>
           </div>
 
-          {/* Chat-based CI Setup Flow */}
           <div className="space-y-3">
-            <div className="bg-white p-4 rounded-lg border border-gray-200 shadow-sm">
-              <p className="text-gray-700 text-sm mb-3">
-                Chat with our assistant to set up your CI pipeline with JFrog integration.
-              </p>
-              
-              <div className="h-[600px] border border-gray-200 rounded-lg bg-gray-50 overflow-hidden flex flex-col">
-                <AIConfigurationChat 
-                  repositoryName="infrastructure" 
-                  onMergeSuccess={handleMergeSuccess} 
-                />
-              </div>
-            </div>
+            {showSection.ciType && (
+              <SelectCIType
+                selectedCI={selectedCI}
+                onSelectCI={handleCISelect}
+                canProceed={true}
+                onNextStep={() => {}}
+              />
+            )}
+
+            {showSection.packageManagers && (
+              <SelectPackageManagers
+                selectedPackages={selectedPackages}
+                onTogglePackage={handleTogglePackage}
+                canProceed={true}
+                onNextStep={() => {}}
+                onPreviousStep={() => {}}
+              />
+            )}
+
+            {showSection.snippetDisplay && (
+              <CISnippetDisplay
+                selectedCI={selectedCI!}
+                selectedPackages={selectedPackages}
+                onNextStep={() => {}}
+                onPreviousStep={() => {}}
+              />
+            )}
+
+            {showSection.implementationGuide && (
+              <ImplementationGuide
+                selectedCI={selectedCI!}
+                selectedPackages={selectedPackages}
+                onPreviousStep={() => {}}
+                onFinish={handleGoBack}
+              />
+            )}
           </div>
         </div>
       </main>
