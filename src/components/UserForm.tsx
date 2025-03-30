@@ -155,32 +155,35 @@ const UserForm: React.FC<UserFormProps> = ({ user, isOpen, onClose, onSubmit }) 
               )}
             />
             
-            <FormField
-              control={form.control}
-              name="developerApp"
-              render={({ field }) => (
-                <FormItem className="space-y-3">
-                  <FormLabel>Developer App Status</FormLabel>
-                  <FormControl>
-                    <RadioGroup
-                      onValueChange={(value) => field.onChange(value === "true")}
-                      defaultValue={field.value ? "true" : "false"}
-                      className="flex flex-row space-x-4"
-                    >
-                      <div className="flex items-center space-x-2">
-                        <RadioGroupItem value="true" id="using" />
-                        <FormLabel htmlFor="using" className="cursor-pointer">Using</FormLabel>
-                      </div>
-                      <div className="flex items-center space-x-2">
-                        <RadioGroupItem value="false" id="not-using" />
-                        <FormLabel htmlFor="not-using" className="cursor-pointer">Not Using</FormLabel>
-                      </div>
-                    </RadioGroup>
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+            {/* Only show Developer App status when editing an existing user */}
+            {user && (
+              <FormField
+                control={form.control}
+                name="developerApp"
+                render={({ field }) => (
+                  <FormItem className="space-y-3">
+                    <FormLabel>Developer App Status</FormLabel>
+                    <FormControl>
+                      <RadioGroup
+                        onValueChange={(value) => field.onChange(value === "true")}
+                        defaultValue={field.value ? "true" : "false"}
+                        className="flex flex-row space-x-4"
+                      >
+                        <div className="flex items-center space-x-2">
+                          <RadioGroupItem value="true" id="using" />
+                          <FormLabel htmlFor="using" className="cursor-pointer">Using</FormLabel>
+                        </div>
+                        <div className="flex items-center space-x-2">
+                          <RadioGroupItem value="false" id="not-using" />
+                          <FormLabel htmlFor="not-using" className="cursor-pointer">Not Using</FormLabel>
+                        </div>
+                      </RadioGroup>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            )}
             
             <DialogFooter>
               <Button type="button" variant="outline" onClick={onClose}>
