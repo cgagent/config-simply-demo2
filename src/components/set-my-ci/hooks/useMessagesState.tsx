@@ -43,6 +43,8 @@ export function useMessagesState({
   ]);
   
   const [setupComplete, setSetupComplete] = useState(false);
+  // Track which user messages have been processed
+  const [processedMessageIds, setProcessedMessageIds] = useState<Set<string>>(new Set());
 
   // Update messages when steps change
   useEffect(() => {
@@ -175,35 +177,37 @@ export function useMessagesState({
     }
   }, [selectedPackages, currentStep, selectedCI, handlePackageSelection, handleContinueToStep3]);
 
-  // Add user messages to the chat
+  // Add user messages to the chat - fixed to avoid duplicates
   useEffect(() => {
     if (userMessages.length > 0) {
-      // Only add the latest message if it's not already in the list
-      const latestMessage = userMessages[userMessages.length - 1];
-      const messageExists = messages.some(msg => {
-        if (typeof msg.component === 'string') {
-          return msg.component === latestMessage.text;
+      // Process only unprocessed messages to avoid duplicates
+      userMessages.forEach(message => {
+        if (!processedMessageIds.has(message.id)) {
+          // Add this message to the processed set
+          setProcessedMessageIds(prev => {
+            const newSet = new Set(prev);
+            newSet.add(message.id);
+            return newSet;
+          });
+          
+          // Add the message to the chat
+          setMessages(prev => [
+            ...prev,
+            {
+              id: `user-msg-${message.id}`,
+              component: (
+                <ChatMessage 
+                  type="system" 
+                  content={message.text}
+                  isUser={true}
+                />
+              )
+            }
+          ]);
         }
-        return false;
       });
-      
-      if (!messageExists) {
-        setMessages(prev => [
-          ...prev,
-          {
-            id: `user-msg-${latestMessage.id}`,
-            component: (
-              <ChatMessage 
-                type="system" 
-                content={latestMessage.text}
-                isUser={true}
-              />
-            )
-          }
-        ]);
-      }
     }
-  }, [userMessages, messages]);
+  }, [userMessages, processedMessageIds]);
 
   return {
     messages,
