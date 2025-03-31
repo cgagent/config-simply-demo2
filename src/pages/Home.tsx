@@ -4,7 +4,6 @@ import { AIChat } from '@/components/ai-chat/AIChat';
 import StatisticsBar from '@/components/StatisticsBar';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useToast } from '@/hooks/use-toast';
-import { Button } from '@/components/ui/button';
 
 const Home: React.FC = () => {
   const [isChatActive, setIsChatActive] = useState(false);
@@ -72,16 +71,6 @@ const Home: React.FC = () => {
     
   }, []);
 
-  // Handler for Set my CI button
-  const handleSetMyCI = useCallback(() => {
-    handleChatQuery("I would like to set up my CI to work with JFrog. Can you set it up for me?");
-  }, [handleChatQuery]);
-
-  // Navigate to CI Setup Chat (original method preserved for backward compatibility)
-  const handleNavigateToCISetup = useCallback(() => {
-    navigate('/ci-setup-chat');
-  }, [navigate]);
-
   // Clean up timeouts when component unmounts
   useEffect(() => {
     return () => {
@@ -106,30 +95,13 @@ const Home: React.FC = () => {
       <main className="flex-1 w-full mx-auto flex flex-col">
         <div className="max-w-7xl w-full mx-auto px-4 sm:px-6 flex flex-col h-[calc(100vh-64px)] pt-6">
           {!isChatActive && (
-            <>
-              <StatisticsBar 
-                ciCompletionPercentage={statsData.ciCompletionPercentage}
-                blockedPackages={statsData.blockedPackages}
-                totalPackages={statsData.totalPackages}
-                dataConsumption={statsData.dataConsumption}
-                onChatQuery={handleChatQuery}
-              />
-              <div className="mt-4 flex justify-center gap-4">
-                <Button 
-                  onClick={handleSetMyCI}
-                  className="bg-blue-700 hover:bg-blue-800 text-white font-medium"
-                >
-                  Set Up CI with JFrog
-                </Button>
-                <Button 
-                  onClick={handleNavigateToCISetup}
-                  variant="outline"
-                  className="text-white font-medium"
-                >
-                  Open CI Setup Page
-                </Button>
-              </div>
-            </>
+            <StatisticsBar 
+              ciCompletionPercentage={statsData.ciCompletionPercentage}
+              blockedPackages={statsData.blockedPackages}
+              totalPackages={statsData.totalPackages}
+              dataConsumption={statsData.dataConsumption}
+              onChatQuery={handleChatQuery}
+            />
           )}
           
           <div className="flex-1 flex flex-col border-0 overflow-hidden bg-background dark:bg-background">
