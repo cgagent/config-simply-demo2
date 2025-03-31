@@ -1,5 +1,5 @@
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 
 export type CIType = 'github' | 'other' | null;
 
@@ -28,6 +28,7 @@ export function useCISetupState({
   const handlePackageSelection = useCallback((packageType: string) => {
     console.log('Package selection toggled in hook:', packageType);
     setSelectedPackages(prevSelected => {
+      // Create a new array to ensure React detects the state change
       if (prevSelected.includes(packageType)) {
         // Remove if already selected
         return prevSelected.filter(p => p !== packageType);
@@ -37,6 +38,11 @@ export function useCISetupState({
       }
     });
   }, []);
+
+  // Debug effect to track package selection changes
+  useEffect(() => {
+    console.log('Selected packages updated:', selectedPackages);
+  }, [selectedPackages]);
 
   // Function to continue to step 3
   const handleContinueToStep3 = useCallback(() => {

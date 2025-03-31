@@ -29,58 +29,134 @@ const CISetupChat = () => {
 
   // Update messages when steps change
   useEffect(() => {
+    // Effect for handling Step 2
     if (currentStep === 2 && selectedCI) {
       const ciName = selectedCI === 'github' ? 'GitHub Actions' : 'Other CI Systems';
-      setMessages(prev => [
-        ...prev,
-        { 
-          id: Date.now(), 
-          component: (
-            <StepTwo 
-              ciName={ciName} 
-              onPackageSelection={handlePackageSelection} 
-              selectedPackages={selectedPackages} 
-              onContinue={handleContinueToStep3} 
-            />
-          )
-        }
-      ]);
-    } else if (currentStep === 3) {
-      setMessages(prev => [
-        ...prev,
-        { 
-          id: Date.now(), 
-          component: (
-            <StepThree 
-              packagesText={getSelectedPackagesText()} 
-              selectedCI={selectedCI} 
-              selectedPackages={selectedPackages} 
-              onNextStep={handleContinueToStep4}
-              onPreviousStep={handlePreviousStep}
-            />
-          )
-        }
-      ]);
-    } else if (currentStep === 4) {
-      setMessages(prev => [
-        ...prev,
-        { 
-          id: Date.now(), 
-          component: (
-            <StepFour 
-              onComplete={() => {
-                setSetupComplete(true);
-                setMessages(prevMessages => [
-                  ...prevMessages,
-                  { id: Date.now(), component: <CompletionStep /> }
-                ]);
-              }} 
-            />
-          )
-        }
-      ]);
+      
+      // Check if step 2 is already in the messages
+      const step2Exists = messages.some(msg => {
+        const comp = msg.component as React.ReactElement;
+        return comp.type === StepTwo;
+      });
+      
+      if (!step2Exists) {
+        setMessages(prev => [
+          ...prev,
+          { 
+            id: Date.now(), 
+            component: (
+              <StepTwo 
+                ciName={ciName} 
+                onPackageSelection={handlePackageSelection} 
+                selectedPackages={selectedPackages} 
+                onContinue={handleContinueToStep3} 
+              />
+            )
+          }
+        ]);
+      } else {
+        // Update the existing Step 2 component with new props
+        setMessages(prev => 
+          prev.map(msg => {
+            const comp = msg.component as React.ReactElement;
+            if (comp.type === StepTwo) {
+              return {
+                ...msg,
+                component: (
+                  <StepTwo 
+                    ciName={ciName} 
+                    onPackageSelection={handlePackageSelection} 
+                    selectedPackages={selectedPackages} 
+                    onContinue={handleContinueToStep3} 
+                  />
+                )
+              };
+            }
+            return msg;
+          })
+        );
+      }
+    } 
+    // Effect for handling Step 3
+    else if (currentStep === 3) {
+      const step3Exists = messages.some(msg => {
+        const comp = msg.component as React.ReactElement;
+        return comp.type === StepThree;
+      });
+      
+      if (!step3Exists) {
+        setMessages(prev => [
+          ...prev,
+          { 
+            id: Date.now(), 
+            component: (
+              <StepThree 
+                packagesText={getSelectedPackagesText()} 
+                selectedCI={selectedCI} 
+                selectedPackages={selectedPackages} 
+                onNextStep={handleContinueToStep4}
+                onPreviousStep={handlePreviousStep}
+              />
+            )
+          }
+        ]);
+      }
+    } 
+    // Effect for handling Step 4
+    else if (currentStep === 4) {
+      const step4Exists = messages.some(msg => {
+        const comp = msg.component as React.ReactElement;
+        return comp.type === StepFour;
+      });
+      
+      if (!step4Exists) {
+        setMessages(prev => [
+          ...prev,
+          { 
+            id: Date.now(), 
+            component: (
+              <StepFour 
+                onComplete={() => {
+                  setSetupComplete(true);
+                  setMessages(prevMessages => [
+                    ...prevMessages,
+                    { id: Date.now(), component: <CompletionStep /> }
+                  ]);
+                }} 
+              />
+            )
+          }
+        ]);
+      }
     }
-  }, [currentStep]);
+  }, [currentStep, selectedCI, selectedPackages, handlePackageSelection, handleContinueToStep3, handleContinueToStep4, handlePreviousStep, getSelectedPackagesText]);
+
+  // Force rerender Step 2 when selectedPackages changes
+  useEffect(() => {
+    if (currentStep === 2) {
+      setMessages(prev => 
+        prev.map(msg => {
+          const comp = msg.component as React.ReactElement;
+          if (comp.type === StepTwo) {
+            const ciName = selectedCI === 'github' ? 'GitHub Actions' : 'Other CI Systems';
+            return {
+              ...msg,
+              component: (
+                <StepTwo 
+                  key={selectedPackages.join(',')} // Add key to force rerender
+                  ciName={ciName} 
+                  onPackageSelection={handlePackageSelection} 
+                  selectedPackages={selectedPackages} 
+                  onContinue={handleContinueToStep3} 
+                />
+              )
+            };
+          }
+          return msg;
+        })
+      );
+    }
+  }, [selectedPackages, currentStep, selectedCI, handlePackageSelection, handleContinueToStep3]);
 
   // Scroll to bottom when messages change
   useEffect(() => {

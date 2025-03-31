@@ -61,9 +61,9 @@ export const CIButtonGroup: React.FC<CIButtonGroupProps> = ({
             {firstRowOptions.map((option) => (
               <Button
                 key={option.id}
-                variant={selectedOptions?.includes(option.id) ? "primary" : "outline"}
+                variant={selectedOptions.includes(option.id) ? "primary" : "outline"}
                 className={`justify-start py-3 px-4 h-auto text-left ${
-                  selectedOptions?.includes(option.id) 
+                  selectedOptions.includes(option.id) 
                     ? "bg-blue-700 text-white border-blue-600" 
                     : "bg-gray-800 text-white hover:bg-gray-700 border-gray-700"
                 }`}
@@ -75,7 +75,7 @@ export const CIButtonGroup: React.FC<CIButtonGroupProps> = ({
                     <div className="font-medium">{option.label}</div>
                     {option.description && <div className="text-xs opacity-80">{option.description}</div>}
                   </div>
-                  {selectedOptions?.includes(option.id) && (
+                  {selectedOptions.includes(option.id) && (
                     <Check className="h-4 w-4 ml-2" />
                   )}
                 </div>
@@ -86,9 +86,9 @@ export const CIButtonGroup: React.FC<CIButtonGroupProps> = ({
             {secondRowOptions.map((option) => (
               <Button
                 key={option.id}
-                variant={selectedOptions?.includes(option.id) ? "primary" : "outline"}
+                variant={selectedOptions.includes(option.id) ? "primary" : "outline"}
                 className={`justify-start py-3 px-4 h-auto text-left ${
-                  selectedOptions?.includes(option.id) 
+                  selectedOptions.includes(option.id) 
                     ? "bg-blue-700 text-white border-blue-600" 
                     : "bg-gray-800 text-white hover:bg-gray-700 border-gray-700"
                 }`}
@@ -100,7 +100,7 @@ export const CIButtonGroup: React.FC<CIButtonGroupProps> = ({
                     <div className="font-medium">{option.label}</div>
                     {option.description && <div className="text-xs opacity-80">{option.description}</div>}
                   </div>
-                  {selectedOptions?.includes(option.id) && (
+                  {selectedOptions.includes(option.id) && (
                     <Check className="h-4 w-4 ml-2" />
                   )}
                 </div>
@@ -113,9 +113,9 @@ export const CIButtonGroup: React.FC<CIButtonGroupProps> = ({
           {options.map((option) => (
             <Button
               key={option.id}
-              variant={selectedOptions?.includes(option.id) ? "primary" : "outline"}
+              variant={selectedOptions.includes(option.id) ? "primary" : "outline"}
               className={`justify-start py-3 px-4 h-auto text-left ${
-                selectedOptions?.includes(option.id) 
+                selectedOptions.includes(option.id) 
                   ? "bg-blue-700 text-white border-blue-600" 
                   : "bg-gray-800 text-white hover:bg-gray-700 border-gray-700"
               }`}
@@ -127,7 +127,7 @@ export const CIButtonGroup: React.FC<CIButtonGroupProps> = ({
                   <div className="font-medium">{option.label}</div>
                   {option.description && <div className="text-xs opacity-80">{option.description}</div>}
                 </div>
-                {selectedOptions?.includes(option.id) && (
+                {selectedOptions.includes(option.id) && (
                   <Check className="h-4 w-4 ml-2" />
                 )}
               </div>
