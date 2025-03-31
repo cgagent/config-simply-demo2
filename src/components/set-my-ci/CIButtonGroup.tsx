@@ -44,7 +44,11 @@ export const CIButtonGroup: React.FC<CIButtonGroupProps> = ({
           <Button
             key={option.id}
             variant={selectedOptions?.includes(option.id) ? "default" : "outline"}
-            className="justify-start py-3 px-4 h-auto text-left bg-gray-800 text-white hover:bg-gray-700 border-gray-700"
+            className={`justify-start py-3 px-4 h-auto text-left ${
+              selectedOptions?.includes(option.id) 
+                ? "bg-gray-800 text-white" 
+                : "bg-gray-800 text-white hover:bg-gray-700 border-gray-700"
+            }`}
             onClick={() => onSelect(option.id)}
           >
             <div className="flex items-center space-x-2">

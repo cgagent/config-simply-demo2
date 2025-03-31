@@ -73,11 +73,73 @@ const CISetupChat = () => {
 
   // Function to handle package manager selection
   function handlePackageSelection(packageType: string) {
-    if (selectedPackages.includes(packageType)) {
-      setSelectedPackages(selectedPackages.filter(p => p !== packageType));
-    } else {
-      setSelectedPackages([...selectedPackages, packageType]);
-    }
+    setSelectedPackages(prevSelected => {
+      if (prevSelected.includes(packageType)) {
+        // Remove if already selected
+        const newSelected = prevSelected.filter(p => p !== packageType);
+        
+        // Update button group with new selected packages
+        const lastMessage = messages[messages.length - 1];
+        if (lastMessage.type === 'button-group') {
+          setMessages(prev => [
+            ...prev.slice(0, -1),
+            {
+              ...lastMessage,
+              id: Date.now(),
+              content: <CIButtonGroup 
+                options={[
+                  { id: 'docker', label: 'Docker' },
+                  { id: 'npm', label: 'npm' },
+                  { id: 'nuget', label: 'NuGet' },
+                  { id: 'python', label: 'Python' },
+                  { id: 'maven', label: 'Maven' },
+                  { id: 'go', label: 'Go' }
+                ]}
+                onSelect={handlePackageSelection}
+                multiSelect
+                selectedOptions={newSelected}
+                showContinueButton={newSelected.length > 0}
+                onContinue={handleContinueToStep3}
+              />
+            }
+          ]);
+        }
+        
+        return newSelected;
+      } else {
+        // Add if not already selected
+        const newSelected = [...prevSelected, packageType];
+        
+        // Update button group with new selected packages
+        const lastMessage = messages[messages.length - 1];
+        if (lastMessage.type === 'button-group') {
+          setMessages(prev => [
+            ...prev.slice(0, -1),
+            {
+              ...lastMessage,
+              id: Date.now(),
+              content: <CIButtonGroup 
+                options={[
+                  { id: 'docker', label: 'Docker' },
+                  { id: 'npm', label: 'npm' },
+                  { id: 'nuget', label: 'NuGet' },
+                  { id: 'python', label: 'Python' },
+                  { id: 'maven', label: 'Maven' },
+                  { id: 'go', label: 'Go' }
+                ]}
+                onSelect={handlePackageSelection}
+                multiSelect
+                selectedOptions={newSelected}
+                showContinueButton={newSelected.length > 0}
+                onContinue={handleContinueToStep3}
+              />
+            }
+          ]);
+        }
+        
+        return newSelected;
+      }
+    });
   }
 
   // Function to continue to step 3
