@@ -5,7 +5,7 @@ import { ChatInput } from '@/components/ai-chat/ChatInput';
 import { useCISetupChat } from '@/hooks/ci-setup';
 import CIToolSelection from '@/components/ci-setup/CIToolSelection';
 import PackageSelection from '@/components/ci-setup/PackageSelection';
-import SnippetTypeSelection from '@/components/ci-setup/SnippetTypeSelection';
+import CodeSnippets from '@/components/ci-setup/CodeSnippets';
 
 const CISetupChat: React.FC = () => {
   const {
@@ -15,13 +15,15 @@ const CISetupChat: React.FC = () => {
     setInputValue,
     selectedPackages,
     showPackageOptions,
-    showSnippetTypeSelection,
+    showCodeSnippets,
     selectedCI,
     messagesEndRef,
     handleCIOption,
     handlePackageSelection,
     handleContinueWithPackages,
-    handleSnippetTypeSelection,
+    copyToClipboard,
+    generateSnippet,
+    generateFullWorkflow,
     handleSendMessage,
     shouldShowCIOptions
   } = useCISetupChat();
@@ -46,8 +48,14 @@ const CISetupChat: React.FC = () => {
                 />
               )}
               
-              {showSnippetTypeSelection && !isProcessing && (
-                <SnippetTypeSelection onSelect={handleSnippetTypeSelection} />
+              {showCodeSnippets && !isProcessing && (
+                <CodeSnippets 
+                  selectedCI={selectedCI}
+                  selectedPackages={selectedPackages}
+                  onCopyToClipboard={copyToClipboard}
+                  generateSnippet={generateSnippet}
+                  generateFullWorkflow={generateFullWorkflow}
+                />
               )}
               
               <div ref={messagesEndRef} />
