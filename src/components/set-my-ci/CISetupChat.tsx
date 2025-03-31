@@ -42,7 +42,7 @@ const CISetupChat = () => {
   const getPlaceholderText = () => {
     switch(currentStep) {
       case 1:
-        return "Type which CI system you want to use...";
+        return "Select a CI system or type your choice...";
       case 2:
         return "Tell us which package managers you use...";
       case 3:

@@ -14,7 +14,7 @@ const StepOne: React.FC<StepOneProps> = ({ onSelectCI, selectedCI }) => {
     <>
       <ChatMessage
         type="system"
-        content="Step 1: Select CI System\n\nStreamline your CI pipeline with JFrog\nIntegrating JFrog with your CI system enhances security and improves artifact management."
+        content="Great, let's set up your CI to work with JFrog.\nWhich CI tools are you using?"
       />
       <ChatMessage
         type="button-group"
@@ -22,7 +22,7 @@ const StepOne: React.FC<StepOneProps> = ({ onSelectCI, selectedCI }) => {
           <CIButtonGroup 
             options={[
               { id: 'github', label: 'GitHub Actions', description: 'Configure JFrog with GitHub Actions' },
-              { id: 'other', label: 'Other CI Systems', description: 'Circle CI, Jenkins, GitLab CI' }
+              { id: 'other', label: 'Other CI', description: 'Circle CI, Jenkins, GitLab CI' }
             ]}
             onSelect={onSelectCI}
             selectedOptions={selectedCI ? [selectedCI] : []}
