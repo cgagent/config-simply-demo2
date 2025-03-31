@@ -72,7 +72,12 @@ const Home: React.FC = () => {
     
   }, []);
 
-  // Navigate to CI Setup Chat
+  // Handler for Set my CI button
+  const handleSetMyCI = useCallback(() => {
+    handleChatQuery("I would like to set up my CI to work with JFrog. Can you set it up for me?");
+  }, [handleChatQuery]);
+
+  // Navigate to CI Setup Chat (original method preserved for backward compatibility)
   const handleNavigateToCISetup = useCallback(() => {
     navigate('/ci-setup-chat');
   }, [navigate]);
@@ -109,12 +114,19 @@ const Home: React.FC = () => {
                 dataConsumption={statsData.dataConsumption}
                 onChatQuery={handleChatQuery}
               />
-              <div className="mt-4 flex justify-center">
+              <div className="mt-4 flex justify-center gap-4">
                 <Button 
-                  onClick={handleNavigateToCISetup}
+                  onClick={handleSetMyCI}
                   className="bg-blue-700 hover:bg-blue-800 text-white font-medium"
                 >
                   Set Up CI with JFrog
+                </Button>
+                <Button 
+                  onClick={handleNavigateToCISetup}
+                  variant="outline"
+                  className="text-white font-medium"
+                >
+                  Open CI Setup Page
                 </Button>
               </div>
             </>
