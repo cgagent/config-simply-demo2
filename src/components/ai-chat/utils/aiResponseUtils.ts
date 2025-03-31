@@ -1,4 +1,3 @@
-
 /**
  * Simulate AI response (would be replaced with actual API call)
  */
@@ -130,13 +129,4 @@ object-assign (4.1.1)`;
   else {
     return "I understand you're asking about \"" + query + "\". Let me provide some information about that. This is a simulated response in our demo application. In a production environment, this would connect to an AI language model API like OpenAI GPT, Anthropic Claude, or Perplexity to provide helpful and accurate responses.";
   }
-};
-
-/**
- * Returns a response based on the user's query
- * This function helps provide a consistent fallback for unhandled special queries
- */
-export const getRandomResponse = (query: string): string => {
-  // Simply use the existing simulateAIResponse function
-  return simulateAIResponse(query);
 };
