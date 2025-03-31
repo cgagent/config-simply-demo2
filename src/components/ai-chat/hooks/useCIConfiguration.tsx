@@ -24,7 +24,7 @@ export const useCIConfiguration = () => {
       
       return {
         handled: true,
-        response: "Great, let's set up your CI to work with JFrog.\nWhich CI tools are you using?"
+        response: "I'll help you set up CI integration. Let me bring up our CI configuration assistant:"
       };
     }
     
