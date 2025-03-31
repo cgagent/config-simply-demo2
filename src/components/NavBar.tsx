@@ -21,8 +21,7 @@ import {
   Infinity,
   Cog,
   Users,
-  BellIcon,
-  GitBranchPlus
+  BellIcon
 } from 'lucide-react';
 
 interface NavBarProps {
@@ -47,7 +46,6 @@ const NavBar: React.FC<NavBarProps> = ({ className, onHomeLinkClick, onExpandCha
   const navItems = [
     { name: 'Home', path: '/home', icon: <Home className="w-5 h-5" /> },
     { name: 'CI', path: '/repositories', icon: <Cog className="w-5 h-5" /> },
-    { name: 'Set My CI', path: '/set-my-ci', icon: <GitBranchPlus className="w-5 h-5" /> },
     { name: 'User Management', path: '/users', icon: <Users className="w-5 h-5" /> },
   ];
 
