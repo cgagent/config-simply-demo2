@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Button } from '@/components/ui/button';
-import { Copy, HelpCircle } from 'lucide-react';
+import { Copy, HelpCircle, Download } from 'lucide-react';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 
 interface CodeSnippetsProps {
@@ -19,20 +19,43 @@ const CodeSnippets: React.FC<CodeSnippetsProps> = ({
   generateSnippet,
   generateFullWorkflow
 }) => {
+  
+  // Function to handle file download
+  const handleDownload = (content: string, filename: string) => {
+    const element = document.createElement('a');
+    const file = new Blob([content], {type: 'text/plain'});
+    element.href = URL.createObjectURL(file);
+    element.download = filename;
+    document.body.appendChild(element);
+    element.click();
+    document.body.removeChild(element);
+  };
+
   return (
     <div className="mb-4 mt-2 space-y-4">
       <div className="bg-gray-800 rounded-md p-4 shadow-lg">
         <div className="flex justify-between items-center mb-2">
           <span className="text-white font-semibold">JFrog CI Setup Snippet</span>
-          <Button 
-            variant="ghost" 
-            size="sm" 
-            className="h-8 text-blue-300 hover:text-white hover:bg-blue-900/60"
-            onClick={() => onCopyToClipboard(generateSnippet(), "Setup snippet copied to clipboard")}
-          >
-            <Copy className="h-4 w-4 mr-1" />
-            Copy
-          </Button>
+          <div className="flex gap-2">
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              className="h-8 text-blue-300 hover:text-white hover:bg-blue-900/60"
+              onClick={() => onCopyToClipboard(generateSnippet(), "Setup snippet copied to clipboard")}
+            >
+              <Copy className="h-4 w-4 mr-1" />
+              Copy
+            </Button>
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              className="h-8 text-blue-300 hover:text-white hover:bg-blue-900/60"
+              onClick={() => handleDownload(generateSnippet(), 'jfrog-setup.yml')}
+            >
+              <Download className="h-4 w-4 mr-1" />
+              Download
+            </Button>
+          </div>
         </div>
         <pre className="bg-gray-900 text-blue-100 p-3 rounded overflow-x-auto text-sm border border-gray-700">
           {generateSnippet()}
@@ -42,15 +65,26 @@ const CodeSnippets: React.FC<CodeSnippetsProps> = ({
       <div className="bg-gray-800 rounded-md p-4 shadow-lg">
         <div className="flex justify-between items-center mb-2">
           <span className="text-white font-semibold">Full CI Workflow Example</span>
-          <Button 
-            variant="ghost" 
-            size="sm" 
-            className="h-8 text-blue-300 hover:text-white hover:bg-blue-900/60"
-            onClick={() => onCopyToClipboard(generateFullWorkflow(), "Full workflow copied to clipboard")}
-          >
-            <Copy className="h-4 w-4 mr-1" />
-            Copy
-          </Button>
+          <div className="flex gap-2">
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              className="h-8 text-blue-300 hover:text-white hover:bg-blue-900/60"
+              onClick={() => onCopyToClipboard(generateFullWorkflow(), "Full workflow copied to clipboard")}
+            >
+              <Copy className="h-4 w-4 mr-1" />
+              Copy
+            </Button>
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              className="h-8 text-blue-300 hover:text-white hover:bg-blue-900/60"
+              onClick={() => handleDownload(generateFullWorkflow(), selectedCI === 'github' ? 'github-workflow.yml' : 'jenkins-pipeline.groovy')}
+            >
+              <Download className="h-4 w-4 mr-1" />
+              Download
+            </Button>
+          </div>
         </div>
         <pre className="bg-gray-900 text-blue-100 p-3 rounded overflow-x-auto text-sm border border-gray-700">
           {generateFullWorkflow()}
