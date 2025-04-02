@@ -1,41 +1,49 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Outlet, useLocation, useNavigate } from "react-router-dom";
 import NavBar from "@/components/NavBar";
+import { useEffect, useState } from "react";
+import { RepositoryProvider, useRepositories } from "./contexts/RepositoryContext";
+
+// Import pages
 import Auth from "./pages/Auth";
 import AccountSetup from "./pages/AccountSetup";
 import Home from "./pages/Home";
 import Repositories from "./pages/Repositories";
 import CIConfiguration from "./pages/CIConfiguration";
-import CISetupChat from "./pages/CISetupChat"; // Add the new page
+import CISetupChat from "./pages/CISetupChat";
 import Users from "./pages/Users";
 import Profile from "./pages/Profile";
 import NotFound from "./pages/NotFound";
-import { useEffect, useState } from "react";
-import { RepositoryProvider, useRepositories } from "./contexts/RepositoryContext";
 
-const queryClient = new QueryClient();
+// Create a single instance of QueryClient
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 5 * 60 * 1000, // 5 minutes
+      retry: 1,
+      refetchOnWindowFocus: false,
+    },
+  },
+});
 
-// Layout wrapper with NavBar
+/**
+ * MainLayout component that provides the application structure with navigation
+ */
 const MainLayout = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const [sidebarExpanded, setSidebarExpanded] = useState(false);
   const { repositories, updateRepositoryStatus } = useRepositories();
 
-  // Handler for resetting to home page (closing chat if active)
   const handleHomeClick = () => {
     if (location.pathname === '/home') {
-      // We're on home, notify home component to reset the chat
-      // The state update will be picked up by the Home component
       navigate('/home', { state: { resetChat: true }, replace: true });
     }
   };
 
-  // Handler for navigating from CI configuration to repositories
   const handleNavigateFromCI = () => {
     const currentRepo = repositories.find(repo => repo.name === 'infrastructure');
     if (currentRepo) {
@@ -50,27 +58,43 @@ const MainLayout = () => {
         onExpandChange={setSidebarExpanded} 
         onNavigateFromCI={handleNavigateFromCI}
       />
-      <div 
+      <main 
         className={`flex-1 transition-all duration-300 overflow-auto ${
           sidebarExpanded ? 'ml-56' : 'ml-16'
         }`}
       >
         <Outlet />
-      </div>
+      </main>
     </div>
   );
 };
 
+/**
+ * Protected routes configuration
+ */
+const protectedRoutes = [
+  { path: '/home', element: <Home /> },
+  { path: '/repositories', element: <Repositories /> },
+  { path: '/ci-configuration', element: <CIConfiguration /> },
+  { path: '/ci-setup-chat', element: <CISetupChat /> },
+  { path: '/users', element: <Users /> },
+  { path: '/profile', element: <Profile /> },
+];
+
+/**
+ * Root App component that provides the application context and routing
+ */
 const App = () => {
-  // Set dark mode as default
   useEffect(() => {
-    // First add dark mode class immediately
+    // Set dark mode as default
     document.documentElement.classList.add('dark');
     
-    // Then add transitions after a small delay to prevent initial transition
-    setTimeout(() => {
+    // Add transitions after a small delay to prevent initial transition
+    const timer = setTimeout(() => {
       document.documentElement.classList.add('init-transitions');
-    },100);
+    }, 100);
+
+    return () => clearTimeout(timer);
   }, []);
 
   return (
@@ -81,17 +105,15 @@ const App = () => {
         <RepositoryProvider>
           <BrowserRouter>
             <Routes>
+              {/* Public routes */}
               <Route path="/" element={<Auth />} />
               <Route path="/account-setup" element={<AccountSetup />} />
               
               {/* Protected routes with sidebar layout */}
               <Route element={<MainLayout />}>
-                <Route path="/home" element={<Home />} />
-                <Route path="/repositories" element={<Repositories />} />
-                <Route path="/ci-configuration" element={<CIConfiguration />} />
-                <Route path="/ci-setup-chat" element={<CISetupChat />} /> {/* Add the new route */}
-                <Route path="/users" element={<Users />} />
-                <Route path="/profile" element={<Profile />} />
+                {protectedRoutes.map(({ path, element }) => (
+                  <Route key={path} path={path} element={element} />
+                ))}
               </Route>
               
               {/* Catch-all route */}

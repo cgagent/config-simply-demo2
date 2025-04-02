@@ -1,9 +1,23 @@
-import { useState, useEffect } from 'react';
-import { Repository } from '@/types/repository';
+import { useState, useEffect, useCallback } from 'react';
+import { Repository, PackageType, Workflow, SupportedLanguage } from '@/types/repository';
 
 const STORAGE_KEY = 'ci_repositories';
 
-// Default demo repositories
+/**
+ * Creates an empty package type status record
+ */
+const createEmptyPackageTypeStatus = (): Record<PackageType, boolean> => ({
+  npm: false,
+  maven: false,
+  docker: false,
+  python: false,
+  debian: false,
+  rpm: false
+});
+
+/**
+ * Default demo repositories for initial state
+ */
 const defaultRepositories: Repository[] = [
   {
     id: '1',
@@ -26,8 +40,13 @@ const defaultRepositories: Repository[] = [
     packageTypes: ['npm', 'docker'],
     isConfigured: true,
     packageTypeStatus: {
-      'npm': true,
-      'docker': true
+      current: {
+        ...createEmptyPackageTypeStatus(),
+        npm: true,
+        docker: true
+      },
+      previous: createEmptyPackageTypeStatus(),
+      showTransition: false
     },
     workflows: [
       { 
@@ -58,9 +77,14 @@ const defaultRepositories: Repository[] = [
     packageTypes: ['npm', 'python', 'docker'],
     isConfigured: true,
     packageTypeStatus: {
-      'npm': true,
-      'python': true,
-      'docker': true
+      current: {
+        ...createEmptyPackageTypeStatus(),
+        npm: true,
+        python: true,
+        docker: true
+      },
+      previous: createEmptyPackageTypeStatus(),
+      showTransition: false
     },
     workflows: [
       { 
@@ -75,65 +99,105 @@ const defaultRepositories: Repository[] = [
   }
 ];
 
+/**
+ * Custom hook for managing CI repository data in localStorage
+ */
 export const useCILocalStorage = () => {
-  const [repositories, setRepositories] = useState<Repository[]>(defaultRepositories);
+  const [repositories, setRepositories] = useState<Repository[]>(() => {
+    try {
+      const stored = localStorage.getItem(STORAGE_KEY);
+      return stored ? JSON.parse(stored) : defaultRepositories;
+    } catch (error) {
+      console.error('Error loading repositories from localStorage:', error);
+      return defaultRepositories;
+    }
+  });
 
   // Save to localStorage whenever repositories change
   useEffect(() => {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(repositories));
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(repositories));
+    } catch (error) {
+      console.error('Error saving repositories to localStorage:', error);
+    }
   }, [repositories]);
 
-  const updateRepositoryStatus = (repoName: string, packageType: string) => {
+  /**
+   * Creates a new workflow for a package type
+   */
+  const createWorkflow = useCallback((packageType: PackageType): Workflow => ({
+    id: `w${Date.now()}`,
+    name: `workflow-${packageType}.yml`,
+    status: 'active',
+    buildNumber: 1,
+    lastRun: 'Just now',
+    packageTypes: [packageType]
+  }), []);
+
+  /**
+   * Updates the status of a repository's package type
+   */
+  const updateRepositoryStatus = useCallback((repoName: string, packageType: PackageType) => {
     setRepositories(prevRepositories => {
       return prevRepositories.map(repo => {
         if (repo.name === repoName) {
-          // Store the previous status before updating
-          const previousPackageTypeStatus = {...(repo.packageTypeStatus || {})};
+          const currentStatus = repo.packageTypeStatus?.current || createEmptyPackageTypeStatus();
+          const previousStatus = { ...currentStatus };
           
-          // Create or update packageTypeStatus object
-          const updatedPackageTypeStatus = {
-            ...previousPackageTypeStatus,
+          // Update current status
+          const updatedCurrentStatus = {
+            ...currentStatus,
             [packageType]: true
           };
           
-          // Create or update packageTypes array
+          // Update package types array
           const updatedPackageTypes = repo.packageTypes?.includes(packageType)
             ? repo.packageTypes
             : [...(repo.packageTypes || []), packageType];
+          
+          // Create or update workflows
+          const hasWorkflow = repo.workflows?.some(w => w.packageTypes?.includes(packageType));
+          const updatedWorkflows = hasWorkflow
+            ? repo.workflows
+            : [...(repo.workflows || []), createWorkflow(packageType)];
           
           return {
             ...repo,
             isConfigured: true,
             packageTypes: updatedPackageTypes,
-            packageTypeStatus: updatedPackageTypeStatus,
-            previousPackageTypeStatus,
-            showStatusTransition: true,
+            packageTypeStatus: {
+              current: updatedCurrentStatus,
+              previous: previousStatus,
+              showTransition: true
+            },
             lastUpdated: 'Today',
-            // Add a workflow if there isn't one
-            workflows: repo.workflows && repo.workflows.length > 0 ? repo.workflows : [
-              {
-                id: `w${Date.now()}`,
-                name: `workflow-${packageType}.yml`,
-                status: 'active' as const,
-                buildNumber: 1,
-                lastRun: 'Just now',
-                packageTypes: [packageType]
-              }
-            ]
+            workflows: updatedWorkflows
           };
         }
         return repo;
       });
     });
-  };
+  }, [createWorkflow]);
 
-  const addRepository = (repository: Repository) => {
-    setRepositories(prev => [...prev, repository]);
-  };
+  /**
+   * Adds a new repository to the list
+   */
+  const addRepository = useCallback((repository: Repository) => {
+    setRepositories(prev => {
+      if (prev.some(repo => repo.name === repository.name)) {
+        console.warn(`Repository ${repository.name} already exists. Add operation skipped.`);
+        return prev;
+      }
+      return [...prev, repository];
+    });
+  }, []);
 
-  const removeRepository = (repoName: string) => {
+  /**
+   * Removes a repository from the list
+   */
+  const removeRepository = useCallback((repoName: string) => {
     setRepositories(prev => prev.filter(repo => repo.name !== repoName));
-  };
+  }, []);
 
   return {
     repositories,

@@ -1,5 +1,44 @@
 import { ChatResponse, ConversationFlow } from './types';
 
+// Types for better type safety
+type PackageManager = 'npm' | 'maven' | 'both';
+type CITool = 'github' | 'jenkins' | 'gitlab' | 'travis' | 'circle' | 'other';
+
+// Constants for better maintainability
+const CI_TOOL_PATTERNS = {
+  github: ['github actions', 'github'],
+  jenkins: ['jenkins'],
+  gitlab: ['gitlab'],
+  travis: ['travis'],
+  circle: ['circle'],
+  other: ['other ci']
+} as const;
+
+const PACKAGE_MANAGER_PATTERNS = {
+  npm: ['npm'],
+  maven: ['maven'],
+  both: ['both']
+} as const;
+
+// Helper functions for response generation
+const generateCIToolResponse = (tool: string): string => {
+  if (tool.includes('github')) {
+    return "I see you're using GitHub Actions. Would you like to set up CI for NPM, Maven, or both package types?";
+  }
+  return "For your CI system, we'll need to configure JFrog integration. Which package managers are you using in your project?";
+};
+
+const generatePackageManagerResponse = (manager: PackageManager): string => {
+  switch (manager) {
+    case 'npm':
+      return "Great! For NPM packages with JFrog, we'll need to set up authentication and repository configuration. Would you like to see a configuration example?";
+    case 'maven':
+      return "For Maven integration with JFrog, we'll need to update your pom.xml and settings.xml files. Would you like me to show you the necessary configurations?";
+    case 'both':
+      return "I'll help you set up both NPM and Maven with JFrog. Let's start with NPM configuration first. Would you like to see the configuration examples?";
+  }
+};
+
 // Define conversation flows
 export const conversationFlows: ConversationFlow[] = [
   {
@@ -14,33 +53,20 @@ export const conversationFlows: ConversationFlow[] = [
       },
       {
         id: 'ci-tool-selection',
-        patterns: ['github actions', 'github', 'jenkins', 'gitlab', 'travis', 'circle', 'other ci'],
-        response: (tool: string) => {
-          if (tool.includes('github')) {
-            return "I see you're using GitHub Actions. Would you like to set up CI for NPM, Maven, or both package types?";
-          }
-          return "For your CI system, we'll need to configure JFrog integration. Which package managers are you using in your project?";
-        },
+        patterns: Object.values(CI_TOOL_PATTERNS).flat(),
+        response: generateCIToolResponse,
         nextSteps: ['package-manager-selection']
       },
       {
         id: 'package-manager-selection',
-        patterns: ['npm', 'maven', 'both'],
-        response: (manager: string) => {
-          if (manager.includes('npm') && !manager.includes('maven')) {
-            return "Great! For NPM packages with JFrog, we'll need to set up authentication and repository configuration. Would you like to see a configuration example?";
-          }
-          if (manager.includes('maven') && !manager.includes('npm')) {
-            return "For Maven integration with JFrog, we'll need to update your pom.xml and settings.xml files. Would you like me to show you the necessary configurations?";
-          }
-          return "I'll help you set up both NPM and Maven with JFrog. Let's start with NPM configuration first. Would you like to see the configuration examples?";
-        }
+        patterns: Object.values(PACKAGE_MANAGER_PATTERNS).flat(),
+        response: generatePackageManagerResponse
       }
     ]
   }
 ];
 
-// Define standalone responses
+// Define standalone responses with better organization
 export const standaloneResponses: ChatResponse[] = [
   {
     id: 'security-risk',
