@@ -1,165 +1,89 @@
+import { conversationFlows, standaloneResponses } from './chatResponses';
+
+// Track conversation state
+let currentFlow: string | null = null;
+let currentStep: string | null = null;
 
 /**
- * Simulate AI response (would be replaced with actual API call)
+ * Simulate AI response using structured conversation flows and responses
  */
 export const simulateAIResponse = (query: string): string => {
   const lowerQuery = query.toLowerCase().trim();
 
-  // Add debug logging to help diagnose the issue
+  // Add debug logging
   console.log("Query evaluation:", {
     query: lowerQuery,
-    containsHello: lowerQuery.includes('hello'),
-    containsBlock: lowerQuery.includes('block'),
-    exactMatch: lowerQuery === "which packages were blocked in the last two weeks?"
+    currentFlow,
+    currentStep
   });
 
-  // Special case for CI setup query
-  if (lowerQuery.includes('set up my ci') || 
-      lowerQuery.includes('set my ci') || 
-      lowerQuery.includes('configure ci') ||
-      lowerQuery.includes('setup ci')) {
-    return "Great, let's set up your CI to work with JFrog. Which CI tools are you using?";
+  // First, check if we're in a conversation flow
+  if (currentFlow) {
+    const flow = conversationFlows.find(f => f.id === currentFlow);
+    if (flow) {
+      const currentStepData = flow.steps.find(s => s.id === currentStep);
+      if (currentStepData) {
+        // Check if the query matches any patterns for the current step
+        const matchingPattern = currentStepData.patterns.find(pattern => 
+          lowerQuery.includes(pattern)
+        );
+
+        if (matchingPattern) {
+          // If there are next steps, update the current step
+          if (currentStepData.nextSteps && currentStepData.nextSteps.length > 0) {
+            currentStep = currentStepData.nextSteps[0];
+          } else {
+            // End of flow
+            currentFlow = null;
+            currentStep = null;
+          }
+
+          // Return the response, handling both string and function responses
+          return typeof currentStepData.response === 'function' 
+            ? currentStepData.response(lowerQuery)
+            : currentStepData.response;
+        }
+      }
+    }
   }
 
-  // Handling for CI tool selection
-  if (lowerQuery.includes('github actions') || lowerQuery.includes('github')) {
-    return "I see you're using GitHub Actions. Would you like to set up CI for NPM, Maven, or both package types?";
+  // If not in a flow or no match in current flow, check for new flow starts
+  for (const flow of conversationFlows) {
+    const initialStep = flow.steps[0];
+    if (initialStep.patterns.some(pattern => lowerQuery.includes(pattern))) {
+      currentFlow = flow.id;
+      currentStep = initialStep.id;
+      return typeof initialStep.response === 'function'
+        ? initialStep.response(lowerQuery)
+        : initialStep.response;
+    }
   }
 
-  if (lowerQuery.includes('jenkins') || 
-      lowerQuery.includes('gitlab') || 
-      lowerQuery.includes('travis') ||
-      lowerQuery.includes('circle') ||
-      lowerQuery.includes('other ci')) {
-    return "For your CI system, we'll need to configure JFrog integration. Which package managers are you using in your project?";
+  // Check standalone responses, prioritizing longer patterns first
+  const sortedResponses = [...standaloneResponses].sort((a, b) => {
+    // Get the longest pattern for each response
+    const aMaxLength = Math.max(...a.patterns.map(p => p.length));
+    const bMaxLength = Math.max(...b.patterns.map(p => p.length));
+    return bMaxLength - aMaxLength;
+  });
+
+  for (const response of sortedResponses) {
+    // For each response, check if any of its patterns are contained in the query
+    // and if the query contains the pattern as a whole word
+    const matchingPattern = response.patterns.find(pattern => {
+      const regex = new RegExp(`\\b${pattern}\\b`, 'i');
+      return regex.test(lowerQuery);
+    });
+
+    if (matchingPattern) {
+      return typeof response.response === 'function'
+        ? response.response(lowerQuery)
+        : response.response;
+    }
   }
 
-  // Package manager selection responses
-  if (lowerQuery.includes('npm') && !lowerQuery.includes('maven')) {
-    return "Great! For NPM packages with JFrog, we'll need to set up authentication and repository configuration. Would you like to see a configuration example?";
-  }
-
-  if (lowerQuery.includes('maven') && !lowerQuery.includes('npm')) {
-    return "For Maven integration with JFrog, we'll need to update your pom.xml and settings.xml files. Would you like me to show you the necessary configurations?";
-  }
-
-  if ((lowerQuery.includes('npm') && lowerQuery.includes('maven')) ||
-      lowerQuery.includes('both')) {
-    return "I'll help you set up both NPM and Maven with JFrog. Let's start with NPM configuration first. Would you like to see the configuration examples?";
-  }
-
-  // Special case handling for blocked packages query (placed at the top to give it priority)
-  if (
-    lowerQuery === "which packages were blocked in the last two weeks?" ||
-    lowerQuery === "blocked packages" ||
-    lowerQuery === "show me the packages that are blocked" ||
-    lowerQuery === "block" ||
-    lowerQuery.includes('block') ||
-    lowerQuery.includes('malicious')
-  ) {
-    console.log("Matched blocked packages query!");
-    return `In the past 2 weeks, we blocked the following malicious npm packages:
-
-evil-package-101: Attempted to steal user credentials.
-malware-lib: Contained scripts to inject ransomware.
-bad-actor-addon: Had a payload to exfiltrate private data.`;
-  }
-
-  if ( (lowerQuery.includes('hello') || lowerQuery.includes('hi')) && !lowerQuery.includes('are at risk')) {
-    return "Hello! How can I assist you today?";
-  }
-  else if (lowerQuery.includes('repository') || lowerQuery.includes('repositories')) {
-    return "Repositories are where your code lives. You can manage your repositories through the CI section of this application. Would you like to know more about setting up CI for your repositories?";
-  }
-  else if (lowerQuery.includes('ci') || lowerQuery.includes('continuous integration')) {
-    return "Continuous Integration (CI) helps you automatically build, test, and validate code changes. Our CI tools integrate with your repositories to ensure code quality and streamline deployments. You can set up CI workflows in the CI section.";
-  }
-  else if (lowerQuery.includes('user') || lowerQuery.includes('account')) {
-    return "User management allows you to control access to your organization's resources. You can add users, define roles, and set permissions in the User Management section.";
-  }
-  else if (lowerQuery.includes('are at risk') || lowerQuery.includes('my organization') || lowerQuery.includes('secured')) {
-    const response = 
-`
-# One package with risks was detected:
-
-### 📦 axios
-• **Used version:** 1.5.1
-• **Latest version published:** 1.8.3
-• **Downloaded by:** yahavi@acme.com
-• **Affected git repositories:** ACME/frontend-app (branch: main), ACME/backend-api (branch: main)
-• **Vulnerabilities:** CVE-2024-39338
-• **Vulnerability description:** axios 1.5.1 allows SSRF via unexpected behavior where requests for path relative URLs get processed as protocol relative URLs
-• **Severity:** High
-    `;
-    return response;
-  }
-  else if (lowerQuery.includes('http request') || lowerQuery.includes('making http request')) {
-    return `
-    
-    Here are 3 recommended npm packages for making HTTP requests:
-
-📦 **axios**
-   
-   • Description: Promise based HTTP client for the browser and node.js
-   
-   • Latest version: 1.8.3
-   
-   🔗 [GitHub Repository](https://github.com/axios/axios) 
-   
-   🔗 [NPM Package Page](https://www.npmjs.com/package/axios) 
-
-
-📦 **node-fetch**
-   
-   • Description: A light-weight module that brings window.fetch to node.js
-   
-   • Latest version: 3.3.2
-   
-   🔗 [GitHub Repository](https://github.com/node-fetch/node-fetch) 
-   
-   🔗[NPM Package Page](https://www.npmjs.com/package/node-fetch) 
-
-
-📦 **request**
-   
-   • Description: Simplified HTTP request client
-   
-   • Latest version: 2.88.2
-   
-   🔗 [GitHub Repository](https://github.com/request/request) 
-   
-   🔗 [NPM Package Page](https://www.npmjs.com/package/node-fetch) 
-
-   ![Request Catalog](/lovable-uploads/req_catalog.png)
-    `;
-  }
-  else if (lowerQuery.includes('sbom') || lowerQuery.includes('report for') || lowerQuery.includes('last 30 days')) {
-    return `Here is the SBOM report for your packages from the last 30 days:
-
-Package: lodash
-Version: 4.17.21
-License: MIT
-Dependencies:
-lodash._baseassign (3.2.0)
-lodash._baseclone (3.3.0)
-Package: axios
-Version: 0.21.1
-License: MIT
-Dependencies:
-follow-redirects (1.14.1)
-Package: react
-Version: 17.0.2
-License: MIT
-Dependencies:
-loose-envify (1.4.0)
-object-assign (4.1.1)`;
-  }
-  else if (lowerQuery === 'what is abc?') {
-    return "ABC is a placeholder term often used as an example in software development. It can represent anything you'd like it to mean in your specific context. How would you like to define ABC for your project?";
-  }
-  else {
-    return "I understand you're asking about \"" + query + "\". Let me provide some information about that. This is a simulated response in our demo application. In a production environment, this would connect to an AI language model API like OpenAI GPT, Anthropic Claude, or Perplexity to provide helpful and accurate responses.";
-  }
+  // Default response if no matches found
+  return "I understand you're asking about \"" + query + "\". Let me provide some information about that. This is a simulated response in our demo application. In a production environment, this would connect to an AI language model API like OpenAI GPT, Anthropic Claude, or Perplexity to provide helpful and accurate responses.";
 };
 
 // Helper function to get a simulated response
