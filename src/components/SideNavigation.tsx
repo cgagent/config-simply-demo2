@@ -13,7 +13,7 @@ import { useRepositories } from '@/contexts/RepositoryContext';
 const navItems = [
   { name: 'Home', path: '/home', icon: <Home className="w-5 h-5" /> },
   { name: 'CI', path: '/repositories', icon: <Infinity className="w-5 h-5" /> },
-  { name: 'CI Setup', path: '/ci-setup-chat', icon: <MessageSquare className="w-5 h-5" /> },
+  // { name: 'CI Setup', path: '/ci-setup-chat', icon: <MessageSquare className="w-5 h-5" /> },
   { name: 'User Management', path: '/users', icon: <Users className="w-5 h-5" /> },
 ];
 
