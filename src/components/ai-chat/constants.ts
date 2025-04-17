@@ -9,8 +9,8 @@ export const SUGGESTED_QUERIES = [
     query: "Identify which packages are at risk in my organization"
   },
   {
-    label: "Open source packages",
-    query: "Can you find a package that handles HTTP requests without critical vulnerabilities?"
+    label: "Show my releases",
+    query: "show me the packages that were released in the last 30 days"
   },
   {
     label: "Common packages",

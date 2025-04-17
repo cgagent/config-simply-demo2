@@ -40,9 +40,9 @@ export const defaultPackageStatistics: PackageStatistics = {
   blockedPackages: 3,
   dataConsumption: 1528,
   packageTypeCounts: {
-    docker: 20,
-    maven: 14,
-    npm: 120
+    docker: 3,
+    maven: 8,
+    npm: 12
   },
   riskyPackages: [
     {

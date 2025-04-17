@@ -131,7 +131,7 @@ const StatisticsBar: React.FC<StatisticsBarProps> = ({
         </Card>
       </motion.div>
 
-      {/* Total Packages Card */}
+      {/* Releases Card */}
       <motion.div
         variants={cardVariants}
         initial="initial"
@@ -143,7 +143,7 @@ const StatisticsBar: React.FC<StatisticsBarProps> = ({
       >
         <Card className="space-card p-6 h-full flex flex-col justify-between backdrop-blur-sm">
           <div className="flex items-center justify-between mb-4">
-            <h3 className="text-sm font-medium text-blue-100/80">Total Packages</h3>
+            <h3 className="text-sm font-medium text-blue-100/80">Releases</h3>
             <Package className="h-5 w-5 text-blue-400" />
           </div>
           <div>
@@ -162,7 +162,7 @@ const StatisticsBar: React.FC<StatisticsBarProps> = ({
               {formatNumber(packageStats.packageTypeCounts.npm)}
             </span>
             <p className="text-xs text-blue-200/60 mt-2">
-              Packages stored in your organization
+              Packages released in the last 30 days
             </p>
           </div>
         </Card>
