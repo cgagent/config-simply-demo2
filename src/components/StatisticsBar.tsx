@@ -125,7 +125,7 @@ const StatisticsBar: React.FC<StatisticsBarProps> = ({
               </div>
             </div>
             <p className="text-xs text-blue-200/60 mt-2">
-              Malicious packages blocked and at risk in your organization
+              Malicious packages blocked and at risk in the last 30 days
             </p>
           </div>
         </Card>
