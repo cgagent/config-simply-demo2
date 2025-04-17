@@ -76,7 +76,20 @@ export const ChatMessage: React.FC<ChatMessageProps> = ({ message, onSelectOptio
           </div>
           
           <div className="prose prose-sm max-w-none dark:prose-invert prose-pre:bg-blue-900/30 prose-pre:text-blue-100 prose-code:text-blue-300">
-            <ReactMarkdown className="whitespace-pre-wrap">
+            <ReactMarkdown 
+              className="whitespace-pre-wrap"
+              components={{
+                code: ({ children, ...props }) => {
+                  const match = /language-(\w+)/.exec(props.className || '');
+                  const isInline = !match;
+                  return (
+                    <code className={isInline ? 'prose-code' : props.className} {...props}>
+                      {children}
+                    </code>
+                  );
+                }
+              }}
+            >
               {message.content}
             </ReactMarkdown>
           
