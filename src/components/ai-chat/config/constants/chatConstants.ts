@@ -1,4 +1,3 @@
-
 export const SUGGESTED_QUERIES = [
   {
     label: "Set my CI",
@@ -24,4 +23,4 @@ export interface Message {
   id: string;
   role: 'user' | 'bot';
   content: string;
-}
+} 

@@ -2,7 +2,7 @@ import React from 'react';
 import { FlyFrogIcon } from './FlyFrogIcon';
 import { ChatInput } from './ChatInput';
 import { SuggestedQueries } from './SuggestedQueries';
-import { SUGGESTED_QUERIES } from './constants';
+import { SUGGESTED_QUERIES } from './config/constants/chatConstants';
 
 interface InitialChatScreenProps {
   isProcessing: boolean;
