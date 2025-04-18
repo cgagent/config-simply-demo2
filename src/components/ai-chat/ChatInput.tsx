@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useMemo } from 'react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Send } from 'lucide-react';
@@ -26,19 +26,19 @@ export const ChatInput: React.FC<ChatInputProps> = ({
   
   const staticPlaceholder = "Ask me anything...";
   
-  const rotatingPlaceholders = [
+  const rotatingPlaceholders = useMemo(() => [
     "set up your CI with JFrog",
     "show you what are the most common packages in your organization in the last...",
     "search for any package or CVE",
     "identify what packages are vulnerable and used in your organization",
     "check what was your data consumption in the last..."
-  ];
+  ], []);
   
   useEffect(() => {
     if (value !== input) {
       setInput(value);
     }
-  }, [value]);
+  }, [value, input]);
   
   useEffect(() => {
     if (textareaRef.current) {
@@ -80,7 +80,7 @@ export const ChatInput: React.FC<ChatInputProps> = ({
         clearTimeout(timeoutId);
       }
     };
-  }, [currentSuggestion, isTyping, currentIndex, isInitialState, rotatingPlaceholders]);
+  }, [currentSuggestion, isTyping, currentIndex, isInitialState, rotatingPlaceholders, input]);
 
   const handleSendMessage = () => {
     if (!input.trim()) return;

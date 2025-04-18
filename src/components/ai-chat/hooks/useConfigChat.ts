@@ -226,7 +226,7 @@ jobs:
         with:
           node-version: '18'
           cache: 'npm'
-      
+-      
 +     - name: Setup JFrog
 +       uses: jfrog/setup-jfrog@v1
 +       with:
