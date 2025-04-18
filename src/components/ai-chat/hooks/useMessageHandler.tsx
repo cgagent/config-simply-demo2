@@ -4,8 +4,9 @@ import { ChatOption } from '@/components/shared/types';
 import { generateSecurityRemediationResponse } from '../config/responses/securityResponses';
 import { isCIConfigurationQuery, getSampleRepository, Repository } from '../config/patterns/ciPatterns';
 import { checkSpecialQuery } from '../config/patterns/specialQueriesPatterns';
-import { getRandomResponse } from '../utils/aiResponseUtils';
+import { getRandomResponse, getCurrentActionOptions } from '../utils/aiResponseUtils';
 import { useState } from 'react';
+import { MessageFactory } from '../utils/messageFactory';
 
 export const useMessageHandler = () => {
   const { toast } = useToast();
@@ -82,7 +83,17 @@ bad-actor-addon: Had a payload to exfiltrate private data.`;
         try {
           const aiResponse = getRandomResponse(content);
           console.log("AI response:", aiResponse);
-          addBotMessage(aiResponse);
+          
+          // Check if there are action options for this response
+          const actionOptions = getCurrentActionOptions();
+          if (actionOptions && actionOptions.length > 0) {
+            // Create an action options message
+            const actionOptionsMessage = MessageFactory.createActionOptionsMessage(aiResponse, actionOptions);
+            addBotMessage(actionOptionsMessage);
+          } else {
+            // Regular text message
+            addBotMessage(aiResponse);
+          }
         } catch (error) {
           console.error("Error generating AI response:", error);
           toast({
@@ -99,7 +110,7 @@ bad-actor-addon: Had a payload to exfiltrate private data.`;
       toast({
         variant: "destructive",
         title: "Error",
-        description: "Failed to get a response. Please try again."
+        description: "Failed to process your message. Please try again."
       });
       setIsProcessing(false);
     }

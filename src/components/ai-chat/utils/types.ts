@@ -10,6 +10,8 @@ export interface ConversationStep {
   response: string | ((input: string) => string);
   /** Optional array of next step IDs in the conversation flow */
   nextSteps?: string[];
+  /** Optional action options to display for this step */
+  actionOptions?: import('@/components/shared/types').ChatOption[];
 }
 
 /**

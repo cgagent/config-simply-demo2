@@ -1,10 +1,15 @@
 import { conversationFlows } from '../config/flows';
 import { standaloneResponses } from '../config/responses/standaloneResponses';
 import { ChatResponse, ChatResponseContent, isResponseFunction } from '@/components/shared/types/chatTypes';
+import { releasePackageNameOptions } from '../config/constants/releaseConstants';
+import { ChatOption } from '@/components/shared/types';
 
 // Track conversation state
 let currentFlow: string | null = null;
 let currentStep: string | null = null;
+
+// Track action options for specific flows
+let currentActionOptions: ChatOption[] | null = null;
 
 /**
  * Simulate AI response using structured conversation flows and responses
@@ -55,6 +60,14 @@ export const simulateAIResponse = (query: string): string => {
     if (initialStep.patterns.some(pattern => lowerQuery.includes(pattern))) {
       currentFlow = flow.id;
       currentStep = initialStep.id;
+      
+      // Set action options for specific flows
+      if (flow.id === 'release' && currentStep === 'initial') {
+        currentActionOptions = releasePackageNameOptions;
+      } else {
+        currentActionOptions = null;
+      }
+      
       return typeof initialStep.response === 'function'
         ? initialStep.response(lowerQuery)
         : initialStep.response;
@@ -91,4 +104,9 @@ export const simulateAIResponse = (query: string): string => {
 // Helper function to get a simulated response
 export const getRandomResponse = (query: string): string => {
   return simulateAIResponse(query);
+};
+
+// Helper function to get current action options
+export const getCurrentActionOptions = () => {
+  return currentActionOptions;
 };

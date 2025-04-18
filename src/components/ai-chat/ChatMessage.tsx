@@ -11,6 +11,11 @@ import { SelectableOptions } from '../ai-configuration/SelectableOptions';
 import { ChatOption } from '@/components/shared/types';
 import { securityRemediationOptions } from './config/constants/securityConstants';
 
+// Extended message type that includes options
+interface MessageWithOptions extends Message {
+  options?: ChatOption[];
+}
+
 interface ChatMessageProps {
   message: Message;
   onSelectOption?: (option: ChatOption) => void;
@@ -28,6 +33,9 @@ export const ChatMessage: React.FC<ChatMessageProps> = ({ message, onSelectOptio
       });
     });
   };
+
+  // Check if the message has options property (for action options messages)
+  const hasOptions = 'options' in message && Array.isArray((message as MessageWithOptions).options);
 
   return (
    
@@ -88,44 +96,54 @@ export const ChatMessage: React.FC<ChatMessageProps> = ({ message, onSelectOptio
               {message.content}
             </ReactMarkdown>
           
-      {message.content.includes("One package with risks was detected") && (
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 1.5, duration: 0.5 }}
-          className="space-y-4"
-        >
-          <CVECard
-            cveId="CVE-2024-39338"
-            description="This CVE is enriched by JFrog Research and provides more accurate information"
-            severity="critical"
-            packageName="axios"
-            packageVersion="1.5.1"
-            fixVersion="1.7.4"
-            cveRelation="Non-Transitive"
-            cvssScore="7.5 (v3)"
-            epssScore="0.09%"
-            percentile="22.52%"
-          />
-          {onSelectOption && (
-            <div className="mt-4">
+          {/* Handle security alert messages */}
+          {message.content.includes("One package with risks was detected") && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 1.5, duration: 0.5 }}
+              className="space-y-4"
+            >
+              <CVECard
+                cveId="CVE-2024-39338"
+                description="This CVE is enriched by JFrog Research and provides more accurate information"
+                severity="critical"
+                packageName="axios"
+                packageVersion="1.5.1"
+                fixVersion="1.7.4"
+                cveRelation="Non-Transitive"
+                cvssScore="7.5 (v3)"
+                epssScore="0.09%"
+                percentile="22.52%"
+              />
+              {onSelectOption && (
+                <div className="mt-4">
+                  <SelectableOptions 
+                    options={securityRemediationOptions}
+                    onSelectOption={onSelectOption}
+                  />
+                </div>
+              )}
+            </motion.div>
+          )}
+          
+          {/* Handle action options messages */}
+          {hasOptions && onSelectOption && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.5, duration: 0.5 }}
+              className="mt-4"
+            >
               <SelectableOptions 
-                options={securityRemediationOptions}
+                options={(message as MessageWithOptions).options || []}
                 onSelectOption={onSelectOption}
               />
-            </div>
+            </motion.div>
           )}
-        </motion.div>
-      )}
- 
           </div>
         </div>
       </motion.div>
     </motion.div>
   );
-  
-  // The issue might be with how ReactMarkdown is handling whitespace
-  // Try preserving whitespace by adding a className with white-space: pre-wrap
-  // or by using the rehypeRaw plugin if needed
-  // Another approach is to check if the message content is being trimmed before it reaches this component
 };

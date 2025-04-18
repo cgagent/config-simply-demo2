@@ -1,4 +1,4 @@
-import { ConversationFlow } from '../../utils/types';
+import { ConversationFlow } from '@/components/ai-chat/utils/types';
 import { getAllSecurityRiskPatterns, getAllSecurityRemediationPatterns } from '../patterns/securityPatterns';
 import { securityRiskResponses } from '../responses/securityResponses';
 

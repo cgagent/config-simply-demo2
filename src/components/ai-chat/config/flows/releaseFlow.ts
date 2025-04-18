@@ -1,5 +1,6 @@
 import { ConversationFlow } from '../../utils/types';
 import { releasePatterns } from '../patterns/releasePatterns';
+import { getAllReleasePackageNamePatterns, releasePackageNameOptions } from '../constants/releaseConstants';
 
 /**
  * Release conversation flow
@@ -12,11 +13,12 @@ export const releaseFlow: ConversationFlow = {
       id: 'initial',
       patterns: ['release', 'new package', 'create package', 'publish package'],
       response: "I'll help you release a new package. Let's start by gathering some information about your package. What's the name of your package?",
-      nextSteps: ['package-details']
+      nextSteps: ['package-details'],
+      actionOptions: releasePackageNameOptions
     },
     {
       id: 'package-details',
-      patterns: ['shared-components', 'frontend-app', 'backend-api'],
+      patterns: getAllReleasePackageNamePatterns(),
       response: "Great! Now, what version would you like to release? (Please use semantic versioning format, e.g., 1.0.0)",
       nextSteps: ['version-selection']
     },

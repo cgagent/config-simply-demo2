@@ -1,6 +1,5 @@
-
 import { useState, useCallback } from 'react';
-import { Message } from '../constants';
+import { Message } from '../types/messageTypes';
 
 export const useMessageState = () => {
   const [messages, setMessages] = useState<Message[]>([]);
@@ -17,21 +16,31 @@ export const useMessageState = () => {
     const userMessage: Message = {
       id: Date.now().toString(),
       role: 'user',
-      content
+      content,
+      type: 'text',
+      timestamp: Date.now()
     };
     
     console.log("Adding user message:", content);
     addMessage(userMessage);
   }, [addMessage]);
 
-  const addBotMessage = useCallback((content: string) => {
+  const addBotMessage = useCallback((content: string | Message) => {
     if (!content) return;
     
-    const botMessage: Message = {
-      id: (Date.now() + 1).toString(),
-      role: 'bot',
-      content
-    };
+    let botMessage: Message;
+    
+    if (typeof content === 'string') {
+      botMessage = {
+        id: (Date.now() + 1).toString(),
+        role: 'assistant',
+        content,
+        type: 'text',
+        timestamp: Date.now()
+      };
+    } else {
+      botMessage = content;
+    }
     
     console.log("Adding bot message");
     addMessage(botMessage);
