@@ -7,7 +7,6 @@ import { useInitialInput } from './hooks/useInitialInput';
 import { useAutoSendMessage } from './hooks/useAutoSendMessage';
 import { useResetDetection } from './hooks/useResetDetection';
 import { useChatStateNotifier } from './hooks/useChatStateNotifier';
-import { Message } from './constants';
 
 interface AIChatProps {
   onChatStateChange?: (isChatActive: boolean) => void;

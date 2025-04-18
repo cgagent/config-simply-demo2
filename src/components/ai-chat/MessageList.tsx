@@ -1,6 +1,6 @@
 import React, { useRef, useEffect } from 'react';
 import { ChatMessage } from './ChatMessage';
-import { Message } from './constants';
+import { Message } from './config/constants/chatConstants';
 import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { Bot } from 'lucide-react';

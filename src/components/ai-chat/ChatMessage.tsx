@@ -2,7 +2,7 @@ import React from 'react';
 import { cn } from '@/lib/utils';
 import { Bot, User, Copy } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
-import { Message } from './constants';
+import { Message } from './config/constants/chatConstants';
 import { motion } from 'framer-motion';
 import { useToast } from '@/hooks/use-toast';
 import { Button } from '@/components/ui/button';

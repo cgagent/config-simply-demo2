@@ -1,13 +1,7 @@
 import React from 'react';
 import { MessageList } from './MessageList';
 import { ChatInput } from './ChatInput';
-import { useMessageHandler } from './hooks/useMessageHandler';
-import { useTypingAnimation } from './hooks/useTypingAnimation';
-import { useInitialInput } from './hooks/useInitialInput';
-import { useAutoSendMessage } from './hooks/useAutoSendMessage';
-import { useResetDetection } from './hooks/useResetDetection';
-import { useChatStateNotifier } from './hooks/useChatStateNotifier';
-import { Message } from './constants';
+import { Message } from './config/constants/chatConstants';
 import { AIConfigurationChat } from '@/components/ai-configuration';
 import { Sheet, SheetContent } from '@/components/ui/sheet';
 import { useNavigate } from 'react-router-dom';

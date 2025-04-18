@@ -36,6 +36,7 @@ src/components/ai-chat/
 ### 1. Configuration (`config/`)
 - Contains all constant definitions, enums, and configuration values
 - Should be the single source of truth for shared values
+- Types related to configuration should be defined alongside their constants
 - Examples: Security remediation actions, message patterns, etc.
 
 ### 2. Utilities (`utils/`)
@@ -92,11 +93,9 @@ src/components/ai-chat/
 ## Example Usage
 
 ```typescript
-// Importing constants
+// Importing constants and their related types
+import { SUGGESTED_QUERIES, Message } from './config/constants/chatConstants';
 import { SECURITY_REMEDIATION_ACTIONS } from './config/constants/securityConstants';
-
-// Importing types
-import { ParsedContent } from './types/parsedContentTypes';
 
 // Using utilities
 import { parseMessageContent } from './utils/parsers/contentParser';
