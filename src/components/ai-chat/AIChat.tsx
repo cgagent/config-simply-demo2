@@ -7,6 +7,7 @@ import { useInitialInput } from './hooks/useInitialInput';
 import { useAutoSendMessage } from './hooks/useAutoSendMessage';
 import { useResetDetection } from './hooks/useResetDetection';
 import { useChatStateNotifier } from './hooks/useChatStateNotifier';
+import { FlowProvider } from './context/FlowContext';
 
 interface AIChatProps {
   onChatStateChange?: (isChatActive: boolean) => void;
@@ -17,6 +18,26 @@ interface AIChatProps {
 }
 
 export const AIChat: React.FC<AIChatProps> = ({ 
+  onChatStateChange, 
+  initialInputValue = '', 
+  clearInitialInputValue,
+  shouldSendMessage = false,
+  clearShouldSendMessage
+}) => {
+  return (
+    <FlowProvider>
+      <AIChatContent
+        onChatStateChange={onChatStateChange}
+        initialInputValue={initialInputValue}
+        clearInitialInputValue={clearInitialInputValue}
+        shouldSendMessage={shouldSendMessage}
+        clearShouldSendMessage={clearShouldSendMessage}
+      />
+    </FlowProvider>
+  );
+};
+
+const AIChatContent: React.FC<AIChatProps> = ({
   onChatStateChange, 
   initialInputValue = '', 
   clearInitialInputValue,

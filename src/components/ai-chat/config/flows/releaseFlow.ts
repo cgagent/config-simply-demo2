@@ -11,11 +11,25 @@ import {
   releaseTypeSelectionOptions
 } from '../constants/releaseConstants';
 
+// Import for formatting responses using flow state
+import { formatResponseWithState } from '../../utils/flowStateUtils';
+
+// Flow ID for use with the flow state
+export const RELEASE_FLOW_ID = 'release';
+
+// Define keys for release flow state fields for type safety
+export const RELEASE_FLOW_FIELDS = {
+  PACKAGE_NAME: 'packageName',
+  BRANCH: 'branch',
+  ENVIRONMENT: 'environment',
+  RELEASE_TYPE: 'releaseType'
+} as const;
+
 /**
  * Release conversation flow
  */
 export const releaseFlow: ConversationFlow = {
-  id: 'release',
+  id: RELEASE_FLOW_ID,
   name: 'Release Flow',
   steps: [
     {
@@ -49,7 +63,20 @@ export const releaseFlow: ConversationFlow = {
     {
       id: 'release-type-selection',
       patterns: getAllReleaseTypeSelectionPatterns(),
-      response: "Perfect! I'll help you create a release with these details. Would you like to proceed with the release?",
+      response: () => {
+        // Use the formatResponseWithState utility to format the response
+        return formatResponseWithState(
+          RELEASE_FLOW_ID,
+          `Perfect! I'll help you create a release with these details:
+  
+Package: {${RELEASE_FLOW_FIELDS.PACKAGE_NAME}}
+Branch: {${RELEASE_FLOW_FIELDS.BRANCH}}
+Environment: {${RELEASE_FLOW_FIELDS.ENVIRONMENT}}
+Release Type: {${RELEASE_FLOW_FIELDS.RELEASE_TYPE}}
+
+Would you like to proceed with the release?`
+        );
+      },
       nextSteps: ['confirmation']
     },
     {

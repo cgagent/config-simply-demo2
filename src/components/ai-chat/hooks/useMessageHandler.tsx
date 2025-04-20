@@ -37,15 +37,31 @@ import { generateSecurityRemediationResponse } from '../config/responses/securit
 import { Repository } from '../config/patterns/ciPatterns';
 import { isConfirmationMessage } from '../config/patterns/confirmationPatterns';
 import { getRandomResponse, getCurrentActionOptions, simulateAIResponse, getCurrentFlow, getCurrentStep } from '../utils/aiResponseUtils';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { MessageFactory } from '../utils/messageFactory';
 import { conversationFlows } from '../config/flows';
+import { useFlow } from '../context/FlowContext';
+import { registerFlowStateGetter } from '../utils/flowStateUtils';
+import { RELEASE_FLOW_ID, RELEASE_FLOW_FIELDS } from '../config/flows/releaseFlow';
+import { 
+  RELEASE_PACKAGE_NAME_ACTIONS, 
+  BRANCH_SELECTION_ACTIONS, 
+  ENVIRONMENT_SELECTION_ACTIONS, 
+  RELEASE_TYPE_SELECTION_ACTIONS 
+} from '../config/constants/releaseConstants';
 
 
 export const useMessageHandler = () => {
   const { toast } = useToast();
   const [showCIConfig, setShowCIConfig] = useState(false);
   const [repository, setRepository] = useState<Repository | null>(null);
+  const { 
+    currentFlowId, 
+    setCurrentFlow, 
+    updateFlowState, 
+    getFlowState, 
+    resetAllFlowStates 
+  } = useFlow();
   
   const {
     messages,
@@ -58,6 +74,54 @@ export const useMessageHandler = () => {
     resetMessages
   } = useMessageState();
 
+  // Register the state getters for each flow once on mount
+  useEffect(() => {
+    // Register a getter for the release flow
+    registerFlowStateGetter(RELEASE_FLOW_ID, () => getFlowState(RELEASE_FLOW_ID));
+    
+    // Register getters for other flows here as they're added
+    // Example: registerFlowStateGetter('config', () => getFlowState('config'));
+  }, [getFlowState]);
+
+  // Update the current flow ID when it changes in the AI response utils
+  useEffect(() => {
+    const flowId = getCurrentFlow();
+    if (flowId !== currentFlowId) {
+      setCurrentFlow(flowId);
+    }
+  }, [currentFlowId, setCurrentFlow]);
+
+  /**
+   * Map option ID and flow ID to the appropriate field update
+   */
+  const updateFlowStateFromOption = (flowId: string, optionId: string, optionValue: string) => {
+    // Handle release flow selections
+    if (flowId === RELEASE_FLOW_ID) {
+      // Package name selections
+      if (optionId === 'common' || optionId === 'frontend-app' || optionId === 'backend-api') {
+        updateFlowState(flowId, RELEASE_FLOW_FIELDS.PACKAGE_NAME, optionValue);
+      }
+      // Branch selections
+      else if (optionId === 'main' || optionId === 'develop' || optionId === 'feature') {
+        updateFlowState(flowId, RELEASE_FLOW_FIELDS.BRANCH, optionValue);
+      }
+      // Environment selections
+      else if (optionId === 'dev' || optionId === 'staging' || optionId === 'prod') {
+        updateFlowState(flowId, RELEASE_FLOW_FIELDS.ENVIRONMENT, optionValue);
+      }
+      // Release type selections
+      else if (optionId === 'major' || optionId === 'minor' || optionId === 'patch') {
+        updateFlowState(flowId, RELEASE_FLOW_FIELDS.RELEASE_TYPE, optionValue);
+      }
+    }
+    
+    // Add logic for other flows as they're added
+    // Example:
+    // if (flowId === 'config') {
+    //   // Handle config flow selections
+    // }
+  };
+
   /**
    * Generic handler for processing user action selections in conversation flows
    */
@@ -69,6 +133,11 @@ export const useMessageHandler = () => {
     // Get the current flow and step
     const currentFlowId = getCurrentFlow();
     const currentStepId = getCurrentStep();
+
+    // If there's a current flow, update its state
+    if (currentFlowId) {
+      updateFlowStateFromOption(currentFlowId, option.id, option.value);
+    }
 
     // Find the current flow configuration
     const currentFlow = conversationFlows.find(flow => flow.id === currentFlowId);
@@ -184,6 +253,11 @@ export const useMessageHandler = () => {
           const afterFlowId = getCurrentFlow();
           const afterStepId = getCurrentStep();
           
+          // If the flow changed, update the context
+          if (beforeFlowId !== afterFlowId) {
+            setCurrentFlow(afterFlowId);
+          }
+          
           console.log("After processing - Current flow and step:", {
             currentFlow: afterFlowId,
             currentStep: afterStepId
@@ -268,6 +342,7 @@ export const useMessageHandler = () => {
 
   const fullReset = () => {
     resetMessages();
+    resetAllFlowStates();
     setShowCIConfig(false);
     setRepository(null);
   };
