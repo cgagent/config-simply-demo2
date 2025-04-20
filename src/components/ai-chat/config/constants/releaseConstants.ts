@@ -4,11 +4,11 @@ import { ChatOption } from '@/components/shared/types';
  * Package name definitions - single source of truth
  */
 export const PACKAGE_NAMES = {
-  SHARED: {
-    id: 'shared-components',
-    label: 'Shared Components',
-    value: 'shared-components',
-    patterns: ['shared-components', 'shared components']
+  COMMON: {
+    id: 'common',
+    label: 'Common',
+    value: 'common',
+    patterns: ['common', 'common package']
   },
   FRONTEND: {
     id: 'frontend-app',
@@ -52,7 +52,7 @@ export const BRANCH_NAMES = {
  * Release package names action types
  */
 export const RELEASE_PACKAGE_NAME_ACTIONS = {
-  SHARED: PACKAGE_NAMES.SHARED.id,
+  SHARED: PACKAGE_NAMES.COMMON.id,
   FRONTEND: PACKAGE_NAMES.FRONTEND.id,
   BACKEND: PACKAGE_NAMES.BACKEND.id
 } as const;
@@ -71,9 +71,9 @@ export const BRANCH_SELECTION_ACTIONS = {
  */
 export const releasePackageNameOptions: ChatOption[] = [
   { 
-    id: PACKAGE_NAMES.SHARED.id, 
-    label: PACKAGE_NAMES.SHARED.label, 
-    value: PACKAGE_NAMES.SHARED.value 
+    id: PACKAGE_NAMES.COMMON.id, 
+    label: PACKAGE_NAMES.COMMON.label, 
+    value: PACKAGE_NAMES.COMMON.value 
   },
   { 
     id: PACKAGE_NAMES.FRONTEND.id, 
@@ -112,7 +112,7 @@ export const branchSelectionOptions: ChatOption[] = [
  * Patterns for release package names
  */
 export const RELEASE_PACKAGE_NAME_PATTERNS = {
-  [RELEASE_PACKAGE_NAME_ACTIONS.SHARED]: PACKAGE_NAMES.SHARED.patterns,
+  [RELEASE_PACKAGE_NAME_ACTIONS.SHARED]: PACKAGE_NAMES.COMMON.patterns,
   [RELEASE_PACKAGE_NAME_ACTIONS.FRONTEND]: PACKAGE_NAMES.FRONTEND.patterns,
   [RELEASE_PACKAGE_NAME_ACTIONS.BACKEND]: PACKAGE_NAMES.BACKEND.patterns
 } as const;
