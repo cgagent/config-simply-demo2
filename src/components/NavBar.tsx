@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { cn } from '@/lib/utils';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -22,8 +21,20 @@ import {
   Cog,
   Users,
   BellIcon,
-  MessageSquare
+  MessageSquare,
+  PackageX,
+  Clock
 } from 'lucide-react';
+import { formatDistanceToNow } from 'date-fns';
+
+interface Notification {
+  id: string;
+  type: 'package_blocked';
+  packageName: string;
+  version: string;
+  reason: string;
+  timestamp: string;
+}
 
 interface NavBarProps {
   className?: string;
@@ -34,7 +45,25 @@ interface NavBarProps {
 
 const NavBar: React.FC<NavBarProps> = ({ className, onHomeLinkClick, onExpandChange, onNavigateFromCI }) => {
   const [expanded, setExpanded] = useState(false);
-  const [hasNotifications, setHasNotifications] = useState(true);
+  const [notifications, setNotifications] = useState<Notification[]>([
+    {
+      id: '1',
+      type: 'package_blocked',
+      packageName: 'malicious-package',
+      version: '1.2.3',
+      reason: 'Security vulnerability detected',
+      timestamp: new Date(Date.now() - 3600000).toISOString() // 1 hour ago
+    },
+    {
+      id: '2',
+      type: 'package_blocked',
+      packageName: 'suspicious-dependency',
+      version: '0.5.1',
+      reason: 'Potential malware detected',
+      timestamp: new Date(Date.now() - 7200000).toISOString() // 2 hours ago
+    }
+  ]);
+  const [hasUnreadNotifications, setHasUnreadNotifications] = useState(true);
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -47,7 +76,6 @@ const NavBar: React.FC<NavBarProps> = ({ className, onHomeLinkClick, onExpandCha
   const navItems = [
     { name: 'Home', path: '/home', icon: <Home className="w-5 h-5" /> },
     { name: 'CI', path: '/repositories', icon: <Cog className="w-5 h-5" /> },
-    // { name: 'CI Setup', path: '/ci-setup-chat', icon: <MessageSquare className="w-5 h-5" /> },
     { name: 'User Management', path: '/users', icon: <Users className="w-5 h-5" /> },
   ];
 
@@ -73,8 +101,7 @@ const NavBar: React.FC<NavBarProps> = ({ className, onHomeLinkClick, onExpandCha
   };
   
   const handleNotificationClick = () => {
-    setHasNotifications(!hasNotifications);
-    console.log('Notification clicked');
+    setHasUnreadNotifications(false);
   };
   
   const handleToggleExpand = () => {
@@ -133,44 +160,78 @@ const NavBar: React.FC<NavBarProps> = ({ className, onHomeLinkClick, onExpandCha
       </nav>
       
       <div className="mt-auto px-2 space-y-2">
-        <button 
-          onClick={handleNotificationClick}
-          className="flex items-center justify-center w-full px-3 py-2 rounded-md text-sm font-medium  text-blue-100/80 hover:bg-blue-800/30 hover:text-white"
-        >
-          <div className="relative">
-            <BellIcon className="w-5 h-5" />
-           
-          </div>
-          {expanded && <span className="ml-3">Notifications</span>}
-        </button>
+        <DropdownMenu>
+          <DropdownMenuTrigger 
+            onClick={handleNotificationClick}
+            className="flex items-center justify-center w-full px-3 py-2 rounded-md text-sm font-medium text-blue-100/80 hover:bg-blue-800/30 hover:text-white"
+          >
+            <div className="relative">
+              <BellIcon className="w-5 h-5" />
+              {hasUnreadNotifications && (
+                <span className="absolute -top-1 -right-1 h-2 w-2 rounded-full bg-red-500 ring-2 ring-blue-900/50" />
+              )}
+            </div>
+            {expanded && <span className="ml-3">Notifications</span>}
+          </DropdownMenuTrigger>
+          <DropdownMenuContent 
+            className="w-80 bg-blue-950/95 border-blue-800/30 backdrop-blur-md"
+            align="end"
+          >
+            <DropdownMenuLabel className="text-blue-100">Recent Notifications</DropdownMenuLabel>
+            <DropdownMenuSeparator className="bg-blue-800/30" />
+            {notifications.length === 0 ? (
+              <div className="p-4 text-center text-blue-200/70 text-sm">
+                No new notifications
+              </div>
+            ) : (
+              notifications.map((notification) => (
+                <DropdownMenuItem 
+                  key={notification.id}
+                  className="flex flex-col items-start gap-1 p-3 hover:bg-blue-800/30 cursor-pointer"
+                >
+                  <div className="flex items-center gap-2">
+                    <PackageX className="h-4 w-4 text-red-400" />
+                    <span className="text-blue-100 font-medium">
+                      Package Blocked
+                    </span>
+                  </div>
+                  <div className="text-blue-200/80 text-sm">
+                    {notification.packageName}@{notification.version}
+                  </div>
+                  <div className="text-blue-200/60 text-xs">
+                    {notification.reason}
+                  </div>
+                  <div className="flex items-center gap-1 text-blue-200/50 text-xs mt-1">
+                    <Clock className="h-3 w-3" />
+                    {formatDistanceToNow(new Date(notification.timestamp), { addSuffix: true })}
+                  </div>
+                </DropdownMenuItem>
+              ))
+            )}
+          </DropdownMenuContent>
+        </DropdownMenu>
         
         <DropdownMenu>
           <DropdownMenuTrigger className="flex items-center gap-2 outline-none w-full px-2 py-2 rounded-md hover:bg-blue-800/30">
             <Avatar className="h-8 w-8 border-2 border-blue-500/30 ring-2 ring-blue-400/20">
               <AvatarImage src="https://github.com/shadcn.png" />
-              <AvatarFallback>JD</AvatarFallback>
+              <AvatarFallback>CN</AvatarFallback>
             </Avatar>
-            {expanded && (
-              <div className="text-left">
-                <p className="text-sm font-medium text-white">John Doe</p>
-                <p className="text-xs text-blue-200/80">Admin</p>
-              </div>
-            )}
+            {expanded && <span className="text-blue-100/80">Profile</span>}
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="w-56 space-card">
-            <DropdownMenuLabel>My Account</DropdownMenuLabel>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem className="cursor-pointer" onClick={() => navigate('/profile')}>
+          <DropdownMenuContent 
+            className="w-56 bg-blue-950/95 border-blue-800/30 backdrop-blur-md"
+            align="end"
+          >
+            <DropdownMenuLabel className="text-blue-100">My Account</DropdownMenuLabel>
+            <DropdownMenuSeparator className="bg-blue-800/30" />
+            <DropdownMenuItem className="text-blue-100/80 hover:bg-blue-800/30">
               <UserCircle className="mr-2 h-4 w-4" />
-              <span>My Profile</span>
+              <span>Profile</span>
             </DropdownMenuItem>
-            <DropdownMenuItem className="cursor-pointer">
-              <UserPlus className="mr-2 h-4 w-4" />
-              <span>Invite Friends</span>
-            </DropdownMenuItem>
-            <DropdownMenuItem className="cursor-pointer">
+            <DropdownMenuItem className="text-blue-100/80 hover:bg-blue-800/30">
               <Download className="mr-2 h-4 w-4" />
-              <span>Download Desktop App</span>
+              <span>Download</span>
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
