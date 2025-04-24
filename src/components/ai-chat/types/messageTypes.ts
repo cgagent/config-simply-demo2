@@ -8,7 +8,8 @@ export type MessageType =
   | 'security-alert' 
   | 'package-info' 
   | 'ci-config' 
-  | 'action-options';
+  | 'action-options'
+  | 'package-table';
 
 /**
  * Base interface for all message types
@@ -77,6 +78,20 @@ export interface ActionOptionsMessage extends BaseMessage {
 }
 
 /**
+ * Interface for package table messages
+ */
+export interface PackageTableMessage extends BaseMessage {
+  type: 'package-table';
+  packages: {
+    type: string;
+    name: string;
+    version: string;
+    firstCreated: string;
+    versions: number;
+  }[];
+}
+
+/**
  * Union type of all possible message types
  */
 export type Message = 
@@ -84,7 +99,8 @@ export type Message =
   | SecurityAlertMessage 
   | PackageInfoMessage 
   | CIConfigMessage 
-  | ActionOptionsMessage;
+  | ActionOptionsMessage
+  | PackageTableMessage;
 
 /**
  * Type guard to check if a message is a security alert
@@ -112,4 +128,11 @@ export function isCIConfigMessage(message: Message): message is CIConfigMessage 
  */
 export function isActionOptionsMessage(message: Message): message is ActionOptionsMessage {
   return message.type === 'action-options';
+}
+
+/**
+ * Type guard to check if a message is a package table message
+ */
+export function isPackageTableMessage(message: Message): message is PackageTableMessage {
+  return message.type === 'package-table';
 } 

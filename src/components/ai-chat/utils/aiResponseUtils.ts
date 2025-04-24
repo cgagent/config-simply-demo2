@@ -32,10 +32,20 @@ import { conversationFlows } from '../config/flows';
 import { standaloneResponses } from '../config/responses/standaloneResponses';
 import { ChatOption } from '@/components/shared/types';
 import { SECURITY_RISK_PATTERNS } from '../config/patterns/securityPatterns';
+import { PACKAGE_PATTERNS } from '../config/patterns/packagePatterns';
+import { packageResponses } from '../config/responses/packageResponses';
+import { PACKAGE_FLOW_ID } from '../config/flows/packageFlow';
 
 // Add priority pattern matching
 const PRIORITY_PATTERNS = {
-  'security-risk': SECURITY_RISK_PATTERNS.identify
+  'security-risk': SECURITY_RISK_PATTERNS.identify,
+  'packages': PACKAGE_PATTERNS.latestPackages
+};
+
+// Global repository context data
+// This will be populated by the setRepositoryData function
+let repositoryData = {
+  latestPackages: []
 };
 
 // Track conversation state
@@ -44,6 +54,11 @@ let currentStep: string | null = null;
 
 // Track action options for specific flows
 let currentActionOptions: ChatOption[] | null = null;
+
+// Function to set repository data from outside this module
+export const setRepositoryData = (data: any) => {
+  repositoryData = data;
+};
 
 /**
  * Simulate AI response using structured conversation flows and responses
@@ -205,7 +220,28 @@ export const simulateAIResponse = (query: string): string => {
 };
 
 // Helper function to get a simulated response
-export const getRandomResponse = (query: string): string => {
+export const getRandomResponse = (query: string): string | any => {
+  const lowerQuery = query.toLowerCase();
+  
+  // Handle package flow special cases
+  if (currentFlow === PACKAGE_FLOW_ID) {
+    const step = currentStep || '';
+    
+    if (step === 'latest-packages' || 
+        PACKAGE_PATTERNS.latestPackages.some(pattern => lowerQuery.includes(pattern.toLowerCase()))) {
+      // Debug logging for repository data
+      console.log("Repository data for package response:", JSON.stringify(repositoryData, null, 2));
+      console.log("Latest packages being sent to response generator:", 
+        repositoryData.latestPackages ? 
+          JSON.stringify(repositoryData.latestPackages, null, 2) : 
+          "No packages found");
+      
+      // Use the package responses to generate a response with the latest packages
+      return packageResponses.latestPackages(repositoryData.latestPackages, query);
+    }
+  }
+  
+  // For all other cases, use the standard response simulation
   return simulateAIResponse(query);
 };
 

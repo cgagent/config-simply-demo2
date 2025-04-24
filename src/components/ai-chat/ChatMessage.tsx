@@ -1,8 +1,9 @@
 import React from 'react';
 import { cn } from '@/lib/utils';
-import { Bot, User, Copy } from 'lucide-react';
+import { Bot, User, Copy, Package } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
-import { Message } from './config/constants/chatConstants';
+import { Message as ConstantMessage } from './config/constants/chatConstants';
+import { Message as TypeMessage, isPackageTableMessage } from './types/messageTypes';
 import { motion } from 'framer-motion';
 import { useToast } from '@/hooks/use-toast';
 import { Button } from '@/components/ui/button';
@@ -10,20 +11,89 @@ import CVECard from '../CVECard';
 import { SelectableOptions } from '../ai-configuration/SelectableOptions';
 import { ChatOption } from '@/components/shared/types';
 import { securityRemediationOptions } from './config/constants/securityConstants';
+import { MessageRenderer } from './display/MessageRenderer';
 
 // Extended message type that includes options
-interface MessageWithOptions extends Message {
+interface MessageWithOptions extends ConstantMessage {
   options?: ChatOption[];
 }
 
 interface ChatMessageProps {
-  message: Message;
+  message: ConstantMessage;
   onSelectOption?: (option: ChatOption) => void;
 }
+
+// Helper to check if message content contains our specific package table
+const hasPackageTable = (content: string): boolean => {
+  return content.includes('| Type | Package Name |') && 
+         content.includes('Latest Packages');
+};
+
+// Helper to parse the package table rows from markdown
+const parsePackageTable = (content: string): Array<{
+  type: string;
+  name: string;
+  version: string;
+  created: string;
+  versions: string;
+  status?: string;
+}> => {
+  const rows: Array<{
+    type: string;
+    name: string;
+    version: string;
+    created: string;
+    versions: string;
+    status?: string;
+  }> = [];
+  
+  // Find all rows in the table
+  const lines = content.split('\n');
+  let inTable = false;
+  
+  for (const line of lines) {
+    // Skip header rows
+    if (line.startsWith('| Type | Package Name |')) {
+      inTable = true;
+      continue;
+    }
+    
+    if (inTable && line.trim().startsWith('|') && line.includes('|')) {
+      const cells = line.split('|').filter(c => c.trim() !== '');
+      if (cells.length >= 5) {
+        // Detect status badges
+        let status = '';
+        if (cells[2].includes('✅')) status = 'passed';
+        else if (cells[2].includes('⚠️')) status = 'warning';
+        else if (cells[2].includes('❌')) status = 'failed';
+        
+        rows.push({
+          type: cells[0].trim(),
+          name: cells[1].trim().replace(/\*\*/g, ''), // Remove markdown bold
+          version: cells[2].trim().replace(/`/g, '').split(' ')[0], // Remove markdown code
+          created: cells[3].trim(),
+          versions: cells[4].trim(),
+          status
+        });
+      }
+    }
+    
+    // End of table
+    if (inTable && !line.trim().startsWith('|') && line.trim() !== '') {
+      inTable = false;
+    }
+  }
+  
+  return rows;
+};
 
 export const ChatMessage: React.FC<ChatMessageProps> = ({ message, onSelectOption }) => {
   const isUser = message.role === 'user';
   const { toast } = useToast();
+  
+  // Check if the message contains a package table
+  const containsPackageTable = !isUser && hasPackageTable(message.content);
+  const packageTableRows = containsPackageTable ? parsePackageTable(message.content) : [];
 
   const copyToClipboard = (text: string) => {
     navigator.clipboard.writeText(text).then(() => {
@@ -36,9 +106,11 @@ export const ChatMessage: React.FC<ChatMessageProps> = ({ message, onSelectOptio
 
   // Check if the message has options property (for action options messages)
   const hasOptions = 'options' in message && Array.isArray((message as MessageWithOptions).options);
+  
+  // Check if this is a package table message - look for type field and packages array
+  const isPackageTable = 'type' in message && message.type === 'package-table' && 'packages' in message;
 
   return (
-   
     <motion.div
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
@@ -53,7 +125,6 @@ export const ChatMessage: React.FC<ChatMessageProps> = ({ message, onSelectOptio
             : "bg-blue-950/30 border-blue-800/30 mr-8 rounded-tl-none"
         )}
       >
-   
         <div className={cn(
           "flex-shrink-0 h-8 w-8 rounded-full flex items-center justify-center",
           isUser ? "bg-blue-600 text-white" : "bg-blue-900 text-blue-200 ring-2 ring-blue-500/30"
@@ -78,70 +149,130 @@ export const ChatMessage: React.FC<ChatMessageProps> = ({ message, onSelectOptio
             )}
           </div>
           
-          <div className="prose prose-sm max-w-none dark:prose-invert prose-pre:bg-blue-900/30 prose-pre:text-blue-100 prose-code:text-blue-300">
-            <ReactMarkdown 
-              className="whitespace-pre-wrap"
-              components={{
-                code: ({ children, ...props }) => {
-                  const match = /language-(\w+)/.exec(props.className || '');
-                  const isInline = !match;
-                  return (
-                    <code className={isInline ? 'prose-code' : props.className} {...props}>
-                      {children}
-                    </code>
-                  );
-                }
-              }}
-            >
-              {message.content}
-            </ReactMarkdown>
-          
-          {/* Handle security alert messages */}
-          {message.content.includes("One package with risks was detected") && (
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 1.5, duration: 0.5 }}
-              className="space-y-4"
-            >
-              <CVECard
-                cveId="CVE-2024-39338"
-                description="This CVE is enriched by JFrog Research and provides more accurate information"
-                severity="critical"
-                packageName="axios"
-                packageVersion="1.5.1"
-                fixVersion="1.7.4"
-                cveRelation="Non-Transitive"
-                cvssScore="7.5 (v3)"
-                epssScore="0.09%"
-                percentile="22.52%"
-              />
-              {onSelectOption && (
-                <div className="mt-4">
+          {/* Use direct package table rendering when we've detected a package table */}
+          {containsPackageTable && packageTableRows.length > 0 ? (
+            <div>
+              <p className="mb-4">Here are the latest packages published in your organization:</p>
+              
+              <div className="bg-blue-900/40 rounded-lg overflow-hidden border border-blue-700/30 shadow-md mb-2">
+                <div className="bg-blue-800/40 px-4 py-2 border-b border-blue-700/30">
+                  <div className="text-sm text-white font-medium flex items-center">
+                    <Package className="h-4 w-4 mr-2 text-blue-400" />
+                    Latest Published Packages
+                  </div>
+                </div>
+                <div className="p-2">
+                  <div className="overflow-hidden rounded-lg border border-blue-800/50 shadow-sm">
+                    <table className="w-full border-collapse bg-blue-950/20">
+                      <thead className="bg-blue-900/50">
+                        <tr>
+                          <th className="py-2 px-3 text-left font-medium text-blue-100 border-b border-blue-800/30">Type</th>
+                          <th className="py-2 px-3 text-left font-medium text-blue-100 border-b border-blue-800/30">Package Name</th>
+                          <th className="py-2 px-3 text-left font-medium text-blue-100 border-b border-blue-800/30">Latest Version</th>
+                          <th className="py-2 px-3 text-left font-medium text-blue-100 border-b border-blue-800/30">First Created</th>
+                          <th className="py-2 px-3 text-left font-medium text-blue-100 border-b border-blue-800/30">Versions</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-blue-800/20">
+                        {packageTableRows.map((row, index) => (
+                          <tr key={index} className="hover:bg-blue-800/20 transition-colors">
+                            <td className="py-3 px-3 flex items-center">
+                              <span className="mr-2">
+                                {row.type === 'docker' && <img src="/lovable-uploads/docker.png" className="h-4 w-4" alt="Docker" />}
+                                {row.type === 'npm' && <img src="/lovable-uploads/npm.png" className="h-4 w-4" alt="NPM" />}
+                                {row.type === 'python' && <img src="/lovable-uploads/python.png" className="h-4 w-4" alt="Python" />}
+                                {row.type === 'go' && <img src="/lovable-uploads/go.png" className="h-4 w-4" alt="Go" />}
+                                {row.type === 'maven' && <img src="/lovable-uploads/maven.png" className="h-4 w-4" alt="Maven" />}
+                                {!['docker', 'npm', 'python', 'go', 'maven'].includes(row.type) && 
+                                  <Package className="h-4 w-4 text-blue-400" />}
+                              </span>
+                              <span>{row.type}</span>
+                            </td>
+                            <td className="py-3 px-3 font-medium text-blue-100">{row.name}</td>
+                            <td className="py-3 px-3">
+                              <code className="px-2 py-1 bg-blue-900/30 rounded text-blue-200">{row.version}</code>
+                              {row.status === 'passed' && <span className="ml-2 text-green-400">✅</span>}
+                              {row.status === 'warning' && <span className="ml-2 text-yellow-400">⚠️</span>}
+                              {row.status === 'failed' && <span className="ml-2 text-red-400">❌</span>}
+                            </td>
+                            <td className="py-3 px-3">{row.created}</td>
+                            <td className="py-3 px-3">{row.versions}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+            </div>
+          ) : isPackageTable ? (
+            <MessageRenderer message={message as any as TypeMessage} onSelectOption={onSelectOption} />
+          ) : (
+            <div className="prose prose-sm max-w-none dark:prose-invert prose-pre:bg-blue-900/30 prose-pre:text-blue-100 prose-code:text-blue-300">
+              <ReactMarkdown 
+                className="whitespace-pre-wrap"
+                components={{
+                  code: ({ children, ...props }) => {
+                    const match = /language-(\w+)/.exec(props.className || '');
+                    const isInline = !match;
+                    return (
+                      <code className={isInline ? 'prose-code' : props.className} {...props}>
+                        {children}
+                      </code>
+                    );
+                  }
+                }}
+              >
+                {message.content}
+              </ReactMarkdown>
+            
+              {/* Handle security alert messages */}
+              {message.content.includes("One package with risks was detected") && (
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ delay: 1.5, duration: 0.5 }}
+                  className="space-y-4"
+                >
+                  <CVECard
+                    cveId="CVE-2024-39338"
+                    description="This CVE is enriched by JFrog Research and provides more accurate information"
+                    severity="critical"
+                    packageName="axios"
+                    packageVersion="1.5.1"
+                    fixVersion="1.7.4"
+                    cveRelation="Non-Transitive"
+                    cvssScore="7.5 (v3)"
+                    epssScore="0.09%"
+                    percentile="22.52%"
+                  />
+                  {onSelectOption && (
+                    <div className="mt-4">
+                      <SelectableOptions 
+                        options={securityRemediationOptions}
+                        onSelectOption={onSelectOption}
+                      />
+                    </div>
+                  )}
+                </motion.div>
+              )}
+              
+              {/* Handle action options messages */}
+              {hasOptions && onSelectOption && (
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ delay: 0.5, duration: 0.5 }}
+                  className="mt-4"
+                >
                   <SelectableOptions 
-                    options={securityRemediationOptions}
+                    options={(message as MessageWithOptions).options || []}
                     onSelectOption={onSelectOption}
                   />
-                </div>
+                </motion.div>
               )}
-            </motion.div>
+            </div>
           )}
-          
-          {/* Handle action options messages */}
-          {hasOptions && onSelectOption && (
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.5, duration: 0.5 }}
-              className="mt-4"
-            >
-              <SelectableOptions 
-                options={(message as MessageWithOptions).options || []}
-                onSelectOption={onSelectOption}
-              />
-            </motion.div>
-          )}
-          </div>
         </div>
       </motion.div>
     </motion.div>

@@ -1,14 +1,15 @@
 import React from 'react';
-import { Message, isSecurityAlertMessage, isPackageInfoMessage, isCIConfigMessage, isActionOptionsMessage } from '../types/messageTypes';
+import { Message, isSecurityAlertMessage, isPackageInfoMessage, isCIConfigMessage, isActionOptionsMessage, isPackageTableMessage } from '../types/messageTypes';
 import { ChatOption } from '@/components/shared/types';
 import { cn } from '@/lib/utils';
-import { Bot, User, Copy } from 'lucide-react';
+import { Bot, User, Copy, Package } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import { motion } from 'framer-motion';
 import { useToast } from '@/hooks/use-toast';
 import { Button } from '@/components/ui/button';
 import CVECard from '../../CVECard';
 import { SelectableOptions } from '../../ai-configuration/SelectableOptions';
+import { formatDistanceToNow } from 'date-fns';
 
 interface MessageRendererProps {
   message: Message;
@@ -197,6 +198,59 @@ const ActionOptionsRenderer: React.FC<{
 };
 
 /**
+ * Renders a package table message
+ */
+const PackageTableRenderer: React.FC<{ message: Message }> = ({ message }) => {
+  if (!isPackageTableMessage(message)) {
+    return <TextMessageRenderer message={message} />;
+  }
+
+  return (
+    <div className="space-y-4">
+      <TextMessageRenderer message={message} />
+      
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 0.5, duration: 0.5 }}
+        className="bg-blue-900/30 rounded-lg overflow-hidden"
+      >
+        <table className="w-full text-sm">
+          <thead className="bg-blue-950/60">
+            <tr>
+              <th className="py-2 px-3 text-left font-medium">Type</th>
+              <th className="py-2 px-3 text-left font-medium">Package Name</th>
+              <th className="py-2 px-3 text-left font-medium">Latest Version</th>
+              <th className="py-2 px-3 text-left font-medium">First Created</th>
+              <th className="py-2 px-3 text-left font-medium">Versions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {message.packages.map((pkg, index) => (
+              <tr 
+                key={index} 
+                className={index % 2 === 0 ? 'bg-blue-900/20' : 'bg-blue-900/10'}
+              >
+                <td className="py-2 px-3 flex items-center">
+                  <span className="mr-2">
+                    <Package className="h-4 w-4 text-blue-400" />
+                  </span>
+                  {pkg.type}
+                </td>
+                <td className="py-2 px-3 font-medium">{pkg.name}</td>
+                <td className="py-2 px-3">{pkg.version}</td>
+                <td className="py-2 px-3">{pkg.firstCreated}</td>
+                <td className="py-2 px-3">{pkg.versions}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </motion.div>
+    </div>
+  );
+};
+
+/**
  * Main message renderer component that determines which renderer to use based on message type
  */
 export const MessageRenderer: React.FC<MessageRendererProps> = ({ message, onSelectOption }) => {
@@ -259,6 +313,8 @@ export const MessageRenderer: React.FC<MessageRendererProps> = ({ message, onSel
             <CIConfigRenderer message={message} />
           ) : isActionOptionsMessage(message) ? (
             <ActionOptionsRenderer message={message} onSelectOption={onSelectOption} />
+          ) : isPackageTableMessage(message) ? (
+            <PackageTableRenderer message={message} />
           ) : (
             <TextMessageRenderer message={message} />
           )}

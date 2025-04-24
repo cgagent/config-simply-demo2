@@ -3,6 +3,7 @@ import { securityFlow, maliciousPackagesFlow } from './securityFlow';
 import { configFlow } from './configFlow';
 import { releaseFlow } from './releaseFlow';
 import { userInviteFlow } from './userInviteFlow';
+import { packageFlow } from './packageFlow';
 
 /**
  * All conversation flows
@@ -12,5 +13,6 @@ export const conversationFlows: ConversationFlow[] = [
   maliciousPackagesFlow,
   configFlow,
   releaseFlow,
-  userInviteFlow
+  userInviteFlow,
+  packageFlow
 ]; 

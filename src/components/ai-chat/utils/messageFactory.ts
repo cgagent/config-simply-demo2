@@ -5,6 +5,7 @@ import {
   PackageInfoMessage, 
   CIConfigMessage, 
   ActionOptionsMessage,
+  PackageTableMessage,
   Message
 } from '../types/messageTypes';
 import { ChatOption } from '@/components/shared/types';
@@ -128,6 +129,29 @@ export class MessageFactory {
       type: 'action-options',
       timestamp: Date.now(),
       options
+    };
+  }
+  
+  /**
+   * Creates a package table message
+   */
+  static createPackageTableMessage(
+    content: string,
+    packages: {
+      type: string;
+      name: string;
+      version: string;
+      firstCreated: string;
+      versions: number;
+    }[]
+  ): PackageTableMessage {
+    return {
+      id: uuidv4(),
+      role: 'assistant',
+      content,
+      type: 'package-table',
+      timestamp: Date.now(),
+      packages
     };
   }
   

@@ -128,7 +128,7 @@ const StatisticsBar: React.FC<StatisticsBarProps> = ({
 
   const handleLatestPackagesClick = useCallback(() => {
     if (onChatQuery) {
-      onChatQuery("Show me the last 5 package releases in my organization");
+      onChatQuery("Show me the latest 5 published packages in a table");
     }
   }, [onChatQuery]);
 

@@ -103,6 +103,20 @@ const defaultRepositories: Repository[] = [
 ];
 
 /**
+ * Generate demo repositories for initial state
+ */
+const generateDemoRepositories = (): Repository[] => {
+  return [...defaultRepositories];
+};
+
+/**
+ * Generate demo package statistics for initial state
+ */
+const generateDemoPackageStats = (): PackageStatistics => {
+  return {...defaultPackageStatistics};
+};
+
+/**
  * Custom hook for managing CI repository data in localStorage
  */
 export const useCILocalStorage = () => {
@@ -138,6 +152,139 @@ export const useCILocalStorage = () => {
   // Add package statistics and blocked packages state
   const [packageStats, setPackageStats] = useState<PackageStatistics>(defaultPackageStatistics);
   const [blockedPackages, setBlockedPackages] = useState<BlockedPackage[]>(defaultBlockedPackages);
+
+  // Load demo data if there's nothing in storage
+  useEffect(() => {
+    let shouldSetDemoData = false;
+    let storedRepos: string | null = null;
+    let storedPackageStats: string | null = null;
+
+    try {
+      // Check if we have repositories data
+      storedRepos = localStorage.getItem(STORAGE_KEY);
+      storedPackageStats = localStorage.getItem(PACKAGE_STATS_KEY);
+
+      if (!storedRepos || !storedPackageStats) {
+        shouldSetDemoData = true;
+      }
+
+      // Load data if it exists
+      if (storedRepos) {
+        setRepositories(JSON.parse(storedRepos));
+      }
+      if (storedPackageStats) {
+        setPackageStats(JSON.parse(storedPackageStats));
+      }
+    } catch (e) {
+      console.error('Error loading data from localStorage', e);
+      shouldSetDemoData = true;
+    }
+
+    // Set demo data if needed
+    if (shouldSetDemoData) {
+      console.log('Setting demo data...');
+      const demoRepos = generateDemoRepositories();
+      const demoPackageStats = generateDemoPackageStats();
+
+      // Always update with our new custom package data
+      const updateWithCustomPackages = (existingData: PackageStatistics) => {
+        console.log('Updating with custom packages...');
+        
+        // Create new package data with specified timestamps
+        const now = new Date();
+        const newPackages: LatestPackage[] = [
+          {
+            id: crypto.randomUUID(),
+            name: "frontend-app",
+            version: "1.2.3",
+            type: "docker",
+            releaseDate: new Date(now.getTime() - (30 * 1000)).toISOString(), // 30 seconds ago
+            repository: "frontend-app",
+            status: "passed"
+          },
+          {
+            id: crypto.randomUUID(),
+            name: "axios",
+            version: "1.7.0",
+            type: "npm",
+            releaseDate: new Date(now.getTime() - (3 * 60 * 60 * 1000)).toISOString(), // 3 hours ago
+            repository: "common-libs",
+            status: "passed"
+          },
+          {
+            id: crypto.randomUUID(),
+            name: "requests",
+            version: "2.31.0",
+            type: "python",
+            releaseDate: new Date(now.getTime() - (5 * 60 * 1000)).toISOString(), // 5 minutes ago
+            repository: "backend-api",
+            status: "warning"
+          },
+          {
+            id: crypto.randomUUID(),
+            name: "spring-boot",
+            version: "3.2.1",
+            type: "maven",
+            releaseDate: new Date(now.getTime() - (1 * 24 * 60 * 60 * 1000)).toISOString(), // 1 day ago
+            repository: "microservices",
+            status: "passed"
+          },
+          {
+            id: crypto.randomUUID(),
+            name: "golang",
+            version: "1.21",
+            type: "docker",
+            releaseDate: new Date(now.getTime() - (15 * 60 * 1000)).toISOString(), // 15 minutes ago
+            repository: "gateway-service",
+            status: "failed"
+          }
+        ];
+
+        // Combine with existing packages and sort by release date (newest first)
+        const combinedPackages = [...newPackages, ...existingData.latestPackages].sort((a, b) => {
+          return new Date(b.releaseDate).getTime() - new Date(a.releaseDate).getTime();
+        });
+
+        // Calculate packages by type
+        const packageTypes = combinedPackages.reduce((acc, pkg) => {
+          if (pkg.type === 'docker') acc.docker++;
+          else if (pkg.type === 'maven') acc.maven++;
+          else if (pkg.type === 'npm') acc.npm++;
+          return acc;
+        }, { docker: 0, maven: 0, npm: 0 });
+
+        return {
+          ...existingData,
+          latestPackages: combinedPackages,
+          packageTypeCounts: packageTypes,
+          totalPackages: combinedPackages.length
+        };
+      };
+
+      // Update existing package stats or set new demo data with custom packages
+      if (storedPackageStats) {
+        try {
+          const parsedStats = JSON.parse(storedPackageStats);
+          const updatedStats = updateWithCustomPackages(parsedStats);
+          setPackageStats(updatedStats);
+          console.log('Updated existing package stats with custom packages:', updatedStats);
+        } catch (e) {
+          console.error('Error updating existing package stats:', e);
+          const updatedDefaultStats = updateWithCustomPackages(demoPackageStats);
+          setPackageStats(updatedDefaultStats);
+        }
+      } else {
+        const updatedDefaultStats = updateWithCustomPackages(demoPackageStats);
+        setPackageStats(updatedDefaultStats);
+        console.log('Set new demo package stats with custom packages:', updatedDefaultStats);
+      }
+
+      setRepositories(demoRepos);
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(demoRepos));
+      localStorage.setItem(PACKAGE_STATS_KEY, JSON.stringify(packageStats));
+      localStorage.setItem(BLOCKED_PACKAGES_KEY, JSON.stringify(defaultBlockedPackages));
+    }
+  }, []);
 
   // Save to localStorage whenever repositories change
   useEffect(() => {
@@ -213,7 +360,7 @@ export const useCILocalStorage = () => {
           // Update current status
           const updatedCurrentStatus = {
             ...currentStatus,
-            [packageType]: true
+            [packageType]: !currentStatus[packageType]
           };
           
           // Update package types array
@@ -229,7 +376,7 @@ export const useCILocalStorage = () => {
           
           return {
             ...repo,
-            isConfigured: true,
+            isConfigured: updatedPackageTypes.length > 0,
             packageTypes: updatedPackageTypes,
             packageTypeStatus: {
               current: updatedCurrentStatus,
