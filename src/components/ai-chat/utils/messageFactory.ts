@@ -143,6 +143,7 @@ export class MessageFactory {
       version: string;
       firstCreated: string;
       versions: number;
+      externalDistributed?: 'Yes' | 'No';
     }[],
     options?: ChatOption[]
   ): PackageTableMessage {

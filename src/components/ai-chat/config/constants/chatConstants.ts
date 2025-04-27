@@ -8,8 +8,8 @@ export const SUGGESTED_QUERIES = [
     query: "Identify which packages are at risk in my organization"
   },
   {
-    label: "Create a release",
-    query: "I would like to release a new package. Can you help me with that?"
+    label: "External Distribution",
+    query: "I need to externally distribute a package to users outside my organization. Can you help me with that?"
   },
   {
     label: "Invite a user",

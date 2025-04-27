@@ -116,6 +116,7 @@ const Home: React.FC = () => {
   // Direct query handler that uses the global event system
   const handleChatQuery = useCallback((query: string) => {
     console.log('handleChatQuery called with:', query);
+    // This will automatically open the chat and send the query
     window.openAIChatWithQuery(query);
   }, []);
 

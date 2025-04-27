@@ -33,18 +33,29 @@ import { standaloneResponses } from '../config/responses/standaloneResponses';
 import { ChatOption } from '@/components/shared/types';
 import { SECURITY_RISK_PATTERNS } from '../config/patterns/securityPatterns';
 import { PACKAGE_PATTERNS } from '../config/patterns/packagePatterns';
+import { DISTRIBUTION_PATTERNS } from '../config/patterns/distributionPatterns';
 import { packageResponses } from '../config/responses/packageResponses';
 import { PACKAGE_FLOW_ID } from '../config/flows/packageFlow';
 import { TOKEN_FLOW_ID } from '../config/flows/tokenFlow';
+import { DISTRIBUTION_FLOW_ID } from '../config/flows/distributionFlow';
 
 // Add priority pattern matching
 const PRIORITY_PATTERNS: Record<string, string[]> = {
+  [DISTRIBUTION_FLOW_ID]: [
+    'external distribution',
+    'externally distribute',
+    'distribute package',
+    'distribute build',
+    'distribute outside',
+    'package to users outside',
+    'need to externally distribute'
+  ],
   [TOKEN_FLOW_ID]: [
     'generate token',
     'create token',
     'new token',
     'token'
-  ],
+  ]
   // Add more flows as needed
 };
 
@@ -155,9 +166,15 @@ export const simulateAIResponse = (query: string): string => {
     // Find the flow by ID
     const flow = conversationFlows.find(f => f.id === flowId);
     if (flow) {
-      // Check if any pattern is an exact match
+      // Check for both exact matches and if the query contains the pattern
       const exactMatch = patterns.some(pattern => 
-        lowerQuery === pattern.toLowerCase()
+        lowerQuery === pattern.toLowerCase() ||
+        lowerQuery.includes(pattern.toLowerCase()) ||
+        // Special case for our distribution query
+        (flowId === DISTRIBUTION_FLOW_ID && 
+         lowerQuery.includes('externally distribute') && 
+         lowerQuery.includes('package') && 
+         lowerQuery.includes('outside'))
       );
       
       if (exactMatch) {

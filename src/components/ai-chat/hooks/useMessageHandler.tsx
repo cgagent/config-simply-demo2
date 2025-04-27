@@ -608,7 +608,8 @@ export const useMessageHandler = ({
                         releaseDate: new Date(new Date().getTime() - (30 * 1000)).toISOString(),
                         repository: "frontend-app",
                         status: "passed",
-                        versions: 5
+                        versions: 5,
+                        externalDistributed: "No"
                       },
                       {
                         id: "2",
@@ -618,7 +619,8 @@ export const useMessageHandler = ({
                         releaseDate: new Date(new Date().getTime() - (3 * 60 * 60 * 1000)).toISOString(),
                         repository: "user-service",
                         status: "passed",
-                        versions: 8
+                        versions: 8,
+                        externalDistributed: "Yes"
                       },
                       {
                         id: "3",
@@ -628,7 +630,8 @@ export const useMessageHandler = ({
                         releaseDate: new Date(new Date().getTime() - (12 * 60 * 60 * 1000)).toISOString(),
                         repository: "analytics",
                         status: "warning",
-                        versions: 3
+                        versions: 3,
+                        externalDistributed: "No"
                       },
                       {
                         id: "4",
@@ -638,7 +641,8 @@ export const useMessageHandler = ({
                         releaseDate: new Date(new Date().getTime() - (2 * 24 * 60 * 60 * 1000)).toISOString(),
                         repository: "infrastructure",
                         status: "passed",
-                        versions: 11
+                        versions: 11,
+                        externalDistributed: "Yes" 
                       },
                       {
                         id: "5",
@@ -648,7 +652,19 @@ export const useMessageHandler = ({
                         releaseDate: new Date(new Date().getTime() - (5 * 24 * 60 * 60 * 1000)).toISOString(),
                         repository: "api-gateway",
                         status: "passed",
-                        versions: 1
+                        versions: 1,
+                        externalDistributed: "No"
+                      },
+                      {
+                        id: "6",
+                        name: "dev-utilities",
+                        version: "0.5.2",
+                        type: "npm",
+                        releaseDate: new Date(new Date().getTime() - (10 * 24 * 60 * 60 * 1000)).toISOString(),
+                        repository: "dev-tools",
+                        status: "warning",
+                        versions: 4,
+                        externalDistributed: "No"
                       }
                     ];
                     
@@ -662,14 +678,41 @@ export const useMessageHandler = ({
                     );
                     
                     // Format packages for table
-                    const formattedPackages = sortedPackages.slice(0, 5).map(pkg => ({
-                      type: pkg.type,
-                      name: pkg.name,
-                      version: pkg.version,
-                      firstCreated: formatDistanceToNow(new Date(pkg.releaseDate), { addSuffix: true }),
-                      versions: pkg.versions || 1,
-                      status: pkg.status
-                    }));
+                    const formattedPackages = sortedPackages.slice(0, 5).map((pkg, index) => {
+                      // Assign varied version counts based on package type and index
+                      let versions;
+                      if (pkg.type === 'docker') {
+                        versions = [3, 5, 7][index % 3]; // Cycle through 3, 5, 7 for docker
+                      } else if (pkg.type === 'npm') {
+                        versions = [1, 2, 4, 6][index % 4]; // Cycle through 1, 2, 4, 6 for npm
+                      } else {
+                        versions = [1, 3, 5, 7][index % 4]; // Default pattern for other types
+                      }
+                      
+                      // Determine External Distributed status to ensure a mix of Yes and No
+                      // If the package already has an explicit value, use it
+                      let isDistributed = false;
+                      
+                      if (pkg.externalDistributed === "Yes") {
+                        isDistributed = true;
+                      } else if (pkg.externalDistributed === "No") {
+                        isDistributed = false;
+                      } else {
+                        // Apply rules that will give us a mix
+                        // For even balance: packages at index 1 and 3 are distributed (Yes)
+                        isDistributed = index === 1 || index === 3;
+                      }
+                      
+                      return {
+                        type: pkg.type,
+                        name: pkg.name,
+                        version: pkg.version,
+                        firstCreated: formatDistanceToNow(new Date(pkg.releaseDate), { addSuffix: true }),
+                        versions: versions,
+                        status: pkg.status,
+                        externalDistributed: isDistributed ? 'Yes' as const : 'No' as const
+                      };
+                    });
                     
                     console.log("Formatted packages for display:", JSON.stringify(formattedPackages, null, 2));
                     
@@ -771,7 +814,8 @@ export const useMessageHandler = ({
                   releaseDate: new Date(new Date().getTime() - (30 * 1000)).toISOString(),
                   repository: "frontend-app",
                   status: "passed",
-                  versions: 5
+                  versions: 5,
+                  externalDistributed: "No"
                 },
                 {
                   id: "2",
@@ -781,7 +825,8 @@ export const useMessageHandler = ({
                   releaseDate: new Date(new Date().getTime() - (3 * 60 * 60 * 1000)).toISOString(),
                   repository: "user-service",
                   status: "passed",
-                  versions: 8
+                  versions: 8,
+                  externalDistributed: "Yes"
                 },
                 {
                   id: "3",
@@ -791,7 +836,8 @@ export const useMessageHandler = ({
                   releaseDate: new Date(new Date().getTime() - (12 * 60 * 60 * 1000)).toISOString(),
                   repository: "analytics",
                   status: "warning",
-                  versions: 3
+                  versions: 3,
+                  externalDistributed: "No"
                 },
                 {
                   id: "4",
@@ -801,7 +847,8 @@ export const useMessageHandler = ({
                   releaseDate: new Date(new Date().getTime() - (2 * 24 * 60 * 60 * 1000)).toISOString(),
                   repository: "infrastructure",
                   status: "passed",
-                  versions: 11
+                  versions: 11,
+                  externalDistributed: "Yes" 
                 },
                 {
                   id: "5",
@@ -811,7 +858,19 @@ export const useMessageHandler = ({
                   releaseDate: new Date(new Date().getTime() - (5 * 24 * 60 * 60 * 1000)).toISOString(),
                   repository: "api-gateway",
                   status: "passed",
-                  versions: 1
+                  versions: 1,
+                  externalDistributed: "No"
+                },
+                {
+                  id: "6",
+                  name: "dev-utilities",
+                  version: "0.5.2",
+                  type: "npm",
+                  releaseDate: new Date(new Date().getTime() - (10 * 24 * 60 * 60 * 1000)).toISOString(),
+                  repository: "dev-tools",
+                  status: "warning",
+                  versions: 4,
+                  externalDistributed: "No"
                 }
               ];
               
@@ -825,14 +884,41 @@ export const useMessageHandler = ({
               );
               
               // Format packages for table
-              const formattedPackages = sortedPackages.slice(0, 5).map(pkg => ({
-                type: pkg.type,
-                name: pkg.name,
-                version: pkg.version,
-                firstCreated: formatDistanceToNow(new Date(pkg.releaseDate), { addSuffix: true }),
-                versions: pkg.versions || 1,
-                status: pkg.status
-              }));
+              const formattedPackages = sortedPackages.slice(0, 5).map((pkg, index) => {
+                // Assign varied version counts based on package type and index
+                let versions;
+                if (pkg.type === 'docker') {
+                  versions = [3, 5, 7][index % 3]; // Cycle through 3, 5, 7 for docker
+                } else if (pkg.type === 'npm') {
+                  versions = [1, 2, 4, 6][index % 4]; // Cycle through 1, 2, 4, 6 for npm
+                } else {
+                  versions = [1, 3, 5, 7][index % 4]; // Default pattern for other types
+                }
+                
+                // Determine External Distributed status to ensure a mix of Yes and No
+                // If the package already has an explicit value, use it
+                let isDistributed = false;
+                
+                if (pkg.externalDistributed === "Yes") {
+                  isDistributed = true;
+                } else if (pkg.externalDistributed === "No") {
+                  isDistributed = false;
+                } else {
+                  // Apply rules that will give us a mix
+                  // For even balance: packages at index 1 and 3 are distributed (Yes)
+                  isDistributed = index === 1 || index === 3;
+                }
+                
+                return {
+                  type: pkg.type,
+                  name: pkg.name,
+                  version: pkg.version,
+                  firstCreated: formatDistanceToNow(new Date(pkg.releaseDate), { addSuffix: true }),
+                  versions: versions,
+                  status: pkg.status,
+                  externalDistributed: isDistributed ? 'Yes' as const : 'No' as const
+                };
+              });
               
               console.log("Formatted packages for display:", JSON.stringify(formattedPackages, null, 2));
               

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Message, isSecurityAlertMessage, isPackageInfoMessage, isCIConfigMessage, isActionOptionsMessage, isPackageTableMessage } from '../types/messageTypes';
 import { ChatOption } from '@/components/shared/types';
 import { cn } from '@/lib/utils';
@@ -10,6 +10,7 @@ import { Button } from '@/components/ui/button';
 import CVECard from '../../CVECard';
 import { SelectableOptions } from '../../ai-configuration/SelectableOptions';
 import { formatDistanceToNow } from 'date-fns';
+import { DistributePackageModal } from '../../DistributePackageModal';
 
 interface MessageRendererProps {
   message: Message;
@@ -204,6 +205,11 @@ const PackageTableRenderer: React.FC<{
   message: Message;
   onSelectOption?: (option: ChatOption) => void;
 }> = ({ message, onSelectOption }) => {
+  const [distributeModalOpen, setDistributeModalOpen] = useState(false);
+  const [selectedPackage, setSelectedPackage] = useState<string>('');
+  const [distributedPackages, setDistributedPackages] = useState<Set<string>>(new Set());
+  const { toast } = useToast();
+  
   console.log("PackageTableRenderer - Input message:", JSON.stringify(message, null, 2));
   
   if (!isPackageTableMessage(message)) {
@@ -215,6 +221,66 @@ const PackageTableRenderer: React.FC<{
 
   // Check if the message has options - it might be a combined message with options
   const hasOptions = 'options' in message && Array.isArray((message as any).options);
+
+  const handleDistributeClick = (packageName: string) => {
+    setSelectedPackage(packageName);
+    setDistributeModalOpen(true);
+  };
+
+  const handleDistributePackage = () => {
+    // Add the package to our set of distributed packages
+    setDistributedPackages(prev => {
+      const newSet = new Set(prev);
+      newSet.add(selectedPackage);
+      return newSet;
+    });
+    
+    toast({
+      title: "Package Distribution Initiated",
+      description: `${selectedPackage} will be distributed to external repositories.`,
+      duration: 3000,
+    });
+  };
+
+  // Function to determine external distribution status based on package properties
+  const getExternalDistributedStatus = (pkg: any, index: number) => {
+    // Check if this package was distributed by the user
+    if (distributedPackages.has(pkg.name)) {
+      return true;
+    }
+    
+    // Always respect explicit setting if it exists
+    if (pkg.externalDistributed === 'Yes') {
+      return true;
+    }
+    
+    if (pkg.externalDistributed === 'No') {
+      return false;
+    }
+    
+    // Apply specific rules that will result in a mix:
+    
+    // 1. Docker packages with versions below 2.0 are distributed
+    if (pkg.type === 'docker' && pkg.version && !pkg.version.startsWith('2.') && !pkg.version.startsWith('3.')) {
+      return true;
+    }
+    
+    // 2. Some npm packages are distributed, but not all (use index as a way to get consistent results)
+    if (pkg.type === 'npm' && index % 3 === 0) {
+      return true;
+    }
+    
+    // 3. Packages with specific patterns in name (but not for all, to ensure we have some No values)
+    if (pkg.name && (
+      (pkg.name.includes('api') && !pkg.name.includes('dashboard')) || 
+      (pkg.name.includes('service') && index % 2 === 0)
+    )) {
+      return true;
+    }
+    
+    // Default to not distributed for other packages
+    return false;
+  };
 
   return (
     <div className="space-y-4">
@@ -241,7 +307,8 @@ const PackageTableRenderer: React.FC<{
                   <th className="py-2 px-3 text-left font-medium text-blue-100 border-b border-blue-800/30">Package Name</th>
                   <th className="py-2 px-3 text-left font-medium text-blue-100 border-b border-blue-800/30">Latest Version</th>
                   <th className="py-2 px-3 text-left font-medium text-blue-100 border-b border-blue-800/30">First Created</th>
-                  <th className="py-2 px-3 text-left font-medium text-blue-100 border-b border-blue-800/30">Versions</th>
+                  <th className="py-2 px-3 text-center font-medium text-blue-100 border-b border-blue-800/30">Versions</th>
+                  <th className="py-2 px-3 text-center font-medium text-blue-100 border-b border-blue-800/30">Externaly Distributed</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-blue-800/20">
@@ -260,7 +327,19 @@ const PackageTableRenderer: React.FC<{
                       <code className="px-2 py-1 bg-blue-900/30 rounded text-blue-200">{pkg.version}</code>
                     </td>
                     <td className="py-3 px-3">{pkg.firstCreated}</td>
-                    <td className="py-3 px-3">{pkg.versions}</td>
+                    <td className="py-3 px-3 text-center">{pkg.versions}</td>
+                    <td className="py-3 px-3 text-center">
+                      {getExternalDistributedStatus(pkg, index) ? (
+                        <span className="text-green-400">Yes</span>
+                      ) : (
+                        <button 
+                          onClick={() => handleDistributeClick(pkg.name)}
+                          className="text-red-400 hover:text-red-300 hover:underline cursor-pointer transition-colors"
+                        >
+                          No
+                        </button>
+                      )}
+                    </td>
                   </tr>
                 ))}
               </tbody>
@@ -268,6 +347,14 @@ const PackageTableRenderer: React.FC<{
           </div>
         </div>
       </motion.div>
+
+      {/* Distribution Modal */}
+      <DistributePackageModal 
+        isOpen={distributeModalOpen}
+        onClose={() => setDistributeModalOpen(false)}
+        packageName={selectedPackage}
+        onDistribute={handleDistributePackage}
+      />
 
       {/* Display selectable options if the message has them and onSelectOption is provided */}
       {hasOptions && onSelectOption && (

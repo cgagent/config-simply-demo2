@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { cn } from '@/lib/utils';
 import { Bot, User, Copy, Package } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
@@ -12,6 +12,7 @@ import { SelectableOptions } from '../ai-configuration/SelectableOptions';
 import { ChatOption } from '@/components/shared/types';
 import { securityRemediationOptions } from './config/constants/securityConstants';
 import { MessageRenderer } from './display/MessageRenderer';
+import { DistributePackageModal } from '../DistributePackageModal';
 
 // Extended message type that includes options
 interface MessageWithOptions extends ConstantMessage {
@@ -90,6 +91,9 @@ const parsePackageTable = (content: string): Array<{
 export const ChatMessage: React.FC<ChatMessageProps> = ({ message, onSelectOption }) => {
   const isUser = message.role === 'user';
   const { toast } = useToast();
+  const [distributeModalOpen, setDistributeModalOpen] = useState(false);
+  const [selectedPackage, setSelectedPackage] = useState<string>('');
+  const [distributedPackages, setDistributedPackages] = useState<Set<string>>(new Set());
   
   // Debug logging to see what messages we're receiving
   console.log("ChatMessage rendering with message:", {
@@ -115,11 +119,66 @@ export const ChatMessage: React.FC<ChatMessageProps> = ({ message, onSelectOptio
     });
   };
 
+  const handleDistributeClick = (packageName: string) => {
+    setSelectedPackage(packageName);
+    setDistributeModalOpen(true);
+  };
+
+  const handleDistributePackage = () => {
+    // Add the package to the set of distributed packages
+    setDistributedPackages(prev => {
+      const newSet = new Set(prev);
+      newSet.add(selectedPackage);
+      return newSet;
+    });
+    
+    toast({
+      title: "Package Distribution Initiated",
+      description: `${selectedPackage} will be distributed to external repositories.`,
+      duration: 3000,
+    });
+  };
+
   // Check if the message has options property (for action options messages)
   const hasOptions = 'options' in message && Array.isArray((message as MessageWithOptions).options);
   
   // Check if this is a package table message - look for type field and packages array
   const isPackageTable = 'type' in message && message.type === 'package-table' && 'packages' in message;
+
+  const getExternalDistributedStatus = (row: { 
+    type?: string; 
+    version?: string; 
+    status?: string;
+    name?: string;
+  }, index: number) => {
+    // Check if this package was distributed by the user
+    if (row.name && distributedPackages.has(row.name)) {
+      return true;
+    }
+    
+    // Apply specific rules to get a mix of Yes and No values
+    
+    // 1. Only specific docker packages are distributed
+    if (row.type === 'docker' && row.name && (
+      row.name.includes('api') || 
+      (row.name.includes('service') && index % 2 === 0)
+    )) {
+      return true;
+    } 
+    
+    // 2. Only some packages with higher version numbers are distributed
+    if (row.version && row.version.startsWith('3.')) {
+      return true;
+    }
+    
+    // 3. Only first and third package with "passed" status are distributed
+    if (row.status === 'passed' && (index === 0 || index === 2)) {
+      return true;
+    }
+    
+    // Default to false for most packages
+    return false;
+  };
 
   return (
     <motion.div
@@ -181,7 +240,8 @@ export const ChatMessage: React.FC<ChatMessageProps> = ({ message, onSelectOptio
                           <th className="py-2 px-3 text-left font-medium text-blue-100 border-b border-blue-800/30">Package Name</th>
                           <th className="py-2 px-3 text-left font-medium text-blue-100 border-b border-blue-800/30">Latest Version</th>
                           <th className="py-2 px-3 text-left font-medium text-blue-100 border-b border-blue-800/30">First Created</th>
-                          <th className="py-2 px-3 text-left font-medium text-blue-100 border-b border-blue-800/30">Versions</th>
+                          <th className="py-2 px-3 text-center font-medium text-blue-100 border-b border-blue-800/30">Versions</th>
+                          <th className="py-2 px-3 text-center font-medium text-blue-100 border-b border-blue-800/30">Externaly Distributed</th>
                         </tr>
                       </thead>
                       <tbody className="divide-y divide-blue-800/20">
@@ -207,7 +267,19 @@ export const ChatMessage: React.FC<ChatMessageProps> = ({ message, onSelectOptio
                               {row.status === 'failed' && <span className="ml-2 text-red-400">❌</span>}
                             </td>
                             <td className="py-3 px-3">{row.created}</td>
-                            <td className="py-3 px-3">{row.versions}</td>
+                            <td className="py-3 px-3 text-center">{row.versions}</td>
+                            <td className="py-3 px-3 text-center">
+                              {getExternalDistributedStatus(row, index) ? (
+                                <span className="text-green-400">Yes</span>
+                              ) : (
+                                <button 
+                                  onClick={() => handleDistributeClick(row.name)}
+                                  className="text-red-400 hover:text-red-300 hover:underline cursor-pointer transition-colors"
+                                >
+                                  No
+                                </button>
+                              )}
+                            </td>
                           </tr>
                         ))}
                       </tbody>
@@ -215,6 +287,14 @@ export const ChatMessage: React.FC<ChatMessageProps> = ({ message, onSelectOptio
                   </div>
                 </div>
               </div>
+              
+              {/* Distribution Modal */}
+              <DistributePackageModal 
+                isOpen={distributeModalOpen}
+                onClose={() => setDistributeModalOpen(false)}
+                packageName={selectedPackage}
+                onDistribute={handleDistributePackage}
+              />
             </div>
           ) : isPackageTable ? (
             <MessageRenderer message={message as any as TypeMessage} onSelectOption={onSelectOption} />

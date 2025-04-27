@@ -2,6 +2,7 @@ import { releaseFlow } from './releaseFlow';
 import { packageFlow } from './packageFlow';
 import { securityFlow, maliciousPackagesFlow } from './securityFlow';
 import { tokenFlow } from './tokenFlow';
+import { distributionFlow } from './distributionFlow';
 import { ConversationFlow } from '../../utils/types';
 
 /**
@@ -12,5 +13,6 @@ export const conversationFlows: ConversationFlow[] = [
   packageFlow,
   securityFlow,
   maliciousPackagesFlow,
-  tokenFlow
+  tokenFlow,
+  distributionFlow
 ]; 

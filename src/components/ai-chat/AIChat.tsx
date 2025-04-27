@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { InitialChatScreen } from './InitialChatScreen';
 import { ConversationScreen } from './ConversationScreen';
 import { useMessageHandler } from './hooks/useMessageHandler';
@@ -9,6 +9,14 @@ import { useResetDetection } from './hooks/useResetDetection';
 import { useChatStateNotifier } from './hooks/useChatStateNotifier';
 import { FlowProvider } from './context/FlowContext';
 import { TokenModal } from '@/components/shared/TokenModal';
+
+// Define the global window functions
+declare global {
+  interface Window {
+    resetAIChat: () => void;
+    openAIChatWithQuery: (query: string) => void;
+  }
+}
 
 interface AIChatProps {
   onChatStateChange?: (isChatActive: boolean) => void;
@@ -77,6 +85,33 @@ const AIChatContent: React.FC<AIChatProps> = ({
   } = useMessageHandler({
     onTokenGenerated: showTokenInModal
   });
+
+  // Register global window functions
+  useEffect(() => {
+    // Function to reset AI chat
+    window.resetAIChat = () => {
+      console.log('Global reset of AI Chat triggered');
+      fullReset();
+    };
+
+    // Function to open AI chat with a query
+    window.openAIChatWithQuery = (query: string) => {
+      console.log('Opening AI Chat with query:', query);
+      // First set the input value
+      setInputValue(query);
+      
+      // Instead of manually calling handleSendMessage with setTimeout,
+      // we'll leverage the useAutoSendMessage hook by directly calling
+      // handleSendMessage with the query
+      handleSendMessage(query);
+    };
+
+    // Clean up on unmount
+    return () => {
+      window.resetAIChat = () => {};
+      window.openAIChatWithQuery = () => {};
+    };
+  }, [fullReset, setInputValue, handleSendMessage]);
 
   // Reset detection when navigating
   useResetDetection({ resetMessages: fullReset });
