@@ -276,7 +276,7 @@ const StatisticsBar: React.FC<StatisticsBarProps> = ({
                 <ChevronRight className="h-4 w-4 text-red-400 opacity-0 group-hover:opacity-100 transition-opacity" />
               </div>
               <p className="text-xs text-red-200/60 mt-1">
-                ⚠️ Critical vulnerability detected
+                ⚠️ Malicious package detected
               </p>
             </div>
 
@@ -325,7 +325,7 @@ const StatisticsBar: React.FC<StatisticsBarProps> = ({
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-2">
                 <Package className="h-4 w-4 text-blue-400" />
-                <span className="text-sm font-medium text-blue-100/80">Recent Package</span>
+                <span className="text-sm font-medium text-blue-100/80">Published Package</span>
               </div>
               <ChevronRight className="h-4 w-4 text-blue-400 opacity-0 group-hover:opacity-100 transition-opacity" />
             </div>
@@ -360,7 +360,7 @@ const StatisticsBar: React.FC<StatisticsBarProps> = ({
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-2">
                 <GitBranch className="h-4 w-4 text-blue-400" />
-                <span className="text-sm font-medium text-blue-100/80">Recent Build</span>
+                <span className="text-sm font-medium text-blue-100/80">CI Build</span>
               </div>
               <ChevronRight className="h-4 w-4 text-blue-400 opacity-0 group-hover:opacity-100 transition-opacity" />
             </div>
