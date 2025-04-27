@@ -157,6 +157,66 @@ export const useMessageHandler = ({
     addUserMessage(option.value);
     setIsProcessing(true);
 
+    // Handle user invitation flow responses
+    if (option.id === 'admin-role' || option.id === 'developer-role') {
+      setTimeout(() => {
+        const role = option.id === 'admin-role' ? 'Admin' : 'Developer';
+        addBotMessage(`Great! You've selected the ${role} role. Please provide the email addresses of the users you'd like to invite, separated by commas.`);
+        setIsProcessing(false);
+      }, 1000);
+      return;
+    }
+    
+    // Handle email input for user invitation - check for previous role message
+    const lastMessages = messages.slice(-3);
+    const roleSelectionMessage = lastMessages.find(msg => 
+      msg.role === 'assistant' && 
+      typeof msg.content === 'string' && 
+      msg.content.includes("Please provide the email addresses")
+    );
+    
+    if (roleSelectionMessage && option.id !== 'send-invites' && option.id !== 'maybe-later') {
+      setTimeout(() => {
+        // Treat this as email addresses
+        const emails = option.value.split(',').map(email => email.trim()).filter(Boolean);
+        
+        if (emails.length > 0) {
+          // Display email confirmation
+          const emailsText = emails.map(email => `- ${email}`).join('\n');
+          const message = MessageFactory.createActionOptionsMessage(
+            `I'll send invitations to the following email addresses:\n\n${emailsText}\n\nWould you like to proceed?`,
+            [
+              { id: 'send-invites', label: 'Send Invites', value: 'Yes, send the invites' },
+              { id: 'maybe-later', label: 'Cancel', value: 'No, maybe later' }
+            ]
+          );
+          addBotMessage(message);
+        } else {
+          addBotMessage("I couldn't identify any email addresses. Please try again with valid email addresses separated by commas.");
+        }
+        setIsProcessing(false);
+      }, 1000);
+      return;
+    }
+    
+    // Handle send invites confirmation
+    if (option.id === 'send-invites') {
+      setTimeout(() => {
+        addBotMessage("✅ Invitations have been sent successfully! The users will receive an email with instructions on how to set up their accounts.");
+        setIsProcessing(false);
+      }, 1500);
+      return;
+    }
+    
+    // Handle maybe later (cancel invites)
+    if (option.id === 'maybe-later') {
+      setTimeout(() => {
+        addBotMessage("No problem. You can invite users anytime by typing 'invite users' in the chat.");
+        setIsProcessing(false);
+      }, 1000);
+      return;
+    }
+
     // Check if we're in the token flow
     if (tokenFlowState) {
       setTimeout(() => {
@@ -325,7 +385,29 @@ export const useMessageHandler = ({
       // Process the message with a slight delay to simulate processing
       setTimeout(() => {
         try {
-          // Check if we're in the token flow
+          // Check for user invite flow
+          if (content.toLowerCase().includes('invite a user') || 
+              content.toLowerCase().includes('invite user') ||
+              content.toLowerCase().includes('add a user') ||
+              content.toLowerCase().includes('add user')) {
+            
+            console.log("Triggering user invitation flow");
+            
+            // Show role selection options
+            const message = MessageFactory.createActionOptionsMessage(
+              "Let's invite users to your organization. Which role would you like to give to these users?",
+              [
+                { id: 'admin-role', label: 'Admin', value: 'Admin' },
+                { id: 'developer-role', label: 'Developer', value: 'Developer' }
+              ]
+            );
+            
+            addBotMessage(message);
+            setIsProcessing(false);
+            return;
+          }
+          
+          // Continue with existing token flow check
           if (tokenFlowState) {
             // Handle token flow based on current step
             if (tokenFlowState.step === 'name') {
