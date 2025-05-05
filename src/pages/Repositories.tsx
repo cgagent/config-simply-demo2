@@ -85,7 +85,7 @@ const RepositoriesPage: React.FC = () => {
 
   return (
     <div className="p-6">
-      <div className="animate-fadeIn">
+      <div className="animate-fadeIn max-w-[1200px] mx-auto w-full">
         <RepositoryHeader 
           organizations={organizations}
           selectedOrg={selectedOrg}

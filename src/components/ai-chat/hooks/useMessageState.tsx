@@ -7,7 +7,17 @@ export const useMessageState = () => {
   const [inputValue, setInputValue] = useState('');
 
   const addMessage = useCallback((message: Message) => {
-    setMessages(prev => [...prev, message]);
+    setMessages(prev => {
+      // If this is a package table message, replace all existing messages
+      if (message.type === 'package-table') {
+        return [
+          // Keep only the most recent user message
+          prev.find(m => m.role === 'user' && m === prev[prev.length - 1]),
+          message
+        ].filter(Boolean) as Message[];
+      }
+      return [...prev, message];
+    });
   }, []);
 
   const addUserMessage = useCallback((content: string) => {
@@ -32,7 +42,7 @@ export const useMessageState = () => {
     
     if (typeof content === 'string') {
       botMessage = {
-        id: (Date.now() + 1).toString(),
+        id: Date.now().toString(),
         role: 'assistant',
         content,
         type: 'text',
@@ -42,8 +52,17 @@ export const useMessageState = () => {
       botMessage = content;
     }
     
-    console.log("Adding bot message");
-    addMessage(botMessage);
+    // Special handling for package table messages
+    if (botMessage.type === 'package-table') {
+      setMessages(prev => {
+        // Keep only the most recent user message
+        const userMessage = prev.find(m => m.role === 'user' && m === prev[prev.length - 1]);
+        return userMessage ? [userMessage, botMessage] : [botMessage];
+      });
+    } else {
+      console.log("Adding bot message");
+      addMessage(botMessage);
+    }
   }, [addMessage]);
 
   const resetMessages = useCallback(() => {

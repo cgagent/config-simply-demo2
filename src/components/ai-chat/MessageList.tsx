@@ -39,18 +39,47 @@ export const MessageList: React.FC<MessageListProps> = ({ messages, isProcessing
   // Debug log to see what messages we're receiving
   console.log("MessageList rendering with messages:", JSON.stringify(messages, null, 2));
   
-  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const messageListRef = useRef<HTMLDivElement>(null);
+  const lastUserMessageRef = useRef<string | null>(null);
+
+  const scrollToMessage = (messageElement: Element) => {
+    if (messageListRef.current) {
+      const container = messageListRef.current;
+      const containerTop = container.getBoundingClientRect().top;
+      const elementTop = messageElement.getBoundingClientRect().top;
+      
+      // Calculate the scroll amount needed to position the element at the top
+      const scrollAmount = container.scrollTop + (elementTop - containerTop) - 20;
+      
+      // Use smooth scrolling
+      container.scrollTo({
+        top: scrollAmount,
+        behavior: 'smooth'
+      });
+    }
+  };
 
   useEffect(() => {
-    scrollToBottom();
-  }, [messages, isProcessing]);
-
-  const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  };
+    // Only scroll when a new user message is added
+    const lastMessage = messages[messages.length - 1];
+    if (lastMessage && lastMessage.role === 'user' && lastMessage.id !== lastUserMessageRef.current) {
+      // Wait for animations to complete (500ms for Framer Motion animations)
+      setTimeout(() => {
+        const messageElements = Array.from(messageListRef.current?.getElementsByClassName('message-item') || []);
+        const lastMessageElement = messageElements[messageElements.length - 1];
+        
+        if (lastMessageElement) {
+          scrollToMessage(lastMessageElement);
+        }
+      }, 100); // Small delay to let the DOM update and animations start
+      
+      lastUserMessageRef.current = lastMessage.id;
+    }
+  }, [messages]);
 
   return (
     <motion.div 
+      ref={messageListRef}
       className={cn(
         "flex-1 overflow-y-auto py-4 space-y-5 rounded-md",
         "bg-gradient-to-b from-gray-100/95 to-white/95 border border-border/50 shadow-md",
@@ -73,6 +102,7 @@ export const MessageList: React.FC<MessageListProps> = ({ messages, isProcessing
             key={message.id} 
             message={message} 
             onSelectOption={onSelectOption}
+            className="message-item"
           />
         ))}
         
@@ -82,7 +112,7 @@ export const MessageList: React.FC<MessageListProps> = ({ messages, isProcessing
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
-            className="px-3"
+            className="px-3 message-item"
           >
             <div className="flex gap-3 p-4 rounded-lg shadow-md border bg-card border-border/60 mr-8 rounded-tl-none">
               <div className="flex-shrink-0 h-8 w-8 rounded-full flex items-center justify-center bg-primary/10 text-primary">
@@ -103,7 +133,6 @@ export const MessageList: React.FC<MessageListProps> = ({ messages, isProcessing
           </motion.div>
         )}
       </div>
-      <div ref={messagesEndRef} />
     </motion.div>
   );
 };

@@ -48,7 +48,7 @@ export const securityRiskPatterns = {
     "send an email about this vulnerability"
   ],
   maliciousPackages: [
-    "which packages were blocked in the last two weeks",
+    "which packages were blocked in the last 30 days",
     "show me the malicious packages",
     "list blocked packages",
     "packages at risk",

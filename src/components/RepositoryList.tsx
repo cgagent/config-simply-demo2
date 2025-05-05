@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { cn } from '@/lib/utils';
 import RepositoryListHeader from './RepositoryListHeader';
@@ -44,7 +43,7 @@ const RepositoryList: React.FC<RepositoryListProps> = ({
     
   const handleConfigureClick = (repo: Repository) => {
     onConfigureRepository(repo);
-    navigate('/ci-configuration', { state: { repository: repo } });
+    navigate('/ci-configuration', { state: { repositoryName: repo.name } });
   };
 
   return (

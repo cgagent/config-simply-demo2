@@ -18,6 +18,11 @@ export const useConfigChat = (
   const [messages, setMessages] = useState<Message[]>([
     {
       id: '1',
+      role: 'user',
+      content: `I would like to integrate the CI workflows in my repository ${repositoryName} with JFrog`
+    },
+    {
+      id: '2',
       role: 'bot',
       content: configResponses.initial
     }
@@ -61,11 +66,11 @@ export const useConfigChat = (
       // Always force update the infrastructure repository when navigating to repositories
       // This ensures the repository is configured when clicking "My CI connection"
       if (onMergeSuccess) {
-        console.log(`Navigation: Force configuring infrastructure with npm`);
+        console.log(`Navigation: Force configuring ${repositoryName} with npm`);
         
         // Add a slight delay to ensure the callback executes
         setTimeout(() => {
-          onMergeSuccess('infrastructure', 'npm');
+          onMergeSuccess(repositoryName || 'infrastructure', 'npm');
           
           // Force update localStorage directly for immediate effect
           try {
@@ -73,7 +78,7 @@ export const useConfigChat = (
             if (repoData) {
               const repos = JSON.parse(repoData);
               const updatedRepos = repos.map(repo => {
-                if (repo.name === 'infrastructure') {
+                if (repo.name === repositoryName) {
                   return {
                     ...repo,
                     isConfigured: true,
@@ -90,7 +95,7 @@ export const useConfigChat = (
                 return repo;
               });
               localStorage.setItem('ci_repositories', JSON.stringify(updatedRepos));
-              console.log('Directly updated localStorage for infrastructure repository', updatedRepos);
+              console.log('Directly updated localStorage for repository:', repositoryName, updatedRepos);
             }
           } catch (error) {
             console.error('Error updating localStorage:', error);

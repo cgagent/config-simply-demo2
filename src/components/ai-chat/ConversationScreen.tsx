@@ -1,5 +1,5 @@
 import React from 'react';
-import { MessageList } from './MessageList';
+import { BufferedMessageList } from './BufferedMessageList';
 import { ChatInput } from './ChatInput';
 import { Message } from './config/constants/chatConstants';
 import { AIConfigurationChat } from '@/components/ai-configuration';
@@ -42,7 +42,7 @@ export const ConversationScreen: React.FC<ConversationScreenProps> = ({
 
   return (
     <div className="flex flex-col h-full">
-      <MessageList 
+      <BufferedMessageList 
         messages={messages} 
         isProcessing={isProcessing}
         onSelectOption={onSelectOption}

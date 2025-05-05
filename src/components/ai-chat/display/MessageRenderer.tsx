@@ -202,25 +202,17 @@ const ActionOptionsRenderer: React.FC<{
  * Renders a package table message
  */
 const PackageTableRenderer: React.FC<{ 
-  message: Message;
+  message: Message; 
   onSelectOption?: (option: ChatOption) => void;
 }> = ({ message, onSelectOption }) => {
+  if (!isPackageTableMessage(message) || !message.packages) {
+    return <TextMessageRenderer message={message} />;
+  }
+
   const [distributeModalOpen, setDistributeModalOpen] = useState(false);
   const [selectedPackage, setSelectedPackage] = useState<string>('');
   const [distributedPackages, setDistributedPackages] = useState<Set<string>>(new Set());
   const { toast } = useToast();
-  
-  console.log("PackageTableRenderer - Input message:", JSON.stringify(message, null, 2));
-  
-  if (!isPackageTableMessage(message)) {
-    console.log("PackageTableRenderer - Not a package table message, using TextMessageRenderer instead");
-    return <TextMessageRenderer message={message} />;
-  }
-
-  console.log("PackageTableRenderer - Message is a valid package table, rendering table UI");
-
-  // Check if the message has options - it might be a combined message with options
-  const hasOptions = 'options' in message && Array.isArray((message as any).options);
 
   const handleDistributeClick = (packageName: string) => {
     setSelectedPackage(packageName);
@@ -228,7 +220,6 @@ const PackageTableRenderer: React.FC<{
   };
 
   const handleDistributePackage = () => {
-    // Add the package to our set of distributed packages
     setDistributedPackages(prev => {
       const newSet = new Set(prev);
       newSet.add(selectedPackage);
@@ -240,130 +231,83 @@ const PackageTableRenderer: React.FC<{
       description: `${selectedPackage} will be distributed to external repositories.`,
       duration: 3000,
     });
-  };
-
-  // Function to determine external distribution status based on package properties
-  const getExternalDistributedStatus = (pkg: any, index: number) => {
-    // Check if this package was distributed by the user
-    if (distributedPackages.has(pkg.name)) {
-      return true;
-    }
     
-    // Always respect explicit setting if it exists
-    if (pkg.externalDistributed === 'Yes') {
-      return true;
-    }
-    
-    if (pkg.externalDistributed === 'No') {
-      return false;
-    }
-    
-    // Apply specific rules that will result in a mix:
-    
-    // 1. Docker packages with versions below 2.0 are distributed
-    if (pkg.type === 'docker' && pkg.version && !pkg.version.startsWith('2.') && !pkg.version.startsWith('3.')) {
-      return true;
-    }
-    
-    // 2. Some npm packages are distributed, but not all (use index as a way to get consistent results)
-    if (pkg.type === 'npm' && index % 3 === 0) {
-      return true;
-    }
-    
-    // 3. Packages with specific patterns in name (but not for all, to ensure we have some No values)
-    if (pkg.name && (
-      (pkg.name.includes('api') && !pkg.name.includes('dashboard')) || 
-      (pkg.name.includes('service') && index % 2 === 0)
-    )) {
-      return true;
-    }
-    
-    // Default to not distributed for other packages
-    return false;
+    setDistributeModalOpen(false);
   };
 
   return (
     <div className="space-y-4">
-      <TextMessageRenderer message={message} />
+      <div className="overflow-x-auto">
+        <table className="min-w-full divide-y divide-blue-800/30">
+          <thead>
+            <tr>
+              <th className="px-4 py-2 text-left text-xs font-medium text-blue-300 uppercase tracking-wider">Type</th>
+              <th className="px-4 py-2 text-left text-xs font-medium text-blue-300 uppercase tracking-wider">Name</th>
+              <th className="px-4 py-2 text-left text-xs font-medium text-blue-300 uppercase tracking-wider">Version</th>
+              <th className="px-4 py-2 text-left text-xs font-medium text-blue-300 uppercase tracking-wider">First Created</th>
+              <th className="px-4 py-2 text-left text-xs font-medium text-blue-300 uppercase tracking-wider">Versions</th>
+              <th className="px-4 py-2 text-center text-xs font-medium text-blue-300 uppercase tracking-wider">Externally Distributed</th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-blue-800/30">
+            {message.packages.map((pkg, index) => (
+              <tr key={pkg.name + index} className="hover:bg-blue-800/10">
+                <td className="px-4 py-2 text-sm text-blue-200">
+                  <div className="flex items-center">
+                    <span className="mr-2">
+                      {pkg.type === 'docker' && <img src="/lovable-uploads/docker.png" className="h-4 w-4" alt="Docker" />}
+                      {pkg.type === 'npm' && <img src="/lovable-uploads/npm.png" className="h-4 w-4" alt="NPM" />}
+                      {pkg.type === 'python' && <img src="/lovable-uploads/python.png" className="h-4 w-4" alt="Python" />}
+                      {pkg.type === 'go' && <img src="/lovable-uploads/go.png" className="h-4 w-4" alt="Go" />}
+                      {pkg.type === 'maven' && <img src="/lovable-uploads/maven.png" className="h-4 w-4" alt="Maven" />}
+                      {!['docker', 'npm', 'python', 'go', 'maven'].includes(pkg.type) && 
+                        <Package className="h-4 w-4 text-blue-400" />}
+                    </span>
+                    <span>{pkg.type || 'unknown'}</span>
+                  </div>
+                </td>
+                <td className="px-4 py-2 text-sm font-medium text-blue-100">{pkg.name}</td>
+                <td className="px-4 py-2 text-sm">
+                  <code className="px-2 py-1 bg-blue-900/30 rounded text-blue-200">{pkg.version}</code>
+                </td>
+                <td className="px-4 py-2 text-sm text-blue-200">{pkg.firstCreated}</td>
+                <td className="px-4 py-2 text-sm text-center text-blue-200">{pkg.versions}</td>
+                <td className="px-4 py-2 text-sm text-center">
+                  {distributedPackages.has(pkg.name) ? (
+                    <span className="text-green-400">Yes</span>
+                  ) : pkg.type === 'docker' && pkg.name === 'frontend-app' ? (
+                    <span className="text-green-400">Yes</span>
+                  ) : (
+                    <button 
+                      onClick={() => handleDistributeClick(pkg.name)}
+                      className="text-red-400 hover:text-red-300 hover:underline cursor-pointer transition-colors"
+                    >
+                      No
+                    </button>
+                  )}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
       
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 0.5, duration: 0.5 }}
-        className="bg-blue-900/40 rounded-lg overflow-hidden border border-blue-700/30 shadow-md"
-      >
-        <div className="bg-blue-800/40 px-4 py-2 border-b border-blue-700/30">
-          <div className="text-sm text-white font-medium flex items-center">
-            <Package className="h-4 w-4 mr-2 text-blue-400" />
-            Latest Published Packages
-          </div>
-        </div>
-        <div className="p-2">
-          <div className="overflow-hidden rounded-lg border border-blue-800/50 shadow-sm">
-            <table className="w-full border-collapse bg-blue-950/20">
-              <thead className="bg-blue-900/50">
-                <tr>
-                  <th className="py-2 px-3 text-left font-medium text-blue-100 border-b border-blue-800/30">Type</th>
-                  <th className="py-2 px-3 text-left font-medium text-blue-100 border-b border-blue-800/30">Package Name</th>
-                  <th className="py-2 px-3 text-left font-medium text-blue-100 border-b border-blue-800/30">Latest Version</th>
-                  <th className="py-2 px-3 text-left font-medium text-blue-100 border-b border-blue-800/30">First Created</th>
-                  <th className="py-2 px-3 text-center font-medium text-blue-100 border-b border-blue-800/30">Versions</th>
-                  <th className="py-2 px-3 text-center font-medium text-blue-100 border-b border-blue-800/30">Externaly Distributed</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-blue-800/20">
-                {message.packages.map((pkg, index) => (
-                  <tr key={index} className="hover:bg-blue-800/20 transition-colors">
-                    <td className="py-3 px-3 flex items-center">
-                      <span className="mr-2">
-                        {pkg.type === 'docker' && <img src="/lovable-uploads/docker.png" className="h-4 w-4" alt="Docker" />}
-                        {pkg.type === 'npm' && <img src="/lovable-uploads/npm.png" className="h-4 w-4" alt="NPM" />}
-                        {!['docker', 'npm'].includes(pkg.type) && <Package className="h-4 w-4 text-blue-400" />}
-                      </span>
-                      <span>{pkg.type}</span>
-                    </td>
-                    <td className="py-3 px-3 font-medium text-blue-100">{pkg.name}</td>
-                    <td className="py-3 px-3">
-                      <code className="px-2 py-1 bg-blue-900/30 rounded text-blue-200">{pkg.version}</code>
-                    </td>
-                    <td className="py-3 px-3">{pkg.firstCreated}</td>
-                    <td className="py-3 px-3 text-center">{pkg.versions}</td>
-                    <td className="py-3 px-3 text-center">
-                      {getExternalDistributedStatus(pkg, index) ? (
-                        <span className="text-green-400">Yes</span>
-                      ) : (
-                        <button 
-                          onClick={() => handleDistributeClick(pkg.name)}
-                          className="text-red-400 hover:text-red-300 hover:underline cursor-pointer transition-colors"
-                        >
-                          No
-                        </button>
-                      )}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </motion.div>
-
-      {/* Distribution Modal */}
-      <DistributePackageModal 
-        isOpen={distributeModalOpen}
-        onClose={() => setDistributeModalOpen(false)}
-        packageName={selectedPackage}
-        onDistribute={handleDistributePackage}
-      />
-
-      {/* Display selectable options if the message has them and onSelectOption is provided */}
-      {hasOptions && onSelectOption && (
+      {message.options && onSelectOption && (
         <div className="mt-4">
-          <SelectableOptions
-            options={(message as any).options}
+          <SelectableOptions 
+            options={message.options}
             onSelectOption={onSelectOption}
           />
         </div>
+      )}
+
+      {distributeModalOpen && (
+        <DistributePackageModal
+          isOpen={distributeModalOpen}
+          onClose={() => setDistributeModalOpen(false)}
+          packageName={selectedPackage}
+          onDistribute={handleDistributePackage}
+        />
       )}
     </div>
   );
@@ -373,72 +317,25 @@ const PackageTableRenderer: React.FC<{
  * Main message renderer component that determines which renderer to use based on message type
  */
 export const MessageRenderer: React.FC<MessageRendererProps> = ({ message, onSelectOption }) => {
-  const isUser = message.role === 'user';
-  const { toast } = useToast();
+  if (isPackageTableMessage(message)) {
+    return <PackageTableRenderer message={message} onSelectOption={onSelectOption} />;
+  }
 
-  const copyToClipboard = (text: string) => {
-    navigator.clipboard.writeText(text).then(() => {
-      toast({
-        title: "Copied to clipboard",
-        description: "Message copied successfully",
-      });
-    });
-  };
+  if (isSecurityAlertMessage(message)) {
+    return <SecurityAlertRenderer message={message} onSelectOption={onSelectOption} />;
+  }
 
-  return (
-    <motion.div
-      initial={{ opacity: 0, y: 10 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.3 }}
-      className="px-3"
-    >
-      <motion.div
-        className={cn(
-          "flex gap-3 p-4 rounded-lg shadow-md border backdrop-blur-sm",
-          isUser 
-            ? "bg-blue-800/30 text-white border-blue-700/30 ml-8 rounded-tr-none" 
-            : "bg-blue-950/30 border-blue-800/30 mr-8 rounded-tl-none"
-        )}
-      >
-        <div className={cn(
-          "flex-shrink-0 h-8 w-8 rounded-full flex items-center justify-center",
-          isUser ? "bg-blue-600 text-white" : "bg-blue-900 text-blue-200 ring-2 ring-blue-500/30"
-        )}>
-          {isUser ? <User className="h-4 w-4" /> : <Bot className="h-4 w-4" />}
-        </div>
-        
-        <div className="flex-1 space-y-2">
-          <div className="flex justify-between items-start">
-            <div className="text-sm font-medium">
-              {isUser ? 'You' : 'JFrog Assistant'}
-            </div>
-            {!isUser && (
-              <Button 
-                variant="ghost" 
-                size="icon" 
-                className="h-6 w-6 text-blue-300/70 hover:text-blue-300 hover:bg-blue-800/30"
-                onClick={() => copyToClipboard(message.content)}
-              >
-                <Copy className="h-3.5 w-3.5" />
-              </Button>
-            )}
-          </div>
-          
-          {isSecurityAlertMessage(message) ? (
-            <SecurityAlertRenderer message={message} onSelectOption={onSelectOption} />
-          ) : isPackageInfoMessage(message) ? (
-            <PackageInfoRenderer message={message} />
-          ) : isCIConfigMessage(message) ? (
-            <CIConfigRenderer message={message} />
-          ) : isActionOptionsMessage(message) ? (
-            <ActionOptionsRenderer message={message} onSelectOption={onSelectOption} />
-          ) : isPackageTableMessage(message) ? (
-            <PackageTableRenderer message={message} onSelectOption={onSelectOption} />
-          ) : (
-            <TextMessageRenderer message={message} />
-          )}
-        </div>
-      </motion.div>
-    </motion.div>
-  );
+  if (isPackageInfoMessage(message)) {
+    return <PackageInfoRenderer message={message} />;
+  }
+
+  if (isCIConfigMessage(message)) {
+    return <CIConfigRenderer message={message} />;
+  }
+
+  if (isActionOptionsMessage(message)) {
+    return <ActionOptionsRenderer message={message} onSelectOption={onSelectOption} />;
+  }
+
+  return <TextMessageRenderer message={message} />;
 }; 

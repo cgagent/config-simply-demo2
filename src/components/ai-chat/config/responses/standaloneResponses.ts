@@ -7,7 +7,7 @@ export const standaloneResponses: ChatResponse[] = [
   {
     id: 'blocked-packages',
     patterns: [
-      'which packages were blocked in the last two weeks?',
+      'which packages were blocked in the last 30 days?',
       'blocked packages',
       'show me the packages that are blocked',
       'block',

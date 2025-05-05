@@ -20,8 +20,9 @@ interface MessageWithOptions extends ConstantMessage {
 }
 
 interface ChatMessageProps {
-  message: ConstantMessage;
+  message: ConstantMessage | TypeMessage;
   onSelectOption?: (option: ChatOption) => void;
+  className?: string;
 }
 
 // Helper to check if message content contains our specific package table
@@ -88,7 +89,7 @@ const parsePackageTable = (content: string): Array<{
   return rows;
 };
 
-export const ChatMessage: React.FC<ChatMessageProps> = ({ message, onSelectOption }) => {
+export const ChatMessage: React.FC<ChatMessageProps> = ({ message, onSelectOption, className }) => {
   const isUser = message.role === 'user';
   const { toast } = useToast();
   const [distributeModalOpen, setDistributeModalOpen] = useState(false);
@@ -185,7 +186,7 @@ export const ChatMessage: React.FC<ChatMessageProps> = ({ message, onSelectOptio
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3 }}
-      className="px-3"
+      className={cn("px-3", className)}
     >
       <motion.div
         className={cn(
@@ -203,18 +204,18 @@ export const ChatMessage: React.FC<ChatMessageProps> = ({ message, onSelectOptio
         </div>
         
         <div className="flex-1 space-y-2">
-          <div className="flex justify-between items-start">
-            <div className="text-sm font-medium">
+          <div className="flex justify-between items-center">
+            <p className="text-sm font-medium text-foreground">
               {isUser ? 'You' : 'JFrog Assistant'}
-            </div>
+            </p>
             {!isUser && (
-              <Button 
-                variant="ghost" 
-                size="icon" 
-                className="h-6 w-6 text-blue-300/70 hover:text-blue-300 hover:bg-blue-800/30"
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-8 w-8 text-muted-foreground hover:text-foreground"
                 onClick={() => copyToClipboard(message.content)}
               >
-                <Copy className="h-3.5 w-3.5" />
+                <Copy className="h-4 w-4" />
               </Button>
             )}
           </div>
@@ -301,7 +302,10 @@ export const ChatMessage: React.FC<ChatMessageProps> = ({ message, onSelectOptio
           ) : (
             <div className="prose prose-sm max-w-none dark:prose-invert prose-pre:bg-blue-900/30 prose-pre:text-blue-100 prose-code:text-blue-300">
               <ReactMarkdown 
-                className="whitespace-pre-wrap"
+                className={cn(
+                  "whitespace-pre-wrap",
+                  isUser ? "text-2xl font-bold" : ""
+                )}
                 components={{
                   code: ({ children, ...props }) => {
                     const match = /language-(\w+)/.exec(props.className || '');
@@ -366,6 +370,15 @@ export const ChatMessage: React.FC<ChatMessageProps> = ({ message, onSelectOptio
           )}
         </div>
       </motion.div>
+      
+      {distributeModalOpen && (
+        <DistributePackageModal
+          isOpen={distributeModalOpen}
+          onClose={() => setDistributeModalOpen(false)}
+          onConfirm={handleDistributePackage}
+          packageName={selectedPackage}
+        />
+      )}
     </motion.div>
   );
 };

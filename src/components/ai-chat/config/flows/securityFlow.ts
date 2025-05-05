@@ -2,6 +2,7 @@ import { ConversationFlow } from '../../utils/types';
 import { securityRiskPatterns } from '../patterns/securityPatterns';
 import { securityRiskResponses } from '../responses/securityResponses';
 import { securityRemediationOptions } from '../constants/securityConstants';
+import { showMoreOption } from '../responses/securityResponses';
 
 /**
  * Security risk flow
@@ -36,12 +37,12 @@ export const maliciousPackagesFlow: ConversationFlow = {
       id: 'packages-at-risk',
       patterns: securityRiskPatterns.maliciousPackages,
       response: securityRiskResponses.maliciousPackages,
-      nextSteps: ['remediation-action-selection']
+      nextSteps: ['show-more-packages']
     },
     {
-      id: 'remediation-action-selection',
-      patterns: securityRiskPatterns.remediationActionSelection,
-      response: securityRiskResponses.remediationActionSelection,
+      id: 'show-more-packages',
+      patterns: ['show more blocked packages'],
+      response: securityRiskResponses.detailedBlockedPackages,
       isEndOfFlow: true
     }
   ]

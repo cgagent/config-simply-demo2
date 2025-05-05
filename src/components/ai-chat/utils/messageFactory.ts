@@ -121,7 +121,7 @@ export class MessageFactory {
   static createActionOptionsMessage(
     content: string,
     options: ChatOption[]
-  ): ActionOptionsMessage {
+  ): Message {
     return {
       id: uuidv4(),
       role: 'assistant',

@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect, useMemo } from 'react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Send } from 'lucide-react';
+import { dispatchCloseStatsBarEvent } from '@/contexts/ChatContext';
 
 interface ChatInputProps {
   onSendMessage: (message: string) => void;
@@ -84,6 +85,7 @@ export const ChatInput: React.FC<ChatInputProps> = ({
 
   const handleSendMessage = () => {
     if (!input.trim()) return;
+    dispatchCloseStatsBarEvent();
     onSendMessage(input);
     setInput('');
     if (setValue) {

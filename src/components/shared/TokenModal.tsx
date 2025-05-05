@@ -1,6 +1,6 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Copy, AlertTriangle } from 'lucide-react';
+import { X, Copy, AlertTriangle, Terminal, Cloud } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
 interface TokenModalProps {
@@ -19,15 +19,29 @@ export const TokenModal: React.FC<TokenModalProps> = ({
   expiration
 }) => {
   const { toast } = useToast();
+  const [selectedExample, setSelectedExample] = useState<'curl' | 'k8s'>('curl');
 
-  const copyToClipboard = () => {
-    navigator.clipboard.writeText(token).then(() => {
+  const copyToClipboard = (text: string) => {
+    navigator.clipboard.writeText(text).then(() => {
       toast({
-        title: "Token copied",
-        description: "The token has been copied to your clipboard",
+        title: "Copied",
+        description: "The content has been copied to your clipboard",
       });
     });
   };
+
+  const curlExample = `curl \\
+  -H "Authorization: Bearer ${token}" \\
+  "https://acme.jfrog.io\\
+  /artifactory/generic/<PACKAGE>"`;
+
+  const k8sExample = `apiVersion: v1
+kind: Secret
+metadata:
+  name: my-bearer-token
+type: Opaque
+stringData:
+  token: ${token}`;
 
   return (
     <AnimatePresence>
@@ -82,11 +96,51 @@ export const TokenModal: React.FC<TokenModalProps> = ({
                         {token}
                       </code>
                       <button
-                        onClick={copyToClipboard}
+                        onClick={() => copyToClipboard(token)}
                         className="p-2 text-blue-400 hover:text-blue-300 transition-colors"
                         title="Copy token"
                       >
                         <Copy className="h-5 w-5" />
+                      </button>
+                    </div>
+                  </div>
+
+                  <div className="mt-6">
+                    <label className="text-sm text-blue-300 mb-2 block">Usage Examples</label>
+                    <div className="flex gap-2 mb-3">
+                      <button
+                        onClick={() => setSelectedExample('curl')}
+                        className={`flex items-center gap-2 px-3 py-1.5 rounded ${
+                          selectedExample === 'curl'
+                            ? 'bg-blue-600 text-white'
+                            : 'bg-blue-900/30 text-blue-300 hover:bg-blue-900/50'
+                        }`}
+                      >
+                        <Terminal className="h-4 w-4" />
+                        curl
+                      </button>
+                      <button
+                        onClick={() => setSelectedExample('k8s')}
+                        className={`flex items-center gap-2 px-3 py-1.5 rounded ${
+                          selectedExample === 'k8s'
+                            ? 'bg-blue-600 text-white'
+                            : 'bg-blue-900/30 text-blue-300 hover:bg-blue-900/50'
+                        }`}
+                      >
+                        <Cloud className="h-4 w-4" />
+                        K8s Secret
+                      </button>
+                    </div>
+                    <div className="relative">
+                      <pre className="bg-blue-900/50 text-blue-100 p-3 rounded border border-blue-800/30 font-mono text-sm whitespace-pre-wrap">
+                        {selectedExample === 'curl' ? curlExample : k8sExample}
+                      </pre>
+                      <button
+                        onClick={() => copyToClipboard(selectedExample === 'curl' ? curlExample : k8sExample)}
+                        className="absolute top-2 right-2 p-1.5 text-blue-400 hover:text-blue-300 transition-colors bg-blue-900/80 rounded"
+                        title="Copy example"
+                      >
+                        <Copy className="h-4 w-4" />
                       </button>
                     </div>
                   </div>
@@ -96,7 +150,7 @@ export const TokenModal: React.FC<TokenModalProps> = ({
                   onClick={onClose}
                   className="w-full bg-blue-600 hover:bg-blue-500 text-white font-medium py-2 px-4 rounded transition-colors"
                 >
-                  I've copied it
+                  Done
                 </button>
               </div>
             </div>

@@ -54,6 +54,8 @@ import { PackageTableMessage, isPackageTableMessage } from '../types/messageType
 import { formatDistanceToNow } from 'date-fns';
 import { PACKAGE_FLOW_ID, packageFollowUpOptions } from '../config/flows/packageFlow';
 import { TOKEN_FLOW_ID } from '../config/flows/tokenFlow';
+import { PACKAGE_PATTERNS } from '../config/patterns/packagePatterns';
+import { getUsageSnippet } from '../utils/snippetGenerator';
 
 // Original hook format
 export const useMessageHandler = ({ 
@@ -312,8 +314,13 @@ export const useMessageHandler = ({
                 
                 // Create and add the response message
                 if (actionOptions.length > 0) {
+                  // Ensure responseText is a string
+                  const messageText = typeof responseText === 'string' 
+                    ? responseText 
+                    : 'Please select an option:';
+                  
                   const actionOptionsMessage = MessageFactory.createActionOptionsMessage(
-                    responseText, 
+                    messageText,
                     actionOptions
                   );
                   addBotMessage(actionOptionsMessage);
@@ -373,12 +380,73 @@ export const useMessageHandler = ({
     
     // Add user message
     addUserMessage(content);
+    // Clear input after sending
+    setInputValue('');
     setIsProcessing(true);
     
     try {
       // Process the message with a slight delay to simulate processing
       setTimeout(() => {
         try {
+          // Check if this is a package display request
+          if (PACKAGE_PATTERNS.latestPackages.some(pattern => 
+            content.toLowerCase().includes(pattern.toLowerCase())
+          )) {
+            // Get packages from repository context
+            const { latestPackages } = packageStats;
+            handlePackagesQuery(latestPackages);
+            setIsProcessing(false);
+            return;
+          }
+
+          // Check for usage instruction requests
+          const lowerContent = content.toLowerCase();
+          
+          // Check for curl instructions
+          if (PACKAGE_PATTERNS.usageInstructions.curl.some(pattern => 
+            new RegExp(pattern, 'i').test(content)
+          )) {
+            const { latestPackages } = packageStats;
+            const examplePackage = latestPackages && latestPackages.length > 0 ? 
+              latestPackages[0] : { name: 'example-package', version: '1.0.0' };
+            
+            const curlSnippet = getUsageSnippet('curl', examplePackage.name, examplePackage.version);
+            
+            addBotMessage(`Here's how to use curl to download the ${examplePackage.name} package:\n\n\`\`\`bash\n${curlSnippet}\n\`\`\`\n\nYou'll need to replace $YOUR_API_TOKEN with your actual API token.`);
+            setIsProcessing(false);
+            return;
+          }
+          
+          // Check for docker instructions
+          if (PACKAGE_PATTERNS.usageInstructions.docker.some(pattern => 
+            new RegExp(pattern, 'i').test(content)
+          )) {
+            const { latestPackages } = packageStats;
+            const examplePackage = latestPackages && latestPackages.length > 0 ? 
+              latestPackages[0] : { name: 'example-package', version: '1.0.0' };
+            
+            const dockerSnippet = getUsageSnippet('docker', examplePackage.name, examplePackage.version);
+            
+            addBotMessage(`Here's how to use Docker with the ${examplePackage.name} package:\n\n\`\`\`bash\n${dockerSnippet}\n\`\`\`\n\nThis will first authenticate you with the registry, then pull the image and run it as a container with port 8080 exposed. When logging in, use your access token as the password.`);
+            setIsProcessing(false);
+            return;
+          }
+          
+          // Check for kubernetes instructions
+          if (PACKAGE_PATTERNS.usageInstructions.kubernetes.some(pattern => 
+            new RegExp(pattern, 'i').test(content)
+          )) {
+            const { latestPackages } = packageStats;
+            const examplePackage = latestPackages && latestPackages.length > 0 ? 
+              latestPackages[0] : { name: 'example-package', version: '1.0.0' };
+            
+            const k8sSnippet = getUsageSnippet('kubernetes', examplePackage.name, examplePackage.version);
+            
+            addBotMessage(`Here's a Kubernetes deployment manifest for the ${examplePackage.name} package:\n\n\`\`\`yaml\n${k8sSnippet}\n\`\`\`\n\nSave this to a file named \`${examplePackage.name}-deployment.yaml\` and apply it with \`kubectl apply -f ${examplePackage.name}-deployment.yaml\`.`);
+            setIsProcessing(false);
+            return;
+          }
+
           // Check explicitly for user invitation flow first
           // This ensures it takes precedence over any other flow patterns
           if (content.toLowerCase().includes('invite a user') || 
@@ -445,18 +513,156 @@ Would you like me to send the invitations now?`,
           }
           
           // Check if this is starting a token flow or a direct token generation command
-          const directTokenPattern = /^generate\s+token\s+for\s+(.+?)\s+with\s+(.+)$/i;
-          const directTokenMatch = content.match(directTokenPattern);
+          const directTokenPatterns = [
+            // Original patterns
+            /^(?:create|generate\s+)?(?:a\s+)?token\s+for\s+(.+?)\s+with\s+(\d+\s*(?:days?|months?|years?|week))(?:\s+expiration)?(?:\s*$|\s*[\n\.])/i,
+            /^(?:create|generate\s+)?(?:a\s+)?token\s+with\s+(?:the\s+)?name\s+(.+?)\s+and\s+(?:an?\s+)?(?:expiration\s+of\s+)?(\d+\s*(?:days?|months?|years?|week))(?:\s*$|\s*[\n\.])/i,
+            /^(?:create|generate\s+)?(?:a\s+)?token\s+named\s+(.+?)\s+(?:with\s+)?(\d+\s*(?:days?|months?|years?|week))(?:\s*$|\s*[\n\.])/i,
+            /^(?:create|generate\s+)?(?:a\s+)?token\s+(.+?)\s+(?:that\s+)?(?:never\s+expires?|valid\s+forever)(?:\s*$|\s*[\n\.])/i,
+            /^(?:create|generate\s+)?(?:a\s+)?token\s+(.+?)\s+(?:valid\s+for\s+)?(\d+\s*(?:days?|months?|years?|week))(?:\s*$|\s*[\n\.])/i,
+            // k8s-deploy patterns
+            /^(?:create|generate\s+)?(?:a\s+)?token\s+k8s-deploy\s+(?:valid\s+)?forever(?:\s*$|\s*[\n\.])/i,
+            /^(?:create|generate\s+)?(?:a\s+)?token\s+k8s-deploy\s+(?:valid\s+for\s+)?(\d+\s*(?:days?|months?|years?|week))(?:\s*$|\s*[\n\.])/i,
+            // Named with expiration patterns
+            /^(?:create|generate\s+)?(?:a\s+)?token\s+named\s+(\w+[-\w]*)\s+with\s+(\d+\s*(?:days?|months?|years?|week))(?:\s+expiration)?(?:\s*$|\s*[\n\.])/i,
+            /^(?:create|generate\s+)?(?:a\s+)?token\s+named\s+(\w+[-\w]*)\s+(?:that\s+)?(?:expires?\s+in\s+)?(\d+\s*(?:days?|months?|years?|week))(?:\s*$|\s*[\n\.])/i,
+            // Natural language variations with better name capture
+            /(?:create|make|generate|get)?\s*(?:a\s+)?token\s+(\w+[-\w]*)\s+(?:for|valid for|with duration|that lasts)?\s*(\d+\s*(?:days?|months?|years?|week))(?:\s*$|\s*[\n\.])/i,
+            // More flexible patterns with name capture
+            /.*token\s+(\w+[-\w]*)(?:\s+for|\s+valid|\s+with)?\s+(\d+\s*(?:days?|months?|years?|week))(?:\s*$|\s*[\n\.])/i,
+            /.*token\s+(\w+[-\w]*)\s+(\d+\s*(?:days?|months?|years?|week))(?:\s*$|\s*[\n\.])/i
+          ];
+          
+          // Define grammar keywords to exclude
+          const grammarKeywords = [
+            'a', 'an', 'the', 'for', 'with', 'and', 'or', 'in', 'on', 'at', 'to', 'of',
+            'valid', 'name', 'named', 'called', 'token', 'generate', 'create', 'make',
+            'that', 'which', 'duration', 'expiration', 'expires', 'days', 'months', 'years',
+            'week', 'forever', 'never'
+          ];
+
+          // Function to validate token name
+          const validateTokenName = (name: string): string | null => {
+            if (!name) return null;
+            
+            // Remove any punctuation and convert to lowercase for checking
+            const cleanName = name.toLowerCase().replace(/[^\w\s-]/g, '').trim();
+            
+            // Check if it's a single word (only contains letters, numbers, hyphen)
+            if (!/^[\w-]+$/.test(cleanName)) {
+              return null;
+            }
+
+            // Check if it's too short (single character)
+            if (cleanName.length < 2) {
+              return null;
+            }
+
+            // Check if it's not a grammar keyword
+            if (grammarKeywords.includes(cleanName)) {
+              return null;
+            }
+
+            return cleanName;
+          };
+
+          // Try to match against any of the patterns
+          let directTokenMatch = null;
+          let tokenDescription = '';
+          let tokenDuration = '';
+          
+          // First try to find a direct token name and duration - most specific patterns first
+          const simpleMatch = 
+            // Match period-separated token name and expiration (flexible punctuation)
+            content.match(/(?:also\s+)?(?:create\s+|generate\s+)?(?:a\s+)?token\s+(?:name\s+|named\s+)?(\w+[-\w]*)[\s.,/]*(?:expiration|expires?(?:\s+in)?|valid\s+for)\s+(\d+\s*(?:days?|months?|years?|week))(?:\s*$|\s*[\n\.,])/i) ||
+            // Match "Create token named X with Y days expiration"
+            content.match(/(?:also\s+)?(?:create|generate)?\s*(?:a\s+)?token\s+named\s+(\w+[-\w]*)\s+(?:for|with)?\s+(\d+\s*(?:days?|months?|years?|week))(?:\s+expiration)?/i) ||
+            // Match "token name with X time expiration"
+            content.match(/(?:also\s+)?(?:create|generate)?\s*(?:a\s+)?token\s+(\w+[-\w]*)\s+with\s+(\d+\s*(?:days?|months?|years?|week))(?:\s+expiration)?/i) ||
+            // Match "token <n> with/for <time>" format
+            content.match(/(?:also\s+)?token\s+<(\w+[-\w]*)>\s+(?:with|for)\s+<(\d+\s*(?:days?|months?|years?|week))>/i) ||
+            // Match other patterns
+            content.match(/(?:also\s+)?(?:create|generate)?\s*(?:a\s+)?token\s+(\w+[-\w]*)\s+(?:for\s+)?(\d+\s*(?:days?|months?|years?|week))/i) ||
+            content.match(/(?:also\s+)?(?:create|generate)?\s*(?:a\s+)?token\s+(\w+[-\w]*)\s+forever/i) ||
+            // Match "token named X valid forever"
+            content.match(/(?:also\s+)?(?:create|generate)?\s*(?:a\s+)?token\s+named\s+(\w+[-\w]*)\s+valid\s+forever/i);
+
+          // Debug logging
+          console.log("Input content:", content);
+          console.log("Simple match result:", simpleMatch);
+
+          if (simpleMatch) {
+            console.log("Match groups:", simpleMatch.groups);
+            console.log("Match array:", Array.from(simpleMatch));
+            const possibleName = validateTokenName(simpleMatch[1]);
+            console.log("Possible name:", possibleName);
+            if (possibleName) {
+              directTokenMatch = simpleMatch;
+              tokenDescription = possibleName;
+              // Remove angle brackets if they exist in the duration
+              tokenDuration = simpleMatch[2] ? simpleMatch[2].trim().replace(/[<>]/g, '') : 'never';
+              console.log("Extracted token info:", { name: tokenDescription, duration: tokenDuration });
+            }
+          }
+
+          // If no simple match, try the more complex patterns
+          if (!directTokenMatch) {
+            const directTokenPatterns = [
+              // Period-separated token name and expiration patterns (flexible punctuation)
+              /(?:also\s+)?(?:create\s+|generate\s+)?(?:a\s+)?token\s+(?:name\s+|named\s+)?(\w+[-\w]*)[\s.,/]*(?:expiration|expires?(?:\s+in)?|valid\s+for)\s+(\d+\s*(?:days?|months?|years?|week))(?:\s*$|\s*[\n\.,])/i,
+              /(?:also\s+)?(?:create\s+|generate\s+)?(?:a\s+)?token\s+(?:name\s+|named\s+)?(\w+[-\w]*)[\s.,/]*(?:expiration|expires?(?:\s+in)?|valid\s+for)\s+forever(?:\s*$|\s*[\n\.,])/i,
+              // Named with expiration patterns - most specific first
+              /(?:also\s+)?(?:create|generate)?\s*(?:a\s+)?token\s+named\s+(\w+[-\w]*)\s+(?:for|with)?\s+(\d+\s*(?:days?|months?|years?|week))(?:\s+expiration)?/i,
+              /(?:also\s+)?(?:create|generate)?\s*(?:a\s+)?token\s+named\s+(\w+[-\w]*)\s+(?:that\s+)?(?:expires?\s+in\s+)?(\d+\s*(?:days?|months?|years?|week))/i,
+              // Simple format
+              /(?:also\s+)?(?:create|generate)?\s*(?:a\s+)?token\s+(\w+[-\w]*)\s+with\s+(\d+\s*(?:days?|months?|years?|week))(?:\s+expiration)?/i,
+              // Angle bracket format
+              /(?:also\s+)?token\s+<(\w+[-\w]*)>\s+(?:with|for)\s+<(\d+\s*(?:days?|months?|years?|week))>/i,
+              // Other patterns
+              /(?:also\s+)?(?:create|generate)?\s*(?:a\s+)?token\s+(\w+[-\w]*)\s+(?:for|valid for|with duration|that lasts)?\s*(\d+\s*(?:days?|months?|years?|week))/i,
+              /(?:also\s+)?(?:create|generate)?\s*(?:a\s+)?token\s+(\w+[-\w]*)\s+(?:valid\s+for\s+)?(\d+\s*(?:days?|months?|years?|week))/i,
+              // Forever patterns
+              /(?:also\s+)?(?:create|generate)?\s*(?:a\s+)?token\s+(\w+[-\w]*)\s+(?:that\s+)?(?:never\s+expires?|valid\s+forever)/i,
+              // k8s-deploy patterns
+              /(?:also\s+)?(?:create|generate)?\s*(?:a\s+)?token\s+k8s-deploy\s+(?:valid\s+)?forever/i,
+              /(?:also\s+)?(?:create|generate)?\s*(?:a\s+)?token\s+k8s-deploy\s+(?:valid\s+for\s+)?(\d+\s*(?:days?|months?|years?|week))/i
+            ];
+
+            for (const pattern of directTokenPatterns) {
+              const match = content.match(pattern);
+              console.log("Trying pattern:", pattern);
+              console.log("Match result:", match);
+              if (match) {
+                const possibleName = match[1] ? validateTokenName(match[1]) : null;
+                if (possibleName) {
+                  directTokenMatch = match;
+                  tokenDescription = possibleName;
+                  // Check if this is a "forever" pattern
+                  if (pattern.toString().includes('forever') || pattern.toString().includes('never')) {
+                    tokenDuration = 'never';
+                  } else {
+                    tokenDuration = match[2] ? match[2].trim() : 'never';
+                  }
+                  console.log("Pattern matched. Token info:", { name: tokenDescription, duration: tokenDuration });
+                  break;
+                }
+              }
+            }
+          }
           
           // Direct token generation pattern matched
           if (directTokenMatch) {
-            console.log("Direct token pattern matched:", directTokenMatch);
+            // Final validation
+            if (!tokenDescription || tokenDescription.length < 2) {
+              addBotMessage("The token name must be at least 2 characters long and cannot be a common word like 'for', 'with', etc. Please try again with a valid name.");
+              setIsProcessing(false);
+              return;
+            }
+
+            console.log("Token generation proceeding with:", { name: tokenDescription, duration: tokenDuration });
             
-            // Extract description and duration from the message
-            const tokenDescription = directTokenMatch[1].trim();
-            const tokenDuration = directTokenMatch[2].trim();
-            
-            console.log("Token details:", { description: tokenDescription, duration: tokenDuration });
+            // Normalize duration for easier matching
+            let normalizedDuration = tokenDuration.toLowerCase().trim().replace(/[\n\.]$/, '');
             
             // Validate duration
             const validDurations = [
@@ -468,27 +674,51 @@ Would you like me to send the invitations now?`,
               '1 year', 'one year', '1year', '365 days', 'a year'
             ];
             
-            // Normalize duration for easier matching
-            let normalizedDuration = tokenDuration.toLowerCase();
+            // Check for custom duration (e.g., "70 days", "3 months", "7 years")
+            const customDaysMatch = normalizedDuration.match(/^(\d+)\s*days?$/i);
+            const customMonthsMatch = normalizedDuration.match(/^(\d+)\s*months?$/i);
+            const customYearsMatch = normalizedDuration.match(/^(\d+)\s*years?$/i);
             
-            // Map to standard format
-            if (['no expiration', 'no expire', 'unlimited'].includes(normalizedDuration)) {
-              normalizedDuration = 'never';
-            } else if (['one day', '1day', 'a day'].includes(normalizedDuration)) {
-              normalizedDuration = '1 day';
-            } else if (['three days', '3days'].includes(normalizedDuration)) {
-              normalizedDuration = '3 days';
-            } else if (['seven days', '7days', 'a week', 'one week'].includes(normalizedDuration)) {
-              normalizedDuration = '7 days';
-            } else if (['one month', '1month', '30 days', 'a month'].includes(normalizedDuration)) {
-              normalizedDuration = '1 month';
-            } else if (['one year', '1year', '365 days', 'a year'].includes(normalizedDuration)) {
-              normalizedDuration = '1 year';
+            if (customDaysMatch) {
+              const days = parseInt(customDaysMatch[1]);
+              if (days > 0) {
+                normalizedDuration = `${days} days`;
+              }
+            } else if (customMonthsMatch) {
+              const months = parseInt(customMonthsMatch[1]);
+              if (months > 0) {
+                normalizedDuration = `${months} months`;
+              }
+            } else if (customYearsMatch) {
+              const years = parseInt(customYearsMatch[1]);
+              if (years > 0) {
+                normalizedDuration = `${years} years`;
+              }
+            } else {
+              // Remove any trailing period before checking standard formats
+              const durationWithoutPeriod = normalizedDuration.replace(/\.$/, '');
+              
+              // Map to standard format
+              if (['no expiration', 'no expire', 'unlimited'].includes(durationWithoutPeriod)) {
+                normalizedDuration = 'never';
+              } else if (['one day', '1day', 'a day'].includes(durationWithoutPeriod)) {
+                normalizedDuration = '1 day';
+              } else if (['three days', '3days'].includes(durationWithoutPeriod)) {
+                normalizedDuration = '3 days';
+              } else if (['seven days', '7days', 'a week', 'one week'].includes(durationWithoutPeriod)) {
+                normalizedDuration = '7 days';
+              } else if (['one month', '1month', '30 days', 'a month'].includes(durationWithoutPeriod)) {
+                normalizedDuration = '1 month';
+              } else if (['one year', '1year', '365 days', 'a year'].includes(durationWithoutPeriod)) {
+                normalizedDuration = '1 year';
+              }
             }
             
-            if (!validDurations.includes(normalizedDuration)) {
+            // Check if the duration is valid (either a custom format or one of the standard durations)
+            const durationWithoutPeriod = normalizedDuration.replace(/\.$/, '');
+            if (!customDaysMatch && !customMonthsMatch && !customYearsMatch && !validDurations.includes(durationWithoutPeriod)) {
               // Invalid duration
-              addBotMessage(`The duration "${tokenDuration}" is not valid. Please choose from: Never, 1 Day, 3 Days, 7 Days, 1 Month, or 1 Year.`);
+              addBotMessage(`The duration "${tokenDuration}" is not valid. Please specify a number of days, months, or years (e.g., "70 days", "3 months", or "2 years") or choose from: Never, 1 Day, 3 Days, 7 Days, 1 Month, or 1 Year.`);
               setIsProcessing(false);
               return;
             }
@@ -497,16 +727,16 @@ Would you like me to send the invitations now?`,
             setTokenFlowState({
               step: 'confirmation',
               tokenName: tokenDescription,
-              tokenExpiration: tokenDuration
+              tokenExpiration: normalizedDuration
             });
             
             // Show confirmation message
             const message = MessageFactory.createActionOptionsMessage(
               `Got it! Here's a quick summary:
 
-Description: ${tokenDescription}
+Name: ${tokenDescription}
 
-Duration: ${tokenDuration}
+Expiry: ${normalizedDuration === 'never' ? 'never' : normalizedDuration}
 
 Would you like me to generate the token now?`,
               [
@@ -527,17 +757,7 @@ Would you like me to generate the token now?`,
             console.log("Token request detected, showing instructions");
             
             // Show token generation instructions
-            addBotMessage(`Of course! 🔑
-To generate a token, I'll need two quick details:
-
-A short description to help you remember what the token is for
-
-The duration for how long the token should be valid (you can choose: Never, 1 Day, 3 Days, 7 Days, 1 Month, 1 Year)
-
-👉 Generate token for [description] with [duration]
-
-Example:
-Generate token for CI pipeline with 7 Days`);
+            addBotMessage(`🔐 Specify the desired token name and expiration.`);
             
             setIsProcessing(false);
             return;
@@ -613,49 +833,21 @@ Generate token for CI pipeline with 7 Days`);
       return;
     }
 
-    // Check if this is a packages at risk query
-    const isRiskQuery = messages.some(msg => 
-      msg.role === 'user' && 
-      typeof msg.content === 'string' && 
-      msg.content.toLowerCase().includes('packages at risk')
-    );
-
-    if (isRiskQuery) {
-      // Use the security risk response for packages at risk
-      const riskResponse = `# One package with risks was detected:
-
-### 📦 axios
-• **Used version:** 1.5.1
-• **Latest version published:** 1.8.3
-• **Downloaded by:** yahavi@acme.com
-• **Affected git repositories:** ACME/frontend-app (branch: main), ACME/backend-api (branch: main)
-• **Vulnerabilities:** CVE-2024-39338
-• **Vulnerability description:** axios 1.5.1 allows SSRF via unexpected behavior where requests for path relative URLs get processed as protocol relative URLs
-• **Severity:** Critical`;
-
-      addBotMessage(riskResponse);
-      return;
-    }
-
-    // Regular package table display
-    const formattedPackages = latestPackages.slice(0, 5).map((pkg: any) => ({
-      type: 'package',
+    // Format packages for display
+    const formattedPackages = latestPackages.slice(0, 5).map((pkg: any, index: number) => ({
+      type: pkg.type || 'unknown',
       name: pkg.name,
-      version: pkg.latest_version || pkg.version,
-      firstCreated: pkg.created_date,
-      versions: pkg.versions_count || 1,
-      externalDistributed: 'Yes' as const
+      version: pkg.version,
+      firstCreated: formatDistanceToNow(new Date(pkg.releaseDate), { addSuffix: true }),
+      versions: pkg.type === 'docker' ? [3, 5, 8][index % 3] : [1, 2, 4, 7][index % 4],
+      externalDistributed: pkg.status === 'passed' ? 'Yes' as const : 'No' as const
     }));
 
     // Create a package table message with follow-up options
     const message = MessageFactory.createPackageTableMessage(
-      "Here are the latest packages published in your organization:",
+      "Here are the latest 5 packages published in your organization:",
       formattedPackages,
-      [
-        { id: 'show-more-packages', label: 'Show More Packages', value: 'Show me more packages' },
-        { id: 'show-package-details', label: 'Show Package Details', value: 'Show me more details about these packages' },
-        { id: 'show-package-usage', label: 'Show Package Usage', value: 'Show me which repositories are using these packages' }
-      ]
+      packageFollowUpOptions
     );
     
     addBotMessage(message);

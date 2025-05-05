@@ -2,7 +2,7 @@ import React from 'react';
 import { Bot, User, Copy } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
-import { Message } from './types';
+import { Message } from '@/components/shared/types';
 import { CodeBlock } from './CodeBlock';
 import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
@@ -30,39 +30,31 @@ export const MessageItem: React.FC<MessageItemProps> = ({ message }) => {
 
   return (
     <motion.div 
-      className={`flex ${isBot ? 'justify-start' : 'justify-end'}`}
+      className={cn(
+        "flex justify-start",
+        isBot ? "-ml-[10px]" : "ml-[10mm]"
+      )}
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
     >
       <motion.div 
         className={cn(
-          "max-w-[85%] rounded-lg p-4 shadow-md border backdrop-blur-sm",
           isBot 
-            ? "bg-blue-900/10 border-blue-800/30 mr-8 rounded-tl-none" 
-            : "bg-gradient-to-r from-blue-800 to-blue-700 text-blue-100 border-blue-600/30 ml-8 rounded-tr-none"
+            ? "max-w-[85%] shadow-md border backdrop-blur-sm bg-blue-900/10 border-blue-800/30 mr-8 rounded-xl rounded-tl-none p-4" 
+            : "w-[calc(100%-10mm)] shadow-md border backdrop-blur-sm bg-[#1B2A4E] text-white border-none px-6 py-3 rounded-lg"
         )}
-     
+        whileHover={{ scale: 1.01 }}
         transition={{ duration: 0.2 }}
       >
-        <div className="flex items-center mb-2">
-          <div className={cn(
-            "p-1 rounded-full border",
-            isBot ? "bg-blue-800/30 border-none" : "bg-blue-700/80 border-blue-600/30"
-          )}>
-            {isBot ? (
-              <Bot className="w-4 h-4 mr-1 text-blue-300" />
-            ) : (
-              <User className="w-4 h-4 mr-1 text-blue-200" />
-            )}
-          </div>
-          <span className={cn(
-            "text-xs font-medium ml-2",
-            isBot ? "text-blue-200" : "text-blue-100"
-          )}>
-            {isBot ? 'JFrog Assistant' : 'You'}
-          </span>
-          {isBot && (
+        {isBot ? (
+          <div className="flex items-center mb-3">
+            <div className="p-1.5 rounded-full bg-blue-800/30">
+              <Bot className="w-4 h-4 text-blue-300" />
+            </div>
+            <span className="text-sm font-medium ml-2 text-blue-200">
+              JFrog Assistant
+            </span>
             <Button 
               variant="ghost" 
               size="sm" 
@@ -71,22 +63,37 @@ export const MessageItem: React.FC<MessageItemProps> = ({ message }) => {
             >
               <Copy className="h-3.5 w-3.5" />
             </Button>
-          )}
-        </div>
+          </div>
+        ) : (
+          <>
+            <div className="flex items-center mb-3">
+              <div className="p-1.5 rounded-full bg-[#2563EB]">
+                <User className="w-5 h-5 text-white" />
+              </div>
+              <span className="text-sm font-medium ml-2 text-white/90">
+                You
+              </span>
+            </div>
+            <div className="text-white text-2xl tracking-tight font-bold">
+              {message.content}
+            </div>
+          </>
+        )}
         
-        <div className={cn(
-          "whitespace-pre-wrap",
-          isBot ? "text-blue-100" : "text-blue-100"
-        )}>
-          {message.content.includes('```') ? (
-            <CodeBlock 
-              content={message.content} 
-              onCopy={copyToClipboard} 
-            />
-          ) : (
-            message.content
-          )}
-        </div>
+        {isBot && (
+          <div className="text-blue-100 whitespace-pre-wrap">
+            {message.content.includes('```') ? (
+              <CodeBlock 
+                content={message.content} 
+                onCopy={copyToClipboard} 
+              />
+            ) : (
+              <div>
+                {message.content}
+              </div>
+            )}
+          </div>
+        )}
       </motion.div>
     </motion.div>
   );

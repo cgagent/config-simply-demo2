@@ -17,7 +17,7 @@ export const SUGGESTED_QUERIES = [
   },
   {
     label: "Generate Token",
-    query: "I would like to generate a token. Can you help me with that?"
+    query: "Please generate an access token"
   }
 ];
 

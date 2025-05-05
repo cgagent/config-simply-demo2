@@ -5,7 +5,10 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Outlet, useLocation, useNavigate } from "react-router-dom";
 import NavBar from "@/components/NavBar";
 import { useEffect, useState, useCallback } from "react";
-import { RepositoryProvider, useRepositories } from "./contexts/RepositoryContext";
+import { RepositoryProvider } from "./contexts/RepositoryContext";
+import { StatisticsProvider } from "./contexts/StatisticsContext";
+import { ChatProvider } from "./contexts/ChatContext";
+import GlobalStatisticsBar from "@/components/GlobalStatisticsBar";
 
 // Import pages
 import Auth from "./pages/Auth";
@@ -16,6 +19,10 @@ import CIConfiguration from "./pages/CIConfiguration";
 import Users from "./pages/Users";
 import Profile from "./pages/Profile";
 import NotFound from "./pages/NotFound";
+
+// Create a custom event for chat reset
+const CHAT_RESET_EVENT = 'resetAIChat';
+const CHAT_OPEN_EVENT = 'openAIChat';
 
 // Create a single instance of QueryClient
 const queryClient = new QueryClient({
@@ -35,11 +42,9 @@ const MainLayout = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const [sidebarExpanded, setSidebarExpanded] = useState(false);
-  const { repositories, updateRepositoryStatus } = useRepositories();
 
   const handleHomeClick = useCallback(() => {
     console.log('App: Navigating to Home with global chat reset');
-    // Use global reset if available, otherwise fallback to clean navigation
     if (window.resetAIChat) {
       window.resetAIChat();
     }
@@ -47,10 +52,28 @@ const MainLayout = () => {
   }, [navigate]);
 
   const handleNavigateFromCI = () => {
-    // Remove automatic configuration of infrastructure repository
     console.log('Navigating from CI configuration page');
-    // No automatic configuration of infrastructure repository
   };
+
+  // Handle global chat functionality
+  useEffect(() => {
+    // Define global functions
+    window.resetAIChat = () => {
+      const event = new Event(CHAT_RESET_EVENT);
+      window.dispatchEvent(event);
+    };
+
+    window.openAIChatWithQuery = (query: string) => {
+      const event = new CustomEvent(CHAT_OPEN_EVENT, { detail: { query } });
+      window.dispatchEvent(event);
+      navigate('/home');
+    };
+
+    return () => {
+      delete window.resetAIChat;
+      delete window.openAIChatWithQuery;
+    };
+  }, [navigate]);
 
   return (
     <div className="flex h-screen space-gradient tech-grid">
@@ -64,6 +87,7 @@ const MainLayout = () => {
           sidebarExpanded ? 'ml-56' : 'ml-16'
         }`}
       >
+        <GlobalStatisticsBar />
         <Outlet />
       </main>
     </div>
@@ -102,25 +126,29 @@ const App = () => {
       <TooltipProvider>
         <Toaster />
         <Sonner />
-        <RepositoryProvider>
-          <BrowserRouter>
-            <Routes>
-              {/* Public routes */}
-              <Route path="/" element={<Auth />} />
-              <Route path="/account-setup" element={<AccountSetup />} />
-              
-              {/* Protected routes with sidebar layout */}
-              <Route element={<MainLayout />}>
-                {protectedRoutes.map(({ path, element }) => (
-                  <Route key={path} path={path} element={element} />
-                ))}
-              </Route>
-              
-              {/* Catch-all route */}
-              <Route path="*" element={<NotFound />} />
-            </Routes>
-          </BrowserRouter>
-        </RepositoryProvider>
+        <BrowserRouter>
+          <RepositoryProvider>
+            <StatisticsProvider>
+              <ChatProvider>
+                <Routes>
+                  {/* Public routes */}
+                  <Route path="/" element={<Auth />} />
+                  <Route path="/account-setup" element={<AccountSetup />} />
+                  
+                  {/* Protected routes with sidebar layout */}
+                  <Route element={<MainLayout />}>
+                    {protectedRoutes.map(({ path, element }) => (
+                      <Route key={path} path={path} element={element} />
+                    ))}
+                  </Route>
+                  
+                  {/* Catch-all route */}
+                  <Route path="*" element={<NotFound />} />
+                </Routes>
+              </ChatProvider>
+            </StatisticsProvider>
+          </RepositoryProvider>
+        </BrowserRouter>
       </TooltipProvider>
     </QueryClientProvider>
   );

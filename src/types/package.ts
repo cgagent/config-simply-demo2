@@ -54,8 +54,8 @@ export interface PackageStatistics {
 
 // Default demo data
 export const defaultPackageStatistics: PackageStatistics = {
-  totalPackages: 154,
-  blockedPackages: 3,
+  totalPackages: 13154,
+  blockedPackages: 13,
   dataConsumption: 1024 * 1024 * 1024 * 2.5, // 2.5 GB
   packageTypeCounts: {
     docker: 45,

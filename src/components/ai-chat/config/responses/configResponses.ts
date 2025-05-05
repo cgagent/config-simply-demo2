@@ -152,7 +152,7 @@ What would you like to configure?`;
  * Configuration chat responses
  */
 export const configResponses = {
-  initial: "Let's set up your CI workflow with JFrog so your packages will be:\n\n⬇️  Downloaded from JFrog\n⬆️  Uploaded to JFrog\n🔍  Scanned for malicious packages\n\nI see you're using GitHub Actions and various package managers in your Git repository.\nLet's select the package managers you would like to configure from the list below:",
+  initial: "Let's set up your CI workflow with JFrog so your packages will be:\n\n⬇️ Downloaded from JFrog\n⬆️ Uploaded to JFrog\n🔍 Scanned for malicious packages\n\nI see you're using GitHub Actions and various package managers in your Git repository.\nLet's select the package managers you would like to configure from the list below:",
   npm: generateNpmResponse,
   docker: generateDockerResponse,
   maven: generateMavenResponse,

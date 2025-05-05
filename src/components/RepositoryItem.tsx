@@ -38,7 +38,7 @@ const RepositoryItem: React.FC<RepositoryItemProps> = ({
 
   const handleConfigure = (e: React.MouseEvent) => {
     e.stopPropagation();
-    navigate('/ci-configuration', { state: { repository: repoState } });
+    navigate('/ci-configuration', { state: { repositoryName: repoState.name } });
   };
 
   const handleRemoveMissingPackage = (type: string) => {

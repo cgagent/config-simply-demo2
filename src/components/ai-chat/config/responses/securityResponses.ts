@@ -1,5 +1,7 @@
 import { ChatOption } from '@/components/shared/types';
 import { securityRemediationOptions, SECURITY_REMEDIATION_ACTIONS } from '../constants/securityConstants';
+import { MessageFactory } from '../../utils/messageFactory';
+import { Message } from '../../types/messageTypes';
 
 /**
  * Generates a response for security remediation actions
@@ -33,28 +35,18 @@ export const generateSecurityRiskResponse = (): string => {
 • **Severity:** Critical`;
 };
 
+// Define the show more option
+export const showMoreOption: ChatOption = {
+  id: 'show-more',
+  label: 'Show more',
+  value: 'show more blocked packages'
+};
+
 /**
  * Generates a comprehensive response for malicious packages
- * This includes both blocked packages and packages at risk
  */
-export const generateMaliciousPackagesResponse = (): string => {
-  return `# Security Alert: Packages Requiring Immediate Attention
-
-## ⚠️ Packages at Risk (1)
-The following package has critical security vulnerabilities that require immediate action:
-
-### 📦 axios
-• **Used version:** 1.5.1
-• **Latest version published:** 1.8.3
-• **Vulnerabilities:** CVE-2024-39338
-• **Severity:** Critical
-• **Affected repositories:** ACME/frontend-app, ACME/backend-api
-
-Would you like to take action on this vulnerable package?
-
----
-
-## 🚫 Blocked Packages (3)
+export const generateMaliciousPackagesResponse = (): Message => {
+  const content = `## 🚫 Blocked Packages
 The following malicious packages were blocked in the last two weeks:
 
 ### evil-package-101
@@ -71,6 +63,87 @@ The following malicious packages were blocked in the last two weeks:
 • **Type:** npm
 • **Blocked at:** 2024-03-05
 • **Reason:** Had a payload to exfiltrate private data`;
+
+  return MessageFactory.createActionOptionsMessage(content, [showMoreOption]);
+};
+
+/**
+ * Generates a detailed response showing all blocked packages
+ */
+export const generateDetailedBlockedPackagesResponse = (): Message => {
+  const content = `## 🚫 Additional Blocked Packages
+
+### suspicious-util
+• **Type:** npm
+• **Blocked at:** 2024-03-03
+• **Reason:** Unauthorized network connections
+• **Detection Method:** Runtime Monitoring
+• **Impact:** Attempted to establish connections to unknown servers
+
+### fake-logger
+• **Type:** npm
+• **Blocked at:** 2024-03-01
+• **Reason:** Cryptomining code detected
+• **Detection Method:** Pattern Matching
+• **Impact:** Would use system resources for cryptocurrency mining
+
+### data-stealer
+• **Type:** npm
+• **Blocked at:** 2024-02-28
+• **Reason:** Malicious data collection
+• **Detection Method:** Behavioral Analysis
+• **Impact:** Would collect and transmit sensitive user data
+
+### trojan-helper
+• **Type:** npm
+• **Blocked at:** 2024-02-25
+• **Reason:** Remote code execution vulnerability
+• **Detection Method:** Vulnerability Scan
+• **Impact:** Could allow attackers to execute arbitrary code
+
+### malicious-formatter
+• **Type:** npm
+• **Blocked at:** 2024-02-23
+• **Reason:** Code injection attempt
+• **Detection Method:** Static Analysis
+• **Impact:** Would inject malicious code into project files
+
+### evil-parser
+• **Type:** npm
+• **Blocked at:** 2024-02-20
+• **Reason:** Backdoor detected
+• **Detection Method:** Code Review
+• **Impact:** Would create a backdoor for unauthorized access
+
+### bad-dependency
+• **Type:** npm
+• **Blocked at:** 2024-02-18
+• **Reason:** Supply chain attack
+• **Detection Method:** Supply Chain Analysis
+• **Impact:** Would compromise dependent packages
+
+### rogue-utility
+• **Type:** npm
+• **Blocked at:** 2024-02-15
+• **Reason:** Malicious code execution
+• **Detection Method:** Runtime Analysis
+• **Impact:** Would execute harmful system commands
+
+### data-thief
+• **Type:** npm
+• **Blocked at:** 2024-02-12
+• **Reason:** Unauthorized data access
+• **Detection Method:** Access Pattern Analysis
+• **Impact:** Would access and steal sensitive data
+
+### malware-package
+• **Type:** npm
+• **Blocked at:** 2024-02-10
+• **Reason:** Multiple security violations
+• **Detection Method:** Multi-layer Analysis
+• **Impact:** Combined multiple malicious behaviors`;
+
+  return MessageFactory.createTextMessage(content, 'assistant');
 };
 
 // Re-export the security remediation options from the constants file
@@ -82,5 +155,7 @@ export { securityRemediationOptions };
 export const securityRiskResponses = {
   identifyRisk: generateSecurityRiskResponse,
   remediationActionSelection: generateSecurityRemediationResponse,
-  maliciousPackages: generateMaliciousPackagesResponse
+  maliciousPackages: generateMaliciousPackagesResponse,
+  detailedBlockedPackages: generateDetailedBlockedPackagesResponse,
+  showMoreOption
 }; 
