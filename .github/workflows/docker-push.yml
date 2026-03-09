@@ -27,4 +27,6 @@ jobs:
         with:
           context: .
           push: true
-          tags: cga.jfrog.io/docker/${{ github.repository }}:latest
+          tags: |
+            cga.jfrog.io/docker/${{ github.repository }}:${{ github.sha }}
+            cga.jfrog.io/docker/${{ github.repository }}:main

@@ -17,7 +17,7 @@ COPY . .
 RUN npm run build
 
 # Production stage
-FROM cga.jfrog.io/docker/nginx:alpine
+FROM cga.jfrog.io/docker/nginx:1.27-alpine
 
 # Copy built assets from build stage
 COPY --from=build /app/dist /usr/share/nginx/html
