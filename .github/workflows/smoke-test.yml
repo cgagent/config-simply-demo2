@@ -1,18 +1,15 @@
 name: Smoke Test
 
 on:
-  workflow_run:
-    workflows:
-      - Build and Push Docker Image
-    types:
-      - completed
-    branches:
-      - main
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Image version to test (e.g. 1.1.7)'
+        required: true
 
 jobs:
   smoke-test:
     runs-on: ubuntu-latest
-    if: ${{ github.event.workflow_run.conclusion == 'success' }}
 
     permissions:
       contents: read
@@ -27,11 +24,11 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Pull Docker image
-        run: docker pull ghcr.io/${{ github.repository }}:latest
+        run: docker pull ghcr.io/${{ github.repository }}:${{ github.event.inputs.version }}
 
       - name: Start container
         run: |
-          docker run -d --name smoke-test-container -p 8080:80 ghcr.io/${{ github.repository }}:latest
+          docker run -d --name smoke-test-container -p 8080:80 ghcr.io/${{ github.repository }}:${{ github.event.inputs.version }}
           sleep 3
 
       - name: Run smoke test
