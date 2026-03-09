@@ -31,6 +31,4 @@ jobs:
         with:
           context: .
           push: true
-          tags: |
-            cga.jfrog.io/docker/${{ github.repository }}:${{ env.IMAGE_VERSION_MAJOR }}.${{ env.IMAGE_VERSION_MINOR }}.${{ github.run_number }}
-            cga.jfrog.io/docker/${{ github.repository }}:${{ github.sha }}
+          tags: cga.jfrog.io/docker/${{ github.repository }}:${{ env.IMAGE_VERSION_MAJOR }}.${{ env.IMAGE_VERSION_MINOR }}.${{ github.run_number }}
