@@ -1,5 +1,5 @@
 # Build stage
-FROM cga.jfrog.io/docker/node:20-alpine as build
+FROM cga.jfrog.io/docker/node:20-alpine AS build
 
 WORKDIR /app
 
